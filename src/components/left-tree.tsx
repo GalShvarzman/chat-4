@@ -14,7 +14,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public render() {
         return (
             <div >
-                jj
+                left tree
             </div>
         );
     }

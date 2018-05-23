@@ -1,0 +1,23 @@
+.chat{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    position: relative;
+    align-content: stretch;
+    min-height: 100%;
+    margin:0;
+    padding: 0;
+}
+
+
+
+div.chat-left{
+    width: 25%;
+    background-color:lightgreen;
+}
+
+div.chat-right{
+    width: 75%;
+    background-color:steelblue;
+
+}

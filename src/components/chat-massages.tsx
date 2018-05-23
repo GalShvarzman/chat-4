@@ -11,10 +11,15 @@ class ChatMassages extends React.Component<IChatMassagesProps, IChatMassagesStat
     constructor(props:IChatMassagesProps){
         super(props)
     }
+
+    // public divStyle={
+    //     height:'100%',
+    //     width:'75%'
+    // };
     public render() {
         return (
             <div>
-                jj
+                massages
             </div>
         );
     }
