@@ -1,28 +1,30 @@
-// const {Group} = require('./group');
-// class NTree{
-//     constructor(){
-//         this.root = new Group(this.root, "treeRoot");
-//     }
-//
-//     add(node, parentNode){
-//         this.root.add(node, parentNode);
-//     }
-//     search(nodeName){
-//         return this.root.search(nodeName)
-//     }
-//     removeGroup(node){
-//         return this.root.removeGroup(node);
-//     }
-//
-//     printFullTree(){
-//         return this.root.printFullTree();
-//     }
-//     getGroupsList(){
-//         return this.root.getGroupsList();
-//     }
-//     isNodeExistInGroup(name){
-//         return this.root.isNodeExistInGroup(name);
-//     }
-// }
-//
-// module.exports.NTree = NTree;
+import Group from './group';
+import IGroup from './group';
+import IUser from "./user";
+
+export default class NTree{
+    public root:IGroup;
+    constructor(){
+        this.root = new Group(this.root, "treeRoot", []);
+    }
+
+    public add(node:IGroup| IUser, parentNode:IGroup){
+        this.root.add(node, parentNode);
+    }
+    public search(nodeName:string){
+        return this.root.search(nodeName)
+    }
+    public removeGroup(node:IGroup){
+        return this.root.removeGroup(node);
+    }
+
+    public printFullTree(){
+        return this.root.printFullTree();
+    }
+    public getGroupsList(){
+        return this.root.getGroupsList();
+    }
+    public isNodeExistInGroup(name:string){
+        return this.root.isNodeExistInGroup(name);
+    }
+}

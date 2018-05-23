@@ -7,7 +7,12 @@ export default interface IGroup{
     children : any[],
     others?:IGroup,
     getParents() : IGroup[],
-    isNodeExistInGroup(name:string):boolean
+    isNodeExistInGroup(name:string):boolean,
+    add(node:IGroup| IUser, parentNode:IGroup):void,
+    search(nodeName:string): IGroup[],
+    removeGroup(node:IGroup):boolean,
+    printFullTree():any[],
+    getGroupsList():IGroup[]
 }
 
 export default class Group implements IGroup{
