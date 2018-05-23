@@ -1,10 +1,14 @@
-interface IUser {
+import IGroup from './group';
+
+export default interface IUser {
     name:string,
     age:number,
-    password:any
+    password:any,
+    parents : IGroup[],
+    removeParent(parentNode:IGroup): boolean
 }
 
-class User implements IUser{
+export default class User implements IUser{
     public name:string;
     public age:number;
     public password:any;
@@ -17,7 +21,7 @@ class User implements IUser{
         this.parents = [];
     }
 
-    removeParent(parentNode){
+    removeParent(parentNode:IGroup){
         let i = this.parents.findIndex((parent)=>{
                     return parent  === parentNode
                 });
@@ -30,11 +34,11 @@ class User implements IUser{
         }
     }
 
-    updateAge(newAge){
+    updateAge(newAge:number){
         this.age = newAge;
         return true;
     }
-    updatePassword(newPassword){
+    updatePassword(newPassword:any){
         this.password = newPassword;
         return true;
     }
@@ -46,4 +50,3 @@ class User implements IUser{
     }
 }
 
-module.exports.User = User;

@@ -1,18 +1,20 @@
-//const {User} = require('./user');
+import User from './user';
+import IUser from './user';
 let i = 0;
-interface IGroup{
+export default interface IGroup{
     parent : IGroup,
     name : string,
     children : any[],
     others?:IGroup,
-    getParents() : IGroup[]
+    getParents() : IGroup[],
+    isNodeExistInGroup(name:string):boolean
 }
 
-class Group implements IGroup{
+export default class Group implements IGroup{
     public array : any[] = [];
     public parent: IGroup;
     public name: string;
-    public children: object[];
+    public children: any[];
     constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
@@ -21,7 +23,7 @@ class Group implements IGroup{
 
     flattening() {
         let result:boolean = true;
-        let parent = this.parent;
+        let parent:IGroup = this.parent;
         if(parent.children.length === 1) {
             parent.children.length = 0;
             if(this.children){
@@ -35,7 +37,7 @@ class Group implements IGroup{
                         child.parents.push(parent);
                     }
                     else{
-                        (child as Group).parent = parent;
+                        (child as IGroup).parent = parent;
                     }
                 });
                 return result;
@@ -58,7 +60,7 @@ class Group implements IGroup{
                 if(child instanceof User){
                     childrenParent.push({"user":child, "parent": node});
                 }
-                if(child.children){
+                if((child as IGroup).children){
                     childrenParent.push(...this.walkAllChildrenAndGetParent(child, node));
                 }
             });
@@ -82,7 +84,7 @@ class Group implements IGroup{
                     allChildren += this.walkChildren(child);
                 }
             });
-            return allChildren;
+            //return allChildren;
         }
         return allChildren;
     }
@@ -106,8 +108,8 @@ class Group implements IGroup{
     }
 
     removeGroup(node:IGroup) {
-        let parent = node.parent;
-        let i = parent.children.findIndex((child) => {
+        let parent:IGroup = node.parent;
+        let i:number = parent.children.findIndex((child) => {
             return child.name === node.name;
         });
         if (i !== -1) {
@@ -149,7 +151,7 @@ class Group implements IGroup{
     checkForOthersGroup(groupChildren:IGroup[]|IUser[], newNode:IUser|IGroup, parentGroup:IGroup){
         const groupOthers = parentGroup.others;
         if (groupOthers) {
-            if((groupOthers as Group).isNodeExistInGroup(newNode.name)){
+            if((groupOthers as IGroup).isNodeExistInGroup(newNode.name)){
                 return false;
             }
             else{
@@ -184,7 +186,7 @@ class Group implements IGroup{
             parentGroup.others = new Group(parentGroup, "others" + ++i, parentGroupChildren);
             parentGroupChildren.length = 0;
             (parentGroupChildren as IGroup[]).push(parentGroup.others, newNode as IGroup);
-            (newNode as Group).parent = parentGroup;
+            (newNode as IGroup).parent = parentGroup;
 
             parentGroup.others.children.forEach((child) => {
                 child.removeParent(parentGroup);
@@ -294,5 +296,3 @@ class Group implements IGroup{
         }
     }
 }
-
-export default Group;
