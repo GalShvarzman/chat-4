@@ -4,7 +4,8 @@ interface IGroup{
     parent : IGroup,
     name : string,
     children : any[],
-    others?:IGroup
+    others?:IGroup,
+    getParents() : IGroup[]
 }
 
 class Group implements IGroup{
@@ -12,7 +13,7 @@ class Group implements IGroup{
     public parent: IGroup;
     public name: string;
     public children: object[];
-    constructor(parent:IGroup, name:string, children:any[]) {
+    constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
         this.children = this.array.concat(children||[]);
@@ -134,9 +135,9 @@ class Group implements IGroup{
         }
     }
 
-    addNodeToSelectedGroupWhenGroupChildrenAreGroups(parentGroupChildren:IGroup[], newNode:IGroup | IUser, parentGroup:IGroup){
+    addNodeToSelectedGroupWhenGroupChildrenAreGroups(parentGroupChildren:IGroup[]|IUser[], newNode:IGroup | IUser, parentGroup:IGroup){
         if(newNode instanceof Group) {
-            parentGroupChildren.push(newNode);
+            (parentGroupChildren as IGroup[]).push(newNode);
             newNode.parent = parentGroup;
             return true;
         }
@@ -145,7 +146,7 @@ class Group implements IGroup{
         }
     }
 
-    checkForOthersGroup(groupChildren:IGroup[], newNode:IUser|IGroup, parentGroup:IGroup){
+    checkForOthersGroup(groupChildren:IGroup[]|IUser[], newNode:IUser|IGroup, parentGroup:IGroup){
         const groupOthers = parentGroup.others;
         if (groupOthers) {
             if((groupOthers as Group).isNodeExistInGroup(newNode.name)){
@@ -153,29 +154,37 @@ class Group implements IGroup{
             }
             else{
                 groupOthers.children.push(newNode);
+                (newNode as User).parents.push(groupOthers);
+                return true;
             }
         }
         else {
-            parentGroup.others = new Group(parentGroup, "others" + ++i, [newNode]);
-            groupChildren.push(parentGroup.others);
-        }
-
-        if(parentGroup.others){
+            parentGroup.others = new Group(parentGroup, "others" + ++i, [newNode as IUser]);
+            (groupChildren as IGroup[]).push(parentGroup.others);
             (newNode as User).parents.push(parentGroup.others);
             return true;
         }
+
+        // if(parentGroup.others){ // fixme
+        //     (newNode as User).parents.push(parentGroup.others);
+        //     return true;
+        // }
+        // else{
+        //     return false;
+        // }
     }
 
-    addNodeToSelectedGroupWhenGroupChildrenAreUsers(parentGroupChildren, newNode, parentGroup){
+
+    addNodeToSelectedGroupWhenGroupChildrenAreUsers(parentGroupChildren:IUser[]|IGroup[], newNode:IGroup|IUser, parentGroup:IGroup){
         if(newNode instanceof User){
-            parentGroupChildren.push(newNode);
+            (parentGroupChildren as IUser[]).push(newNode);
             newNode.parents.push(parentGroup);
         }
         else{
             parentGroup.others = new Group(parentGroup, "others" + ++i, parentGroupChildren);
             parentGroupChildren.length = 0;
-            parentGroupChildren.push(parentGroup.others, newNode);
-            newNode.parent = parentGroup;
+            (parentGroupChildren as IGroup[]).push(parentGroup.others, newNode as IGroup);
+            (newNode as Group).parent = parentGroup;
 
             parentGroup.others.children.forEach((child) => {
                 child.removeParent(parentGroup);
@@ -185,18 +194,18 @@ class Group implements IGroup{
         return true;
     }
 
-    addNodeToSelectedGroupWhenGroupHasNoChildren(parentGroupChildren, newNode, parentGroup){
-        parentGroupChildren.push(newNode);
+    addNodeToSelectedGroupWhenGroupHasNoChildren(parentGroupChildren:IGroup[]|IUser[], newNode:IGroup|IUser, parentGroup:IGroup){
+        (parentGroupChildren as any[]).push(newNode);
         if (newNode instanceof Group) {
             newNode.parent = parentGroup;
         }
         else {
-            newNode.parents.push(parentGroup);
+            (newNode as User).parents.push(parentGroup);
         }
         return true;
     }
 
-    add(node, parentNode) {
+    add(node:IGroup|IUser, parentNode:IGroup) {
         if (parentNode) {
             this.addNodeToSelectedGroup(parentNode, node);
         }
@@ -205,18 +214,18 @@ class Group implements IGroup{
         }
     }
 
-    addUserToGroup(userNode) {
+    addUserToGroup(userNode:IUser) {
         return this.addNodeToSelectedGroup(this, userNode)
     }
 
 
-    search(nodeName) {
+    search(nodeName:string) {
         return this.internalSearchAll(this, nodeName);
     }
 
-    internalSearchAll(node, nodeName) {
+    internalSearchAll(node:IGroup, nodeName:string) {
+        const results:IGroup[] = [];
         if (node.children) {
-            const results = [];
             node.children.forEach((child) => {
                 if (child.name === nodeName) {
                     results.push(child);
@@ -225,8 +234,9 @@ class Group implements IGroup{
                     results.push(...this.internalSearchAll(child, nodeName))
                 }
             });
-            return results;
+            //return results;
         }
+        return results;
     }
 
     myPath() {
@@ -237,15 +247,15 @@ class Group implements IGroup{
     }
 
     getParents() {
-        const parents = [this];
+        const parents:IGroup[] = [this];
         if (this.parent) {
             parents.unshift(...this.parent.getParents());
         }
-        return parents
+        return parents;
     }
 
-    isNodeExistInGroup(name) {
-        const i = this.children.findIndex((child) => {
+    isNodeExistInGroup(name:string) {
+        const i = this.children.findIndex((child:IGroup|IUser) => {
             return child.name === name;
         });
         return i !== -1;
@@ -255,9 +265,9 @@ class Group implements IGroup{
         return this.internalSearchAllGroups(this)
     }
 
-    internalSearchAllGroups(node) {
+    internalSearchAllGroups(node:IGroup) {
+        const results:IGroup[] = [];
         if (node.children) {
-            const results = [];
             node.children.forEach((child) => {
                 if (child instanceof Group) {
                     results.push(child);
@@ -266,11 +276,13 @@ class Group implements IGroup{
                     results.push(...this.internalSearchAllGroups(child));
                 }
             });
-            return results;
+            //return results;
         }
+        return results;
     }
-    removeUserFromGroup(userName){
-        let i = this.children.findIndex((child)=>{
+
+    removeUserFromGroup(userName:string){
+        let i = this.children.findIndex((child:IUser)=>{
                     return child.name === userName
                 });
         if(i !== -1){
@@ -283,4 +295,4 @@ class Group implements IGroup{
     }
 }
 
-module.exports.Group = Group;
+export default Group;
