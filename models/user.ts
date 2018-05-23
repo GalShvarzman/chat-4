@@ -21,8 +21,8 @@ export default class User implements IUser{
         this.parents = [];
     }
 
-    removeParent(parentNode:IGroup){
-        let i = this.parents.findIndex((parent)=>{
+    public removeParent(parentNode:IGroup){
+        const i = this.parents.findIndex((parent)=>{
                     return parent  === parentNode
                 });
         if(i !== -1){
@@ -34,16 +34,16 @@ export default class User implements IUser{
         }
     }
 
-    updateAge(newAge:number){
+    public updateAge(newAge:number){
         this.age = newAge;
         return true;
     }
-    updatePassword(newPassword:any){
+    public updatePassword(newPassword:any){
         this.password = newPassword;
         return true;
     }
 
-    getParentsToPrint(){
+    public getParentsToPrint(){
         return this.parents.map((parent)=>{
             return parent.name;
         })
