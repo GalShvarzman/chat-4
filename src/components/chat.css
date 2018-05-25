@@ -19,5 +19,15 @@ div.chat-left{
 div.chat-right{
     width: 75%;
     background-color:steelblue;
+    display: flex;
+    flex-direction: column;
+}
 
+.massage-text-area{
+    background-color: darkslategrey;
+}
+
+.massages{
+    height: 100%;
+    background-color: purple;
 }

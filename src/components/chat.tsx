@@ -21,8 +21,12 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     <LeftTree/>
                 </div>
                 <div className="chat-right">
-                    <ChatMassages/>
-                    <MassageTextArea/>
+                    <div className="massages">
+                        <ChatMassages/>
+                    </div>
+                    <div className="massage-text-area">
+                        <MassageTextArea/>
+                    </div>
                 </div>
             </div>
         );
