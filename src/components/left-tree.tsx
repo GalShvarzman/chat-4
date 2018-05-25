@@ -31,6 +31,11 @@ const items = [
                 "name": "Roni"
             }
         ];
+interface listItem{
+    items: object[],
+    name:string,
+    type:string
+}
 interface ILeftTreeProps {
 
 }
@@ -55,24 +60,14 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         //     this.ul.appendChild(item);
         // }
 
-
-        //this.ul.appendChild(tree);
         // document.body.insertBefore(this.ul,document.body.firstChild);
-        // this.addEventListenersToList();
     // };
 
     public load =  ()=>{
         return this.walkTree(items, 0);
     };
 
-
-    // public addEventListenersToList = ()=>{debugger
-    //     this.clickListener(this.ul);
-    //     this.dblClickListener(this.ul);
-    //     this.keyUpListener(this.ul);
-    // };
-
-    public keyUpListener = (e:any)=>{
+    public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
         const keyName = e.key;
         if(e.target){
             if((e.target as HTMLElement).className === "left tree"){
@@ -99,12 +94,12 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public getAllLi=(element:HTMLElement, keyName:string)=>{
+    public getAllLi = (element:HTMLElement, keyName:string)=>{
         const selectedLi = element.parentElement;
         const allLi = document.querySelectorAll("li");
 
         function getDisplayedLi(){
-            const result = [];
+            const result:HTMLLIElement[] = [];
             for(let i = 0; i < allLi.length; i++){
                 if(allLi[i].offsetParent){
                     result.push(allLi[i]);
@@ -123,7 +118,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
             return result;
         }
         const index = findIndex();
-        if(index && index !== -1){
+        if(index !== undefined && index !== -1){
             if(keyName === "ArrowDown"){
                 const nextLi=index+1;
                 if(nextLi < displayedLi.length){
@@ -139,14 +134,14 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public openChildren=(element:HTMLElement)=>{
+    public openChildren = (element:HTMLElement)=>{
         if(element.nextElementSibling){
             (element.nextElementSibling as HTMLElement).style.display = "block";
             (element.nextElementSibling as HTMLElement).focus();
         }
     };
 
-    public closeChildren=(element:HTMLElement)=>{
+    public closeChildren = (element:HTMLElement)=>{
         if(element.parentElement && element.parentElement.parentElement && element.parentElement.parentElement.parentElement){
             if(element.nextElementSibling){
                 if((element.nextElementSibling as HTMLElement).style.display === "block"){
@@ -158,16 +153,16 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
             }
         }
     };
-    public ulStyle={
+
+    public ulStyle = {
       display : "none"
     };
-    public walkTree=(items:any[], step:number)=>{
+
+    public walkTree = (items:object[], step:number)=>{
         const result:any[] = [];
-        items.forEach((item)=>{
+        items.forEach((item:listItem)=>{
             if(item.items){
-                // const children = [] as any[];
                 const li = this.createLiWithChildren(item, step);
-                // ul.style.display = 'none';
                 result.push(li);
             }
             else{
@@ -189,14 +184,14 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public dblClickListener= (e:any)=>{
+    public dblClickListener= (e:React.MouseEvent<HTMLElement>)=>{
         if(e.target){
             this.toggleDisplay(((e.target as HTMLElement).nextElementSibling as HTMLElement));
             e.stopPropagation();
         }
     };
 
-    public clickListener=(e:any)=>{
+    public clickListener=(e:React.MouseEvent<HTMLElement>)=>{
         (e.target as HTMLElement).focus();
         e.stopPropagation();
     };
@@ -209,15 +204,18 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
         return start;
     };
+
     public groupStyle = {
         cursor:"pointer",
         color : "#113f6b"
     };
+
     public userStyle = {
         color: "#006cbe"
     };
-    public createLiWithChildren=(item:any, step:number)=>{
-        const space = this.padding(step);
+
+    public createLiWithChildren=(item:listItem, step:number)=>{
+        const space:string = this.padding(step);
         const ul = React.createElement("ul", {style:this.ulStyle},
             this.walkTree(item.items, step+1).map((childItem)=>{
                 return childItem
@@ -228,7 +226,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public createLi=(item:any, step:number)=>{
-        const space = this.padding(step);
+        const space:string = this.padding(step);
         const a = React.createElement("a", {tabIndex:1, style:this.userStyle}, space+item.name);
         return React.createElement("li", {key:idx++}, a);
     };
@@ -251,10 +249,9 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
 
     public render() {
         const list = this.load();
-        debugger
         return (
             <div>
-                <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.keyUpListener} className="left tree">{list}</ul>
+                <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp} className="left tree">{list}</ul>
             </div>
         );
     }
