@@ -1,25 +1,26 @@
-// import {listeners} from "cluster";
 import {usersDb} from "../models/users";
-interface IAppService {
+import IUser from "../models/user";
+
+interface IStateStoreService {
     set(key: string, val: any): void,
     get(key: string): any | null,
     subscribe(listener:any): void
 }
 
-export class AppService implements IAppService{
+export class StateStoreService implements IStateStoreService{
     listeners: Function[];
 
     constructor(){
         this.listeners = [];
     }
 
-    public set(key: string, val: any) {
-        StateStore[key] = val;
+    public set(key: string, val: any) {debugger
+        StateStore.getInstance()[key] = val;
         this.onStoreChanged();
     }
 
     public get(key: string) {
-        return StateStore[key] || null;
+        return StateStore.getInstance()[key] || null;
     }
 
     public subscribe(listener:any){
@@ -34,12 +35,12 @@ export class AppService implements IAppService{
 }
 
 interface IStateStore {
-    state : {}
+    users : IUser[]
 }
 
 
 class StateStore implements IStateStore {
-    state:{} = {users: usersDb.getUsers()};
+    users:IUser[] = usersDb.getUsers();
 
     static instance: IStateStore;
 
@@ -54,4 +55,4 @@ class StateStore implements IStateStore {
 
 export default StateStore;
 
-export const appService: AppService = new AppService();
+export const stateStoreService: StateStoreService = new StateStoreService();
