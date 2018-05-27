@@ -221,13 +221,13 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
                 return childItem
             })
         );
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle}, space+"☺"+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle, className:"item-name"}, space+"☺"+item.name);
         return React.createElement("li", {key:idx++}, a, ul);
     };
 
     public createLi=(item:any, step:number)=>{
         const space:string = this.padding(step);
-        const a = React.createElement("a", {tabIndex:1, style:this.userStyle}, space+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.userStyle, className:"item-name"}, space+item.name);
         return React.createElement("li", {key:idx++}, a);
     };
 

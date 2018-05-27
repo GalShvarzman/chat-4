@@ -14,7 +14,7 @@ ul {
 li{
     margin: 0.4em 0;
 }
-a{
+.item-name{
     display:block;
     width:100%;
     margin: 0;
@@ -25,7 +25,7 @@ a{
     user-select: none;
 }
 
-a:focus{
+.item-name:focus{
     background-color: #e6eae2;
     outline: none;
 }

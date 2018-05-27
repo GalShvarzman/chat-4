@@ -3,7 +3,7 @@ import IGroup from './group';
 export default interface IUser {
     name:string,
     age:number,
-    password:any,
+    password:string,
     parents : IGroup[],
     removeParent(parentNode:IGroup): boolean
 }
@@ -11,7 +11,7 @@ export default interface IUser {
 export default class User implements IUser{
     public name:string;
     public age:number;
-    public password:any;
+    public password:string;
     public parents:IGroup[];
 
     constructor(username:string, age:number, password:any){

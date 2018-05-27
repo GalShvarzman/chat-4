@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 interface ILoginProps {
-
+    users:any[]
 }
 interface ILoginState {
 
@@ -9,7 +9,8 @@ interface ILoginState {
 
 class Login extends React.Component<ILoginProps, ILoginState> {
     constructor(props:ILoginProps){
-        super(props)
+        super(props);
+        debugger
     }
     public render() {
         return (

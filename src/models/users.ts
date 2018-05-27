@@ -1,12 +1,22 @@
 import IUser from "./user";
+import User from "./user"
 
-export default class UsersDb{
-    public users: IUser[];
+interface IUsersDb {
+    isUserExists(username:string):boolean,
+    deleteUser(username:string):boolean,
+    addUser(user:IUser):void,
+    getUserNamesList():string[],
+    getUser(userName:string):IUser|undefined,
+    getUsers():IUser[]
+}
+
+class UsersDb implements IUsersDb{
+    private users: IUser[];
     constructor(){
-        this.users = [];
+        this.users = [new User("gal", 27, "123")];
     }
 
-    public findUserIndex(username:string){
+    private findUserIndex(username:string){
         return this.users.findIndex((user)=>{
             return username === user.name;
         })
@@ -38,4 +48,9 @@ export default class UsersDb{
             return user.name === userName;
         })
     }
+    public getUsers(){
+        return this.users;
+    }
 }
+
+export const usersDb: IUsersDb = new UsersDb();
