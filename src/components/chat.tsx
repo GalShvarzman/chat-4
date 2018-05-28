@@ -14,6 +14,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps){
         super(props)
     }
+
+
     public render() {
         return (
             <div className="chat">

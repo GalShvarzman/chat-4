@@ -5,8 +5,19 @@
 .switch{
   height: 95%;
 }
-.nav-right{
+.nav-left{
   float:left;
+}
+
+.nav-right{
+  float: right;
+}
+
+.app-logged-in{
+  box-sizing: border-box;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  color:white;
 }
 
 nav{
@@ -22,3 +33,4 @@ nav{
   color: white;
   font-size: 1em;
 }
+

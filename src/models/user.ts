@@ -2,19 +2,20 @@ import IGroup from './group';
 
 export default interface IUser {
     name:string,
-    age:number,
+    age?:number,
     password:string,
     parents : IGroup[],
-    removeParent(parentNode:IGroup): boolean
+    removeParent(parentNode:IGroup):boolean,
+    auth(enteredPassword:string):boolean
 }
 
 export default class User implements IUser{
     public name:string;
-    public age:number;
+    public age?:number;
     public password:string;
     public parents:IGroup[];
 
-    constructor(username:string, age:number, password:any){
+    constructor(username:string, age:number, password:string){
         this.name = username;
         this.age = age;
         this.password = password;
@@ -22,16 +23,19 @@ export default class User implements IUser{
     }
 
     public removeParent(parentNode:IGroup){
-        const i = this.parents.findIndex((parent)=>{
-                    return parent  === parentNode
-                });
-        if(i !== -1){
-            this.parents.splice(i, 1);
-            return true
+        if(this.parents.length){
+            const i = this.parents.findIndex((parent)=>{
+                return parent  === parentNode
+            });
+            if(i !== -1){
+                this.parents.splice(i, 1);
+                return true
+            }
+            else{
+                return false;
+            }
         }
-        else{
-            return false;
-        }
+        return false;
     }
 
     public updateAge(newAge:number){
@@ -44,9 +48,16 @@ export default class User implements IUser{
     }
 
     public getParentsToPrint(){
-        return this.parents.map((parent)=>{
-            return parent.name;
-        })
+        if(this.parents.length){
+            return this.parents.map((parent)=>{
+                return parent.name;
+            })
+        }
+        return false;
+    }
+
+    public auth(enteredPassword:string){
+        return enteredPassword === this.password
     }
 }
 

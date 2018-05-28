@@ -1,7 +1,7 @@
 import IUser from "./user";
 import User from "./user"
 
-interface IUsersDb {
+export interface IUsersDb {
     isUserExists(username:string):boolean,
     deleteUser(username:string):boolean,
     addUser(user:IUser):void,

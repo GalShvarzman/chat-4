@@ -23,6 +23,16 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
+    public auth(user:{name:string, password:string}){
+        const currentUser = usersDb.getUser(user.name);
+        if(currentUser) {
+            return currentUser.auth(user.password)
+        }
+        else{
+            return false
+        }
+    }
+
     public subscribe(listener:any){
         this.listeners.push(listener);
     }
