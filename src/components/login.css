@@ -3,9 +3,7 @@
     border: 2px solid darkslateblue;
     border-radius: 5px;
     display: table-cell;
-    text-align: center;
     vertical-align: middle;
-
 }
 
 .login-btn{
@@ -22,10 +20,17 @@
     display: table;
     width: 40%;
     height: 40%;
-    /*margin: 0 auto;*/
     top: 50%;
     left: 50%;
     margin-top: -150px;
     margin-left: -250px;
     position: absolute;
+}
+
+.login-X{
+    margin-left:0;
+}
+
+.login-fields{
+    text-align: center;
 }

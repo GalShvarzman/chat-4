@@ -1,6 +1,7 @@
 import Group from './group';
 import IGroup from './group';
 import IUser from "./user";
+import User from './user'
 
 export default class NTree{
     public root:IGroup;
@@ -8,7 +9,7 @@ export default class NTree{
         this.root = new Group(this.root, "treeRoot", []);
     }
 
-    public add(node:IGroup| IUser, parentNode:IGroup){
+    public add(node:IGroup| IUser, parentNode?:IGroup){
         this.root.add(node, parentNode);
     }
     public search(nodeName:string){
@@ -28,3 +29,15 @@ export default class NTree{
         return this.root.isNodeExistInGroup(name);
     }
 }
+
+export const nTree:NTree = new NTree();
+
+const friends = new Group(nTree.root, "Friends", []);
+const bestFriends = new Group(friends, "Best Friends", []);
+
+nTree.add(friends);
+nTree.add(bestFriends, friends);
+nTree.add(new User("Tommy", 24, "123"), bestFriends);
+nTree.add(new User("Udi", 34, "123"), bestFriends);
+nTree.add(new User("Ori", 30, "123"));
+nTree.add(new User("Roni", 5, "123"));

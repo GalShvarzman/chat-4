@@ -6,13 +6,15 @@ export default interface IGroup{
     name : string,
     children : any[],
     others?:IGroup,
+    massages:string[],
     getParents() : IGroup[],
     isNodeExistInGroup(name:string):boolean,
-    add(node:IGroup| IUser, parentNode:IGroup):void,
+    add(node:IGroup| IUser, parentNode?:IGroup):void,
     search(nodeName:string): IGroup[],
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
-    getGroupsList():IGroup[]
+    getGroupsList():IGroup[],
+    addMassage(massage:string):void
 }
 
 export default class Group implements IGroup{
@@ -20,10 +22,12 @@ export default class Group implements IGroup{
     public parent: IGroup;
     public name: string;
     public children: any[];
+    public massages: string[];
     constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
         this.children = this.array.concat(children||[]);
+        this.massages = [];
     }
 
     public flattening() {
@@ -299,5 +303,9 @@ export default class Group implements IGroup{
         else{
             return false;
         }
+    }
+
+    public addMassage(massage:string){
+        this.massages.push(massage);
     }
 }

@@ -1,10 +1,13 @@
 import {usersDb} from "../models/users";
-import IUser from "../models/user";
-
+import IUser, {default as User} from "../models/user";
+import {nTree} from '../models/tree';
+import NTree from '../models/tree';
+import IGroup, {default as Group} from "../models/group";
 interface IStateStoreService {
     set(key: string, val: any): void,
     get(key: string): any | null,
-    subscribe(listener:any): void
+    subscribe(listener:any): void,
+    // getUser(name: string):IUser
 }
 
 export class StateStoreService implements IStateStoreService{
@@ -21,6 +24,24 @@ export class StateStoreService implements IStateStoreService{
 
     public get(key: string) {
         return StateStore.getInstance()[key] || null;
+    }
+
+    public addMassage(massage:string, selected:IGroup|IUser|undefined, loggedInUser:IUser){
+        if(selected instanceof Group){
+            selected.addMassage(massage);
+        }
+        else if(selected instanceof User){
+            selected.addMassage(massage, loggedInUser);
+        }
+        this.onStoreChanged();
+    }
+
+    public getUser(name: string){
+        return usersDb.getUser(name)
+    }
+
+    public search(name:string){
+        return nTree.search(name);
     }
 
     public auth(user:{name:string, password:string}){
@@ -45,12 +66,16 @@ export class StateStoreService implements IStateStoreService{
 }
 
 interface IStateStore {
-    users : IUser[]
+    users : IUser[],
+    tree:NTree,
+    groups:IGroup[]
 }
 
 
 class StateStore implements IStateStore {
-    users:IUser[] = usersDb.getUsers();
+    public users:IUser[] = usersDb.getUsers();
+    public tree:NTree = nTree;
+    public groups:IGroup[] = nTree.getGroupsList();
 
     static instance: IStateStore;
 

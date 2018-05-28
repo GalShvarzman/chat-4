@@ -9,11 +9,10 @@
     padding: 0;
 }
 
-
-
 div.chat-left{
     width: 25%;
-    background-color:lightgreen;
+    background-color:white;
+    border-right: 2px solid darkslateblue;
 }
 
 div.chat-right{
@@ -24,10 +23,10 @@ div.chat-right{
 }
 
 .massage-text-area{
-    background-color: darkslategrey;
+    background-color: #e8e8e8;
 }
 
 .massages{
     height: 100%;
-    background-color: purple;
+    background-color: #e8e8e8;
 }

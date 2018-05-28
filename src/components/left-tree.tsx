@@ -31,22 +31,27 @@ const items = [
                 "name": "Roni"
             }
         ];
+
 interface listItem{
     items: object[],
     name:string,
     type:string
 }
-interface ILeftTreeProps {
 
+interface ILeftTreeProps {
+    getSelected(event:any):void
 }
 
 interface ILeftTreeState {
-
+    selected : {}
 }
 
 class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     constructor(props:ILeftTreeProps){
-        super(props)
+        super(props);
+        this.state = {
+            selected : {}
+        }
     }
 
     // public load = () => {
@@ -194,6 +199,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public clickListener=(e:React.MouseEvent<HTMLElement>)=>{
         (e.target as HTMLElement).focus();
         e.stopPropagation();
+        this.props.getSelected(e);
     };
 
     public padding=(number:number)=>{
@@ -221,13 +227,13 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
                 return childItem
             })
         );
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle, className:"item-name"}, space+"☺"+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle, className:"item-name"}, space+"☻"+item.name);
         return React.createElement("li", {key:idx++}, a, ul);
     };
 
     public createLi=(item:any, step:number)=>{
         const space:string = this.padding(step);
-        const a = React.createElement("a", {tabIndex:1, style:this.userStyle, className:"item-name"}, space+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.userStyle, className:"item-name"}, space+"☺"+item.name);
         return React.createElement("li", {key:idx++}, a);
     };
 

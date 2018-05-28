@@ -13,7 +13,7 @@ export interface IUsersDb {
 class UsersDb implements IUsersDb{
     private users: IUser[];
     constructor(){
-        this.users = [new User("gal", 27, "123")];
+        this.users = [new User("gal", 27, "123"), new User("Tommy", 24, "123"), new User("Ori", 30, "123"), new User("Udi", 34, "123"), new User("Roni", 5, "123")];
     }
 
     private findUserIndex(username:string){

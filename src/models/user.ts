@@ -5,8 +5,10 @@ export default interface IUser {
     age?:number,
     password:string,
     parents : IGroup[],
+    massages : {},
     removeParent(parentNode:IGroup):boolean,
-    auth(enteredPassword:string):boolean
+    auth(enteredPassword:string):boolean,
+    addMassage(massage:string, chatWith:IUser):void
 }
 
 export default class User implements IUser{
@@ -14,12 +16,23 @@ export default class User implements IUser{
     public age?:number;
     public password:string;
     public parents:IGroup[];
-
+    public massages:{};
     constructor(username:string, age:number, password:string){
         this.name = username;
         this.age = age;
         this.password = password;
         this.parents = [];
+        this.massages = {};
+    }
+
+    public addMassage(massage:string, chatWith:IUser){
+        const chatWithName = chatWith.name;
+        if(this.massages[chatWithName]){
+            this.massages[chatWithName].push(massage);
+        }
+        else{
+            this.massages[chatWithName] = [massage]
+        }
     }
 
     public removeParent(parentNode:IGroup){

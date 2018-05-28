@@ -1,8 +1,9 @@
 import * as React from 'react';
-// import {Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import Field from './field';
 import {ERROR_MSG} from '../App'
 import './login.css'
+
 interface ILoginProps {
     state:{},
     onSubmit: (user: {}) => void,
@@ -50,16 +51,22 @@ class Login extends React.Component<ILoginProps, ILoginState> {
     };
 
 
+
     public render() {
         return (
-            <div className="login-form-wrapper">
-                <form className="login-form">
-                    <Field name={'name'} type={'text'} onChange={this.updateField}/>
-                    <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                    <button className="login-btn" disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Login</button>
-                    <p style={{color:this.colors[this.props.loginStatus]}}>{this.messages[this.props.loginStatus]}</p>
-                </form>
-            </div>
+            <section>
+                <div className="login-form-wrapper">
+                    <form className="login-form">
+                        <Link to='/'><button className='login-X'>X</button></Link>
+                        <div className="login-fields">
+                            <Field className="login-field" name={'name'} type={'text'} onChange={this.updateField}/>
+                            <Field className="login-field" name={'password'} type={'password'} onChange={this.updateField}/>
+                            <button className="login-btn" disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Login</button>
+                        </div>
+                        <p style={{color:this.colors[this.props.loginStatus]}}>{this.messages[this.props.loginStatus]}</p>
+                    </form>
+                </div>
+            </section>
         );
     }
 }

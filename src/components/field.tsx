@@ -4,7 +4,8 @@ import './field.css';
 interface IFieldProps {
     name: string,
     type?: string,
-    onChange(field:string, value:string):void
+    onChange(field:string, value:string):void,
+    className:string
 }
 
 const Field:React.StatelessComponent<IFieldProps> = (props) => {

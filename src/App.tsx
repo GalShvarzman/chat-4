@@ -33,7 +33,7 @@ class App extends React.Component<{}, IAppState> {
             loggedInUser: null,
             errorMsg: ERROR_MSG.none,
             counter: 0,
-            redirect:false
+            redirect:false,
         };
 
         stateStoreService.subscribe(() => {
@@ -74,9 +74,7 @@ class App extends React.Component<{}, IAppState> {
 
     public loginRender = (props:any)=>(this.state.redirect ? <Redirect to={{ pathname: '/chat/'+this.state.loggedInUser}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
-    // public set = () => {
-    //     stateStoreService.set('users', []);
-    // };
+    public chatRender = () => (<Chat data={this.state}/>);
 
     public render() {
         // const users = stateStoreService.get('users').map((user,idx)=>{
@@ -96,10 +94,10 @@ class App extends React.Component<{}, IAppState> {
                 </nav>
                 <div className="switch">
                     <Switch>
-                        <Route exact={true} path='/chat' component={Chat}/>
-                        <Route exact={true} path='/chat/:name' component={Chat}/>
-                        <Route path='/login' render={this.loginRender}/>
+                        <Route exact={true} path='/chat' render={this.chatRender}/>
+                        <Route exact={true} path='/chat/:name' render={this.chatRender}/>
                         <Route path='/sign-up' component={SignUp}/>
+                        <Route path='/login' render={this.loginRender}/>
                         <Redirect to='/chat' />
                     </Switch>
                 </div>
