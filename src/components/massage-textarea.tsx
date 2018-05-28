@@ -39,7 +39,7 @@ class MassageTextArea extends React.Component<IMassageTextAreaProps, IMassageTex
 
     public render() {
         return (
-            <textarea onKeyUp={this.props.keyUpListener} onChange={this.props.handleChange} style={this.textAreaStyle} placeholder="Type a message"/>
+            <textarea disabled={!this.props.data.loggedInUser} onKeyUp={this.props.keyUpListener} onChange={this.props.handleChange} style={this.textAreaStyle} placeholder="Type a message"/>
         );
     }
 }

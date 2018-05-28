@@ -22,7 +22,8 @@ interface IChatProps {
 interface IChatState {
     selected? : IGroup | IUser,
     massage:string,
-    loggedInUser:IUser
+    loggedInUser?:IUser,
+    selectedMassages?:string[],
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
@@ -31,20 +32,29 @@ class Chat extends React.Component<IChatProps, IChatState> {
         if(this.props.data.loggedInUser){
             const user = stateStoreService.getUser(this.props.data.loggedInUser);
             if(user){
-                this.state = {massage:'', loggedInUser:user}
+                this.state = {massage:'', loggedInUser:user, selectedMassages:[]}
             }
+        }
+        else{
+            this.state = {massage:'', selectedMassages:[]}
         }
     }
 
-    public getSelected = (event:any) => {debugger
+    public getSelected = (event:any) => {// fixme את כל התהליך של קבלת נתונים על הקבוצה להביא מהסרביס
         const matchGroups:IGroup[] = stateStoreService.search(event.target.innerHTML.substr(1));
         const matchUser:IUser|undefined = stateStoreService.getUser(event.target.innerHTML.substr(1));
         // fixme
-        if(matchGroups){
-            this.setState({selected: matchGroups[0]});
+        if(matchGroups.length){debugger
+            const massagesList = stateStoreService.getMassages(matchGroups[0]);
+                 // fixme צריך לבחור את הקבוצה הרלוונטית...
+
+            this.setState({selected: matchGroups[0], selectedMassages:massagesList});
         }
         else if(matchUser) {
-            this.setState({selected: matchUser});
+            if(this.state.loggedInUser){
+                const massagesList = stateStoreService.getMassages(matchUser, this.state.loggedInUser.name);
+                this.setState({selected: matchUser, selectedMassages: massagesList});
+            }
         }
         else{
             // fixme
@@ -56,7 +66,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public keyUpListener = (event:any) => {
-        if(event.key === 'Enter'){
+        if(event.key === 'Enter'){debugger
             stateStoreService.addMassage(this.state.massage, this.state.selected, this.state.loggedInUser);
         }
     };
@@ -69,7 +79,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 </div>
                 <div className="chat-right">
                     <div className="massages">
-                        <ChatMassages/>
+                        <ChatMassages massages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">
                         <MassageTextArea data={this.props.data} handleChange={this.handleChange} keyUpListener={this.keyUpListener}/>

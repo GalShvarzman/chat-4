@@ -26,7 +26,7 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
-    public addMassage(massage:string, selected:IGroup|IUser|undefined, loggedInUser:IUser){
+    public addMassage(massage:string, selected:IGroup|IUser|undefined, loggedInUser:IUser|undefined){debugger
         if(selected instanceof Group){
             selected.addMassage(massage);
         }
@@ -34,6 +34,13 @@ export class StateStoreService implements IStateStoreService{
             selected.addMassage(massage, loggedInUser);
         }
         this.onStoreChanged();
+    }
+
+    public getMassages(match: IUser | IGroup, loggedInUserName?:string){
+        if(match instanceof User){
+            return match.getMassages(loggedInUserName)
+        }
+        return match.getMassages();
     }
 
     public getUser(name: string){
@@ -68,14 +75,14 @@ export class StateStoreService implements IStateStoreService{
 interface IStateStore {
     users : IUser[],
     tree:NTree,
-    groups:IGroup[]
+    // groups:IGroup[]
 }
 
 
 class StateStore implements IStateStore {
     public users:IUser[] = usersDb.getUsers();
     public tree:NTree = nTree;
-    public groups:IGroup[] = nTree.getGroupsList();
+    // public groups:IGroup[] = nTree.getGroupsList();
 
     static instance: IStateStore;
 

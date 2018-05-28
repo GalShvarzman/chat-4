@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface IMassageListItemProps {
-
+    massage:string
 }
 interface IChatMassageListItemState {
 
@@ -13,9 +13,9 @@ class MassageListItem extends React.Component<IMassageListItemProps, IChatMassag
     }
     public render() {
         return (
-            <div>
-                jj
-            </div>
+            <li>
+                {this.props.massage}
+            </li>
         );
     }
 }

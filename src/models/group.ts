@@ -14,7 +14,8 @@ export default interface IGroup{
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
     getGroupsList():IGroup[],
-    addMassage(massage:string):void
+    addMassage(massage:string):void,
+    getMassages():string[]
 }
 
 export default class Group implements IGroup{
@@ -307,5 +308,11 @@ export default class Group implements IGroup{
 
     public addMassage(massage:string){
         this.massages.push(massage);
+    }
+
+    public getMassages(){
+        return this.massages.map((massage)=>{
+            return massage;
+        })
     }
 }

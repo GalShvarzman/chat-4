@@ -8,7 +8,8 @@ export default interface IUser {
     massages : {},
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean,
-    addMassage(massage:string, chatWith:IUser):void
+    addMassage(massage:string, chatWith:IUser|undefined):void,
+    getMassages(loggedInUserName:string|undefined):string[]
 }
 
 export default class User implements IUser{
@@ -71,6 +72,10 @@ export default class User implements IUser{
 
     public auth(enteredPassword:string){
         return enteredPassword === this.password
+    }
+
+    public getMassages(loggedInUserName:string){
+        return this.massages[loggedInUserName];
     }
 }
 
