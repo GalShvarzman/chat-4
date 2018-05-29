@@ -3,15 +3,16 @@ import LeftTree from "./left-tree";
 import ChatMassages from "./chat-massages";
 import MassageTextArea from "./massage-textarea";
 import './chat.css';
-import {IUsersDb} from "../models/users";
 import {ERROR_MSG} from "../App";
-import IUser from "../models/user";
 import {stateStoreService} from "../state/state-store";
-import IGroup from "../models/group";
+
+export interface IMessage{
+    message:string,
+    date:string
+}
 
 interface IChatProps {
     data:{
-        users: IUsersDb,
         loggedInUser: string | null,
         errorMsg: ERROR_MSG,
         counter: number,
@@ -20,55 +21,55 @@ interface IChatProps {
 }
 
 interface IChatState {
-    selected? : IGroup | IUser,
-    massage:string,
-    loggedInUser?:IUser,
-    selectedMassages?:string[],
+    selected? : string,
+    message:IMessage,
+    selectedMassages:IMessage[],
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps) {
         super(props);
-        if(this.props.data.loggedInUser){
-            const user = stateStoreService.getUser(this.props.data.loggedInUser);
-            if(user){
-                this.state = {massage:'', loggedInUser:user, selectedMassages:[]}
-            }
-        }
-        else{
-            this.state = {massage:'', selectedMassages:[]}
-        }
+            this.state = {message:{message:'', date:''}, selectedMassages: []}
     }
 
-    public getSelected = (event:any) => {// fixme את כל התהליך של קבלת נתונים על הקבוצה להביא מהסרביס
-        const matchGroups:IGroup[] = stateStoreService.search(event.target.innerHTML.substr(1));
-        const matchUser:IUser|undefined = stateStoreService.getUser(event.target.innerHTML.substr(1));
-        // fixme
-        if(matchGroups.length){debugger
-            const massagesList = stateStoreService.getMassages(matchGroups[0]);
-                 // fixme צריך לבחור את הקבוצה הרלוונטית...
+    public getSelected = (event:any) => {debugger
+        this.setState({selected: event.target.innerHTML.substr(1)}, ()=>{
+            this.getSelectedMessageHistory();
+        });
+    };
 
-            this.setState({selected: matchGroups[0], selectedMassages:massagesList});
-        }
-        else if(matchUser) {
-            if(this.state.loggedInUser){
-                const massagesList = stateStoreService.getMassages(matchUser, this.state.loggedInUser.name);
-                this.setState({selected: matchUser, selectedMassages: massagesList});
-            }
-        }
-        else{
-            // fixme
+    private getSelectedMessageHistory = () => {
+        if(this.state.selected){
+            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selected, this.props.data.loggedInUser);
+            this.setState({selectedMassages:messagesList});
         }
     };
 
     public handleChange = (event: any):void => {
-        this.setState({massage : event.target.value})
+        this.setState({message : {message: event.target.value, date:''}});
     };
 
-    public keyUpListener = (event:any) => {
-        if(event.key === 'Enter'){debugger
-            stateStoreService.addMassage(this.state.massage, this.state.selected, this.state.loggedInUser);
+    public keyDownListener = (event:any) => {
+        if(this.props.data.loggedInUser && this.state.selected){
+            if(event.keyCode == 10 || event.keyCode == 13){
+                event.preventDefault();
+                this.addMessage();
+            }
         }
+    };
+
+    public onClickSend = (event:React.MouseEvent<HTMLButtonElement>) => {
+        if(this.props.data.loggedInUser && this.state.selected){
+            this.addMessage();
+        }
+    };
+
+    public addMessage = ()=>{
+        this.setState({message:{message:this.state.message.message, date:new Date().toLocaleString().slice(0, -3)}}, ()=>{
+            stateStoreService.addMessage(this.state.message, this.state.selected, this.props.data.loggedInUser);
+            const messagesList = stateStoreService.getSelectedMessagesHistory(this.state.selected, this.props.data.loggedInUser);
+            this.setState({selectedMassages:messagesList, message:{message:'', date:''}});
+        });
     };
 
     public render() {
@@ -79,10 +80,10 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 </div>
                 <div className="chat-right">
                     <div className="massages">
-                        <ChatMassages massages={this.state.selectedMassages}/>
+                        <ChatMassages loggedInUser={this.props.data.loggedInUser} selected={this.state.selected} messages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">
-                        <MassageTextArea data={this.props.data} handleChange={this.handleChange} keyUpListener={this.keyUpListener}/>
+                        <MassageTextArea onClickSend={this.onClickSend} message={this.state.message} selected={this.state.selected} data={this.props.data} handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
                     </div>
                 </div>
             </div>

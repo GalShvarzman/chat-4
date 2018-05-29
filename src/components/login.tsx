@@ -6,7 +6,7 @@ import './login.css'
 
 interface ILoginProps {
     state:{},
-    onSubmit: (user: {}) => void,
+    onSubmit(user: {name:string, password:string}):void,
     loginStatus: ERROR_MSG
 }
 

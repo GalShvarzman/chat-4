@@ -6,7 +6,7 @@ export interface IUsersDb {
     deleteUser(username:string):boolean,
     addUser(user:IUser):void,
     getUserNamesList():string[],
-    getUser(userName:string):IUser|undefined,
+    getUser(userName:string|undefined):IUser|undefined,
     getUsers():IUser[]
 }
 

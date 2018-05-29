@@ -28,6 +28,10 @@ const items = [
             },
             {
                 "type": "user",
+                "name": "gal"
+            },
+            {
+                "type": "user",
                 "name": "Roni"
             }
         ];
@@ -163,7 +167,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
       display : "none"
     };
 
-    public walkTree = (items:object[], step:number)=>{
+    public walkTree = (items:object[], step:number)=>{debugger
         const result:any[] = [];
         items.forEach((item:listItem)=>{
             if(item.items){
@@ -200,6 +204,10 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         (e.target as HTMLElement).focus();
         e.stopPropagation();
         this.props.getSelected(e);
+    };
+
+    public shouldComponentUpdate(nextProps:any, nextState:any) {
+        return false
     };
 
     public padding=(number:number)=>{

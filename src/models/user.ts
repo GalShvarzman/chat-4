@@ -1,15 +1,17 @@
 import IGroup from './group';
+import {IMessage} from '../components/chat';
+import {stateStoreService} from "../state/state-store";
 
 export default interface IUser {
     name:string,
     age?:number,
     password:string,
     parents : IGroup[],
-    massages : {},
+    messages : {},
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean,
-    addMassage(massage:string, chatWith:IUser|undefined):void,
-    getMassages(loggedInUserName:string|undefined):string[]
+    addMessage(massage:{}, chatWith:string|null):void,
+    getMessages(loggedInUserName:string|null|undefined):IMessage[]
 }
 
 export default class User implements IUser{
@@ -17,22 +19,23 @@ export default class User implements IUser{
     public age?:number;
     public password:string;
     public parents:IGroup[];
-    public massages:{};
+    public messages:{};
+
     constructor(username:string, age:number, password:string){
         this.name = username;
         this.age = age;
         this.password = password;
         this.parents = [];
-        this.massages = {};
+        this.messages = {};
     }
 
-    public addMassage(massage:string, chatWith:IUser){
-        const chatWithName = chatWith.name;
-        if(this.massages[chatWithName]){
-            this.massages[chatWithName].push(massage);
+    public addMessage(massage:string, chatWith:string){
+        if(this.messages[chatWith]){
+            this.messages[chatWith].push(massage);
         }
         else{
-            this.massages[chatWithName] = [massage]
+            this.messages[chatWith] = [massage];
+            stateStoreService.updateUserMessages(this, chatWith);
         }
     }
 
@@ -74,8 +77,15 @@ export default class User implements IUser{
         return enteredPassword === this.password
     }
 
-    public getMassages(loggedInUserName:string){
-        return this.massages[loggedInUserName];
+    public getMessages(loggedInUserName:string|null){
+        if(loggedInUserName && this.messages[loggedInUserName]){
+            return this.messages[loggedInUserName].map((message:string)=>{
+                return message;
+            });
+        }
+        else{
+            return [];
+        }
     }
 }
 

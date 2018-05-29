@@ -1,28 +1,42 @@
 import * as React from 'react';
-import MassageListItem from "./massage-list-item";
+import MessageListItem from "./message-list-item";
 
-interface IChatMassagesProps {
-    massages:string[] | undefined
+interface IChatMessagesProps {
+    messages:any[],
+    selected:string|undefined,
+    loggedInUser: string|null
 }
-interface IChatMassagesState {
+
+interface IChatMessagesState {
 
 }
 
-class ChatMassages extends React.Component<IChatMassagesProps, IChatMassagesState> {
-    constructor(props:IChatMassagesProps){
+class ChatMassages extends React.Component<IChatMessagesProps, IChatMessagesState> {
+    constructor(props:IChatMessagesProps){
         super(props)
     }
 
+    public ulWrapper = {
+        width: '100%'
+    };
+
+
+
     public render() {
-        let massagesHistory;
-        if(this.props.massages){
-             massagesHistory = this.props.massages.map((massage, idx)=>{
-                return <MassageListItem key={idx} massage={massage}/>
+        let messagesHistory;
+        if(this.props.messages.length){
+             messagesHistory = this.props.messages.map((message, idx)=>{
+                return <MessageListItem key={idx} message={message}/>
             })
         }
         return (
             <div>
-                <ul>{massagesHistory}</ul>
+                <div hidden={!this.props.selected || !this.props.loggedInUser}>
+                    <h1 className='messages-on'>{this.props.selected}</h1>
+                 </div>
+                <div style={this.ulWrapper}>
+                    <ul>{messagesHistory}</ul>
+                </div>
             </div>
         );
     }

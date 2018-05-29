@@ -1,21 +1,23 @@
 import User from './user';
 import IUser from './user';
+import {IMessage} from '../components/chat';
 let i = 0;
+
 export default interface IGroup{
     parent : IGroup,
     name : string,
     children : any[],
     others?:IGroup,
-    massages:string[],
+    messages:IMessage[],
     getParents() : IGroup[],
     isNodeExistInGroup(name:string):boolean,
     add(node:IGroup| IUser, parentNode?:IGroup):void,
-    search(nodeName:string): IGroup[],
+    search(nodeName:string|undefined): IGroup[],
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
     getGroupsList():IGroup[],
-    addMassage(massage:string):void,
-    getMassages():string[]
+    addMessage(message:IMessage):void,
+    getMessages():IMessage[]
 }
 
 export default class Group implements IGroup{
@@ -23,12 +25,12 @@ export default class Group implements IGroup{
     public parent: IGroup;
     public name: string;
     public children: any[];
-    public massages: string[];
+    public messages: IMessage[];
     constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
         this.children = this.array.concat(children||[]);
-        this.massages = [];
+        this.messages = [];
     }
 
     public flattening() {
@@ -306,13 +308,13 @@ export default class Group implements IGroup{
         }
     }
 
-    public addMassage(massage:string){
-        this.massages.push(massage);
+    public addMessage(message:IMessage){
+        this.messages.push(message);
     }
 
-    public getMassages(){
-        return this.massages.map((massage)=>{
-            return massage;
+    public getMessages(){
+        return this.messages.map((message)=>{
+            return message;
         })
     }
 }

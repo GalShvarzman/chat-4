@@ -12,7 +12,7 @@ export default class NTree{
     public add(node:IGroup| IUser, parentNode?:IGroup){
         this.root.add(node, parentNode);
     }
-    public search(nodeName:string){
+    public search(nodeName:string|undefined){
         return this.root.search(nodeName)
     }
     public removeGroup(node:IGroup){

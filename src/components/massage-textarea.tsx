@@ -1,17 +1,19 @@
 import * as React from 'react';
-import {IUsersDb} from "../models/users";
 import {ERROR_MSG} from "../App";
+import {IMessage} from '../components/chat';
 
 interface IMassageTextAreaProps {
     data: {
-        users: IUsersDb,
         loggedInUser: string | null,
         errorMsg: ERROR_MSG,
         counter: number,
         redirect:boolean
     },
+    selected:string|undefined,
+    message:IMessage,
     handleChange(event: any):void,
-    keyUpListener(event:any):void
+    keyDownListener(event:any):void,
+    onClickSend(event:React.MouseEvent<HTMLButtonElement>):void
 }
 interface IMassageTextAreaState {
 
@@ -39,7 +41,10 @@ class MassageTextArea extends React.Component<IMassageTextAreaProps, IMassageTex
 
     public render() {
         return (
-            <textarea disabled={!this.props.data.loggedInUser} onKeyUp={this.props.keyUpListener} onChange={this.props.handleChange} style={this.textAreaStyle} placeholder="Type a message"/>
+            <div>
+                <textarea value={this.props.message['message']} disabled={!this.props.data.loggedInUser || !this.props.selected} onKeyDown={this.props.keyDownListener} onChange={this.props.handleChange} style={this.textAreaStyle} placeholder="Type a message"/>
+                <button onClick={this.props.onClickSend}>send</button>
+            </div>
         );
     }
 }
