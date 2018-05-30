@@ -54,19 +54,21 @@ class Login extends React.Component<ILoginProps, ILoginState> {
 
     public render() {
         return (
-            <section>
+            <div className="login-wrapper">
                 <div className="login-form-wrapper">
                     <form className="login-form">
-                        <Link to='/'><button className='login-X'>X</button></Link>
+                        <div>
+                            <Link to='/'><button className='login-X'>X</button></Link>
+                        </div>
                         <div className="login-fields">
                             <Field className="login-field" name={'name'} type={'text'} onChange={this.updateField}/>
                             <Field className="login-field" name={'password'} type={'password'} onChange={this.updateField}/>
                             <button className="login-btn" disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Login</button>
+                            <p style={{color:this.colors[this.props.loginStatus]}}>{this.messages[this.props.loginStatus]}</p>
                         </div>
-                        <p style={{color:this.colors[this.props.loginStatus]}}>{this.messages[this.props.loginStatus]}</p>
                     </form>
                 </div>
-            </section>
+            </div>
         );
     }
 }

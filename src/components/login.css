@@ -1,36 +1,54 @@
 .login-form{
-    padding: 3em 6em;
-    border: 2px solid darkslateblue;
-    border-radius: 5px;
-    display: table-cell;
+    padding: 0;
     vertical-align: middle;
 }
 
-.login-btn{
-    padding:0.5em 1em;
+.login-btn, .login-X{
     color: darkslateblue;
     background-color: lightblue;
-    font-size:1em;
     border: 2px solid darkslateblue;
     border-radius: 5px;
+}
+
+.login-btn{
     margin-top:2em;
+    font-size:1em;
+    padding:0.5em 1em;
 }
 
 .login-form-wrapper{
+    border: 3px solid darkslateblue;
     display: table;
-    width: 40%;
+    width: 30%;
     height: 40%;
     top: 50%;
     left: 50%;
     margin-top: -150px;
-    margin-left: -250px;
+    margin-left: -200px;
     position: absolute;
+    background-color: white;
+}
+
+.login-wrapper{
+    background-color: rgba(0,0,0, 0.5);
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top:0;
+    right: 0;
+    left:0;
+    bottom: 0;
+    margin:auto;
+    z-index: 1;
 }
 
 .login-X{
-    margin-left:0;
+    margin-left:5px;
+    margin-top: 5px;
+    text-decoration: none;
 }
 
 .login-fields{
     text-align: center;
+    padding-top: 2em;
 }

@@ -10,6 +10,10 @@
 }
 
 .nav-right{
+  float:right;
+}
+
+.nav-right{
   float: right;
 }
 
@@ -22,15 +26,21 @@
 
 nav{
   height: 5%;
-  background-color: #71b3b3;
+  background-color: #8fb3ae;
 }
 
-.btn-sign-up, .btn-login{
+.btn-sign-up, .btn-login, .btn-log-out{
   border: none;
-  background-color: #71b3b3;
+  background: transparent;
   cursor: pointer;
   padding: 0.3em 0.6em;
-  color: white;
+  color: #fafffb;
   font-size: 1em;
+  margin-top: 0.2em;
+  box-sizing: border-box;
+}
+
+.logged-in-name{
+  color: darkslateblue;
 }
 

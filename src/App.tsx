@@ -74,7 +74,7 @@ class App extends React.Component<{}, IAppState> {
     public chatRender = (props:any) => (<Chat {...props} data={this.state}/>);
 
     public logOut = () => {
-        this.setState({loggedInUser:null, redirect:false});
+        this.setState({loggedInUser:null, redirect:false, errorMsg: ERROR_MSG.none});
     };
 
     // public componentDidMount (){debugger
@@ -88,14 +88,17 @@ class App extends React.Component<{}, IAppState> {
 
         return (
             <div className="App">
+                <Route path='/login' render={this.loginRender}/>
                 <nav>
                     <div className="nav-left">
                         <Link to="/login"><button className="btn-login">login</button></Link>
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
-                        <Link to="/"><button onClick={this.logOut}>Log out</button></Link>
+                    </div>
+                    <div className="nav-right">
+                        <Link to="/"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
                     <div className='nav-right'>
-                        <div hidden={!this.state.loggedInUser} className="app-logged-in">You are logged in as {this.state.loggedInUser}</div>
+                        <div hidden={!this.state.loggedInUser} className="app-logged-in">You are logged in as: <span className='logged-in-name'>{this.state.loggedInUser}</span></div>
                     </div>
                 </nav>
                 <div className="switch">
@@ -103,8 +106,7 @@ class App extends React.Component<{}, IAppState> {
                         <Route exact={true} name='chat' path='/chat' render={this.chatRender}/>
                         <Route exact={true} path='/chat/:name' render={this.chatRender}/>
                         <Route path='/sign-up' component={SignUp}/>
-                        <Route path='/login' render={this.loginRender}/>
-                        <Redirect to='/chat' />
+                        <Route path='/' render={this.chatRender}/>
                     </Switch>
                 </div>
             </div>
