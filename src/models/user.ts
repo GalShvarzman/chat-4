@@ -78,10 +78,8 @@ export default class User implements IUser{
     }
 
     public getMessages(loggedInUserName:string|null){
-        if(loggedInUserName && this.messages[loggedInUserName]){
-            return this.messages[loggedInUserName].map((message:string)=>{
-                return message;
-            });
+        if(loggedInUserName && this.messages[loggedInUserName]) {
+            return this.messages[loggedInUserName]
         }
         else{
             return [];

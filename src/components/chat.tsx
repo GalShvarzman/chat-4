@@ -1,14 +1,15 @@
 import * as React from 'react';
 import LeftTree from "./left-tree";
-import ChatMassages from "./chat-massages";
-import MassageTextArea from "./massage-textarea";
+import ChatMessages from "./chat-messages";
+import MessageTextarea from "./message-textarea";
 import './chat.css';
 import {ERROR_MSG} from "../App";
 import {stateStoreService} from "../state/state-store";
 
 export interface IMessage{
     message:string,
-    date:string
+    date:string,
+    sender?:string|null
 }
 
 interface IChatProps {
@@ -22,6 +23,7 @@ interface IChatProps {
 
 interface IChatState {
     selected? : string,
+    // selectedA?:HTMLElement,
     message:IMessage,
     selectedMassages:IMessage[],
 }
@@ -32,8 +34,12 @@ class Chat extends React.Component<IChatProps, IChatState> {
             this.state = {message:{message:'', date:''}, selectedMassages: []}
     }
 
-    public getSelected = (event:any) => {debugger
-        this.setState({selected: event.target.innerHTML.substr(1)}, ()=>{
+    public getSelected = (event:any) => {
+        // if(this.state.selectedA && this.state.selectedA != event.target){
+        //     (this.state.selectedA as HTMLElement).classList.remove('active');
+        // }
+        this.setState({selected: event.target.innerHTML.substr(1) /*selectedA:event.target*/}, ()=>{
+            // (this.state.selectedA as HTMLElement).classList.add('active');
             this.getSelectedMessageHistory();
         });
     };
@@ -50,7 +56,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public keyDownListener = (event:any) => {
-        if(this.props.data.loggedInUser && this.state.selected){
+        if(this.props.data.loggedInUser && this.state.selected && this.state.message.message.trimLeft().length){
             if(event.keyCode == 10 || event.keyCode == 13){
                 event.preventDefault();
                 this.addMessage();
@@ -80,10 +86,10 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 </div>
                 <div className="chat-right">
                     <div className="massages">
-                        <ChatMassages loggedInUser={this.props.data.loggedInUser} selected={this.state.selected} messages={this.state.selectedMassages}/>
+                        <ChatMessages loggedInUser={this.props.data.loggedInUser} selected={this.state.selected} messages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">
-                        <MassageTextArea onClickSend={this.onClickSend} message={this.state.message} selected={this.state.selected} data={this.props.data} handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
+                        <MessageTextarea onClickSend={this.onClickSend} message={this.state.message} selected={this.state.selected} data={this.props.data} handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import MessageListItem from "./message-list-item";
+import './chat-messages.css';
 
 interface IChatMessagesProps {
     messages:any[],
@@ -11,7 +12,7 @@ interface IChatMessagesState {
 
 }
 
-class ChatMassages extends React.Component<IChatMessagesProps, IChatMessagesState> {
+class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesState> {
     constructor(props:IChatMessagesProps){
         super(props)
     }
@@ -26,11 +27,16 @@ class ChatMassages extends React.Component<IChatMessagesProps, IChatMessagesStat
         let messagesHistory;
         if(this.props.messages.length){
              messagesHistory = this.props.messages.map((message, idx)=>{
-                return <MessageListItem key={idx} message={message}/>
+                 if(message.sender === this.props.loggedInUser){
+                     return <MessageListItem className='me' key={idx} message={message}/>
+                 }
+                else{
+                     return <MessageListItem key={idx} message={message}/>
+                 }
             })
         }
         return (
-            <div>
+            <div className='messages-wrapper'>
                 <div hidden={!this.props.selected || !this.props.loggedInUser}>
                     <h1 className='messages-on'>{this.props.selected}</h1>
                  </div>
@@ -42,4 +48,4 @@ class ChatMassages extends React.Component<IChatMessagesProps, IChatMessagesStat
     }
 }
 
-export default ChatMassages;
+export default ChatMessages;

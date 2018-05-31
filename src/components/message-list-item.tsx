@@ -1,7 +1,9 @@
 import * as React from 'react';
-import './chat-messages.css';
+import './message-list-item.css';
+
 interface IMessageListItemProps {
-    message:{message:string, date:string}
+    message:{message:string, date:string},
+    className?:string
 }
 interface IChatMessageListItemState {
 
@@ -13,32 +15,17 @@ class MessageListItem extends React.Component<IMessageListItemProps, IChatMessag
         super(props)
     }
 
-    public liStyle = {
-        paddingLeft:'1em',
-        paddingBottom: '1em',
-        paddingTop: '0.5em',
-        width: "100%"
-    };
-
-    public messageStyle = {
-        backgroundColor: '#bddfdc',
-        padding: '0.3em 0.5em',
-        borderRadius:'5px',
-        border: 'transparent',
-        fontSize: '1.4em'
-    };
-
-    public dateStyle = {
-        fontSize: '0.5em'
-    };
-
     public render() {
+        let className;
+        if(this.props.className){
+            className = this.props.className
+        }
         return (
-            <li style={this.liStyle}>
-                <span style={this.messageStyle}>
+            <li className="message-li">
+                <div className={"message-text "+ className}>
                     {this.props.message.message}
-                    <span style={this.dateStyle}>{this.props.message.date}</span>
-                </span>
+                    <div className="message-date">{this.props.message.date}</div>
+                </div>
             </li>
         );
     }

@@ -30,6 +30,7 @@ export class StateStoreService implements IStateStoreService{
     }
 
     public addMessage(message:IMessage, selected:string|undefined, loggedInUser:string|null){
+        message.sender = loggedInUser;
         const selectedObj = this.locatingSelected(selected);
         if(selectedObj instanceof Group){
             selectedObj.addMessage(message);

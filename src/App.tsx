@@ -34,6 +34,8 @@ class App extends React.Component<{}, IAppState> {
             redirect:false,
         };
 
+
+
         stateStoreService.subscribe(() => {
             this.forceUpdate();
         });
@@ -69,7 +71,7 @@ class App extends React.Component<{}, IAppState> {
         }
     };
 
-    public loginRender = (props:any)=>(this.state.redirect ? <Redirect to={{ pathname: '/chat/'+this.state.loggedInUser}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any)=>(this.state.redirect ? <Redirect to={{ pathname: '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat {...props} data={this.state}/>);
 
@@ -77,15 +79,7 @@ class App extends React.Component<{}, IAppState> {
         this.setState({loggedInUser:null, redirect:false, errorMsg: ERROR_MSG.none});
     };
 
-    // public componentDidMount (){debugger
-    //
-    // }
-
     public render() {
-        // const users = stateStoreService.get('users').map((user,idx)=>{
-        //     return <li key={idx}>{user.name}</li>
-        // });
-
         return (
             <div className="App">
                 <Route path='/login' render={this.loginRender}/>
@@ -103,8 +97,7 @@ class App extends React.Component<{}, IAppState> {
                 </nav>
                 <div className="switch">
                     <Switch>
-                        <Route exact={true} name='chat' path='/chat' render={this.chatRender}/>
-                        <Route exact={true} path='/chat/:name' render={this.chatRender}/>
+                        <Route exact={true} path='/chat' render={this.chatRender}/>
                         <Route path='/sign-up' component={SignUp}/>
                         <Route path='/' render={this.chatRender}/>
                     </Switch>

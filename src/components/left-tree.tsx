@@ -79,6 +79,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
         const keyName = e.key;
         if(e.target){
+            // this.props.getSelected(e);
             if((e.target as HTMLElement).className === "left tree"){
                 ((e.target as HTMLElement).children[0].querySelector(":scope > a") as HTMLElement).focus();
             }
@@ -167,7 +168,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
       display : "none"
     };
 
-    public walkTree = (items:object[], step:number)=>{debugger
+    public walkTree = (items:object[], step:number)=>{
         const result:any[] = [];
         items.forEach((item:listItem)=>{
             if(item.items){
@@ -211,37 +212,44 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public padding=(number:number)=>{
-        let start = "";
-        let space = "\u00a0\u00a0";
+        let start = 0;
+        let space = 20;
         for(let i = 0; i < number; i++){
             start+=space;
         }
         return start;
     };
 
-    public groupStyle = {
-        cursor:"pointer",
-        color : "#113f6b"
+    public groupStyle = (step:number)=>{
+        const space:number = this.padding(step);
+        return{
+            cursor:"pointer",
+            color : "#113f6b",
+            paddingLeft:space+'px'
+        }
     };
 
-    public userStyle = {
-        color: "#006cbe"
+    public userStyle = (step:number)=>{
+        const space:number = this.padding(step);
+        return{
+            color: "#006cbe",
+            paddingLeft:space+'px'
+        }
     };
 
     public createLiWithChildren=(item:listItem, step:number)=>{
-        const space:string = this.padding(step);
+
         const ul = React.createElement("ul", {style:this.ulStyle},
             this.walkTree(item.items, step+1).map((childItem)=>{
                 return childItem
             })
         );
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle, className:"item-name"}, space+"☻"+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name"}, "☻"+item.name);
         return React.createElement("li", {key:idx++}, a, ul);
     };
 
     public createLi=(item:any, step:number)=>{
-        const space:string = this.padding(step);
-        const a = React.createElement("a", {tabIndex:1, style:this.userStyle, className:"item-name"}, space+"☺"+item.name);
+        const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name"}, "☺"+item.name);
         return React.createElement("li", {key:idx++}, a);
     };
 
