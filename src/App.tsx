@@ -20,8 +20,6 @@ interface IAppState {
     redirect:boolean
 }
 
-
-
 class App extends React.Component<{}, IAppState> {
 
     constructor(props:{}) {
@@ -89,7 +87,7 @@ class App extends React.Component<{}, IAppState> {
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
                     </div>
                     <div className="nav-right">
-                        <Link to="/"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
+                        <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
                     <div className='nav-right'>
                         <div hidden={!this.state.loggedInUser} className="app-logged-in">You are logged in as: <span className='logged-in-name'>{this.state.loggedInUser}</span></div>

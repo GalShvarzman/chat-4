@@ -21,7 +21,6 @@
     padding-right:1em;
     padding-bottom: 1em;
     padding-top: 0.5em;
-    max-width: 500px;
-    width: auto;
+    width: 100%;
     box-sizing: border-box;
 }

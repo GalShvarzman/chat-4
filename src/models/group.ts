@@ -2,20 +2,29 @@ import User from './user';
 import IUser from './user';
 import {IMessage} from '../components/chat';
 let i = 0;
-let id = 0;
+
+function create_UUID(){
+    let dt = new Date().getTime();
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
 
 export default interface IGroup{
     parent : IGroup,
     name : string,
     children : any[],
-    id:number;
+    id:string;
     others?:IGroup,
     messages:IMessage[],
     type:string;
     getParents() : IGroup[],
     isNodeExistInGroup(name:string):boolean,
     add(node:IGroup| IUser, parentNode?:IGroup):void,
-    search(nodeName:string|undefined): IGroup[],
+    search(nodeId:string|undefined): IUser|IGroup,
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
     getGroupsList():IGroup[],
@@ -25,7 +34,7 @@ export default interface IGroup{
 
 export default class Group implements IGroup{
     public array : any[] = [];
-    public id:number;
+    public id:string;
     public parent: IGroup;
     public name: string;
     public children: any[];
@@ -37,7 +46,7 @@ export default class Group implements IGroup{
         this.name = name;
         this.children = this.array.concat(children||[]);
         this.messages = [];
-        this.id = ++id;
+        this.id = create_UUID();
         this.type = 'group';
     }
 
@@ -142,6 +151,7 @@ export default class Group implements IGroup{
         }
         else{
             return{
+                id:child.id,
                 type:child.type,
                 name:child.name,
             }
@@ -262,24 +272,28 @@ export default class Group implements IGroup{
     }
 
 
-    public search(nodeName:string) {
-        return this.internalSearchAll(this, nodeName);
+    public search(nodeId:string) {
+        return this.internalSearchAll(this, nodeId);
     }
 
-    public internalSearchAll(node:IGroup, nodeName:string) {
-        const results:IGroup[] = [];
+    public internalSearchAll(node:IGroup, nodeId:string) : any{
+        let result;
         if (node.children) {
-            node.children.forEach((child) => {
-                if (child.name === nodeName) {
-                    results.push(child);
+            node.children.some((child) => {
+                if (child.id === nodeId) {
+                    result = child;
+                    return true;
                 }
                 if(child.children){
-                    results.push(...this.internalSearchAll(child, nodeName))
+                    result = this.internalSearchAll(child, nodeId);
+                    if(result){
+                        return true;
+                    }
                 }
+                return false;
             });
-            // return results;
         }
-        return results;
+        return result;
     }
 
     public myPath() {

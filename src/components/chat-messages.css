@@ -5,9 +5,9 @@
 }
 
 .me-left{
-    float:left;
+    left:0;
 }
 
 .others-right{
-    float:right;
+    text-align: right;
 }

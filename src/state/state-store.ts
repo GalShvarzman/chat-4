@@ -29,51 +29,37 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
-    public addMessage(message:IMessage, selected:string|undefined, loggedInUser:string|null){
+    public addMessage(selectedId:string|undefined, message:IMessage, selected:string|undefined, loggedInUser:string|null){
         message.sender = loggedInUser;
-        const selectedObj = this.locatingSelected(selected);
+        const selectedObj = this.locatingSelected(selectedId);
         if(selectedObj instanceof Group){
             selectedObj.addMessage(message);
         }
         else if(selectedObj instanceof User){
             const result = selectedObj.addMessage(message, loggedInUser);
             if(result){
-                this.updateUserMessages(result.user,result.chatWith)
+                this.updateOtherUserMessages(result.user,result.chatWith)
             }
         }
         this.onStoreChanged();
     }
 
-    public locatingSelected (selected:string|undefined) {
-        const matchGroups: IGroup[] = this.search(selected);
-        const matchUser: IUser | undefined = this.getUser(selected);
-        if (matchGroups.length) {
-            return matchGroups[0];
-            // fixme צריך לבחור את הקבוצה הרלוונטית...
-        }
-        else if (matchUser) {
-            return matchUser
-        }
-        else return false;
+    public locatingSelected (selectedId:string|undefined) {
+        return this.search(selectedId);
     }
 
-    public getSelectedMessagesHistory(selected:string|undefined, loggedInUser?:string|null){
-       if(selected){
-           const selectedObj = this.locatingSelected(selected);
-
-           if(selectedObj instanceof Group){
-               return this.getMessages(selectedObj);
-           }
-           else if(selectedObj instanceof User) {
+    public getSelectedMessagesHistory(selectedId:string|undefined,selected:string|undefined, loggedInUser?:string|null){
+       if(selected && selectedId){
+           const selectedObj:IUser|IGroup = this.locatingSelected(selectedId);
+           if(selectedObj){
+               if(selectedObj instanceof Group){
+                   return this.getMessages(selectedObj);
+               }
                return this.getMessages(selectedObj, loggedInUser);
            }
-           else{
-               return [];
-           }
+           return [];
        }
-        else{
-            return [];
-        }
+       return [];
     }
 
     private getMessages(match: IUser | IGroup , loggedInUserName?:string|null){
@@ -86,17 +72,8 @@ export class StateStoreService implements IStateStoreService{
         return [];
     }
 
-    public getUserName(name: string){
-        const user = StateStore.getInstance().users.getUser(name);
-        if(user){
-            return user.name
-        }
-        else{
-            return false;
-        }
-    }
 
-    public updateUserMessages(selectedUser:IUser, chatWith:string){
+    public updateOtherUserMessages(selectedUser:IUser, chatWith:string){
         if(chatWith && selectedUser){
             const chatWithUserObj = this.getUser(chatWith);
             (chatWithUserObj as IUser).messages[selectedUser.name] = selectedUser.messages[chatWith];
@@ -108,8 +85,8 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance().users.getUser(name);
     }
 
-    public search(name:string|undefined){
-        return StateStore.getInstance().tree.search(name);
+    public search(id:string|undefined){
+        return StateStore.getInstance().tree.search(id);
     }
 
     public auth(user:{name:string, password:string}){

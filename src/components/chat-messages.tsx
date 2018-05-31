@@ -4,7 +4,7 @@ import './chat-messages.css';
 
 interface IChatMessagesProps {
     messages:any[],
-    selected:string|undefined,
+    selectedName:string|undefined,
     loggedInUser: string|null
 }
 
@@ -36,9 +36,9 @@ class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesStat
             })
         }
         return (
-            <div className='messages-wrapper'>
-                <div hidden={!this.props.selected || !this.props.loggedInUser}>
-                    <h1 className='messages-on'>{this.props.selected}</h1>
+            <div hidden={!this.props.loggedInUser || !this.props.selectedName} className='messages-wrapper'>
+                <div hidden={!this.props.selectedName}>
+                    <h1 className='messages-on'>{this.props.selectedName}</h1>
                  </div>
                 <div style={this.ulWrapper}>
                     <ul>{messagesHistory}</ul>

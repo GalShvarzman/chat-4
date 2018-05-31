@@ -12,8 +12,8 @@ export default class NTree{
     public add(node:IGroup| IUser, parentNode?:IGroup){
         this.root.add(node, parentNode);
     }
-    public search(nodeName:string|undefined){
-        return this.root.search(nodeName)
+    public search(nodeId:string|undefined){
+        return this.root.search(nodeId)
     }
     public removeGroup(node:IGroup){
         return this.root.removeGroup(node);

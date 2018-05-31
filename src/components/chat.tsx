@@ -22,7 +22,8 @@ interface IChatProps {
 }
 
 interface IChatState {
-    selected? : string,
+    selectedName? : string,
+    selectedId?:string,
     // selectedA?:HTMLElement,
     message:IMessage,
     selectedMassages:IMessage[],
@@ -35,19 +36,27 @@ class Chat extends React.Component<IChatProps, IChatState> {
     }
 
     public getSelected = (event:any) => {
+        if(event.target.tagName !== 'UL' && event.target.tagName !== 'LI'){
+            this.setState({selectedName: event.target.innerHTML.substr(1), selectedId:event.target.id /*selectedA:event.target*/}, ()=>{
+                // (this.state.selectedA as HTMLElement).classList.add('active');
+                if(this.props.data.loggedInUser){
+                    this.getSelectedMessageHistory();
+                }
+                else{
+                    alert("You need to login first...")
+                }
+            });
+        }
         // if(this.state.selectedA && this.state.selectedA != event.target){
         //     (this.state.selectedA as HTMLElement).classList.remove('active');
         // }
-        this.setState({selected: event.target.innerHTML.substr(1) /*selectedA:event.target*/}, ()=>{
-            // (this.state.selectedA as HTMLElement).classList.add('active');
-            this.getSelectedMessageHistory();
-        });
+
     };
 
     private getSelectedMessageHistory = () => {
-        if(this.state.selected){
-            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selected, this.props.data.loggedInUser);
-            this.setState({selectedMassages:messagesList});
+        if(this.state.selectedName){
+            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selectedId, this.state.selectedName, this.props.data.loggedInUser);
+            this.setState({selectedMassages:messagesList, message:{message:'', date:''}});
         }
     };
 
@@ -56,7 +65,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public keyDownListener = (event:any) => {
-        if(this.props.data.loggedInUser && this.state.selected && this.state.message.message.trimLeft().length){
+        if(this.props.data.loggedInUser && this.state.selectedName && this.state.message.message.trimLeft().length){
             if(event.keyCode == 10 || event.keyCode == 13){
                 event.preventDefault();
                 this.addMessage();
@@ -65,16 +74,15 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public onClickSend = (event:React.MouseEvent<HTMLButtonElement>) => {
-        if(this.props.data.loggedInUser && this.state.selected){
+        if(this.props.data.loggedInUser && this.state.selectedName){
             this.addMessage();
         }
     };
 
     public addMessage = ()=>{
         this.setState({message:{message:this.state.message.message, date:new Date().toLocaleString().slice(0, -3)}}, ()=>{
-            stateStoreService.addMessage(this.state.message, this.state.selected, this.props.data.loggedInUser);
-            const messagesList = stateStoreService.getSelectedMessagesHistory(this.state.selected, this.props.data.loggedInUser);
-            this.setState({selectedMassages:messagesList, message:{message:'', date:''}});
+            stateStoreService.addMessage(this.state.selectedId, this.state.message, this.state.selectedName, this.props.data.loggedInUser);
+            this.getSelectedMessageHistory();
         });
     };
 
@@ -86,10 +94,10 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 </div>
                 <div className="chat-right">
                     <div className="massages">
-                        <ChatMessages loggedInUser={this.props.data.loggedInUser} selected={this.state.selected} messages={this.state.selectedMassages}/>
+                        <ChatMessages loggedInUser={this.props.data.loggedInUser} selectedName={this.state.selectedName} messages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">
-                        <MessageTextarea onClickSend={this.onClickSend} message={this.state.message} selected={this.state.selected} data={this.props.data} handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
+                        <MessageTextarea onClickSend={this.onClickSend} message={this.state.message} selectedName={this.state.selectedName} data={this.props.data} handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,17 @@
 import IGroup from './group';
 import {IMessage} from '../components/chat';
 
+function create_UUID(){
+    let dt = new Date().getTime();
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
 export default interface IUser {
+    id:string,
     name:string,
     age?:number,
     password:string,
@@ -21,6 +31,7 @@ export default class User implements IUser{
     public parents:IGroup[];
     public messages:{};
     public type:string;
+    public id:string;
 
     constructor(username:string, age:number, password:string){
         this.name = username;
@@ -29,6 +40,7 @@ export default class User implements IUser{
         this.parents = [];
         this.messages = {};
         this.type = 'user';
+        this.id = create_UUID();
     }
 
     public addMessage(massage:string, chatWith:string){

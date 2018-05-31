@@ -1,13 +1,14 @@
 import * as React from 'react';
 import './left-tree.css'
 import {stateStoreService} from "../state/state-store";
-let idx = 0;
+
 const items = JSON.parse(stateStoreService.walkTree());
 
 interface listItem{
     items: object[],
     name:string,
-    type:string
+    type:string,
+    id:string
 }
 
 interface ILeftTreeProps {
@@ -15,14 +16,14 @@ interface ILeftTreeProps {
 }
 
 interface ILeftTreeState {
-    selected : {}
+    selectedName : {}
 }
 
 class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     constructor(props:ILeftTreeProps){
         super(props);
         this.state = {
-            selected : {}
+            selectedName : {}
         }
     }
 
@@ -188,7 +189,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         return start;
     };
 
-    public groupStyle = (step:number)=>{
+    public groupStyle = (step:number) => {
         const space:number = this.padding(step);
         return{
             cursor:"pointer",
@@ -197,7 +198,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public userStyle = (step:number)=>{
+    public userStyle = (step:number) => {
         const space:number = this.padding(step);
         return{
             color: "#006cbe",
@@ -205,20 +206,19 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public createLiWithChildren=(item:listItem, step:number)=>{
-
+    public createLiWithChildren = (item:listItem, step:number) => {
         const ul = React.createElement("ul", {style:this.ulStyle},
-            this.walkTree(item.items, step+1).map((childItem)=>{
+            this.walkTree(item.items, step+1).map((childItem) => {
                 return childItem
             })
         );
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name"}, "☻"+item.name);
-        return React.createElement("li", {key:idx++}, a, ul);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item.id}, "☻"+item.name);
+        return React.createElement("li", {key:item.id}, a, ul);
     };
 
-    public createLi=(item:any, step:number)=>{
-        const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name"}, "☺"+item.name);
-        return React.createElement("li", {key:idx++}, a);
+    public createLi = (item:any, step:number) => {
+        const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name", id:item.id}, "☺"+item.name);
+        return React.createElement("li", {key:item.id}, a);
     };
 
 
@@ -238,7 +238,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     // };
 
     public render() {
-        stateStoreService.walkTree();
         const list = this.load();
         return (
             <div>
