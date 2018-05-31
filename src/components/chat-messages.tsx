@@ -28,10 +28,10 @@ class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesStat
         if(this.props.messages.length){
              messagesHistory = this.props.messages.map((message, idx)=>{
                  if(message.sender === this.props.loggedInUser){
-                     return <MessageListItem className='me' key={idx} message={message}/>
+                     return(<div className='me-left'> <MessageListItem className='me' key={idx} message={message}/></div>)
                  }
                 else{
-                     return <MessageListItem key={idx} message={message}/>
+                     return (<div className='others-right'><MessageListItem key={idx} message={message}/></div>)
                  }
             })
         }

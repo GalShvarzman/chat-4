@@ -2,13 +2,16 @@ import User from './user';
 import IUser from './user';
 import {IMessage} from '../components/chat';
 let i = 0;
+let id = 0;
 
 export default interface IGroup{
     parent : IGroup,
     name : string,
     children : any[],
+    id:number;
     others?:IGroup,
     messages:IMessage[],
+    type:string;
     getParents() : IGroup[],
     isNodeExistInGroup(name:string):boolean,
     add(node:IGroup| IUser, parentNode?:IGroup):void,
@@ -22,15 +25,20 @@ export default interface IGroup{
 
 export default class Group implements IGroup{
     public array : any[] = [];
+    public id:number;
     public parent: IGroup;
     public name: string;
     public children: any[];
     public messages: IMessage[];
+    public type:string;
+
     constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
         this.children = this.array.concat(children||[]);
         this.messages = [];
+        this.id = ++id;
+        this.type = 'group';
     }
 
     public flattening() {
@@ -102,21 +110,42 @@ export default class Group implements IGroup{
     }
 
     public printFullTree(){
-        return [{"child":this, "step":0} , ...this.walkTree(this, 1)]
+        return [...this.walkTree(this)]
     }
 
-    public walkTree(node:IGroup, step:number){
+    public walkTree(node:IGroup){
         const allTree:any[] = [];
         if(node.children){
             node.children.forEach((child)=>{
-                allTree.push({child, step});
+                const node = this.getDetails(child);
+                allTree.push(node);
                 if(child.children){
-                    allTree.push(...this.walkTree(child, step+1));
+                    this.walkTree(child)
                 }
             });
             return allTree;
         }
         return allTree;
+    }
+
+    public getDetails(child:IUser|IGroup){
+        if(child instanceof Group){
+            const children:any[] = child.children.map((child)=>{
+                return this.getDetails(child);
+            });
+            return{
+                id: child.id,
+                type:child.type,
+                name:child.name,
+                items:children
+            }
+        }
+        else{
+            return{
+                type:child.type,
+                name:child.name,
+            }
+        }
     }
 
     public removeGroup(node:IGroup) {

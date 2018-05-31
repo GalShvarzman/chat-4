@@ -1,40 +1,8 @@
 import * as React from 'react';
 import './left-tree.css'
+import {stateStoreService} from "../state/state-store";
 let idx = 0;
-const items = [
-        {
-            "type": "group",
-            "name": "Friends",
-            "items": [
-                {
-                    "type": "group",
-                    "name": "Best Friends",
-                    "items": [
-                        {
-                            "type": "user",
-                            "name": "Tommy"
-                        }
-                    ]
-                },
-                {
-                    "type": "user",
-                    "name": "Udi"
-                }
-            ]
-        },
-            {
-                "type": "user",
-                "name": "Ori"
-            },
-            {
-                "type": "user",
-                "name": "gal"
-            },
-            {
-                "type": "user",
-                "name": "Roni"
-            }
-        ];
+const items = JSON.parse(stateStoreService.walkTree());
 
 interface listItem{
     items: object[],
@@ -270,6 +238,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     // };
 
     public render() {
+        stateStoreService.walkTree();
         const list = this.load();
         return (
             <div>

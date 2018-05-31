@@ -36,7 +36,10 @@ export class StateStoreService implements IStateStoreService{
             selectedObj.addMessage(message);
         }
         else if(selectedObj instanceof User){
-            selectedObj.addMessage(message, loggedInUser);
+            const result = selectedObj.addMessage(message, loggedInUser);
+            if(result){
+                this.updateUserMessages(result.user,result.chatWith)
+            }
         }
         this.onStoreChanged();
     }
@@ -117,6 +120,12 @@ export class StateStoreService implements IStateStoreService{
         else{
             return false
         }
+    }
+
+    public walkTree(){
+        const tree = StateStore.getInstance().tree;
+        const treeToPrint = tree.printFullTree();
+        return JSON.stringify(treeToPrint);
     }
 
     public subscribe(listener:any){

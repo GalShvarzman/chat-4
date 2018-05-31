@@ -1,6 +1,5 @@
 import IGroup from './group';
 import {IMessage} from '../components/chat';
-import {stateStoreService} from "../state/state-store";
 
 export default interface IUser {
     name:string,
@@ -8,9 +7,10 @@ export default interface IUser {
     password:string,
     parents : IGroup[],
     messages : {},
+    type:string;
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean,
-    addMessage(massage:{}, chatWith:string|null):void,
+    addMessage(massage:{}, chatWith:string|null):{user:IUser, chatWith:string}|void,
     getMessages(loggedInUserName:string|null|undefined):IMessage[]
 }
 
@@ -20,6 +20,7 @@ export default class User implements IUser{
     public password:string;
     public parents:IGroup[];
     public messages:{};
+    public type:string;
 
     constructor(username:string, age:number, password:string){
         this.name = username;
@@ -27,16 +28,16 @@ export default class User implements IUser{
         this.password = password;
         this.parents = [];
         this.messages = {};
+        this.type = 'user';
     }
 
     public addMessage(massage:string, chatWith:string){
         if(this.messages[chatWith]){
             this.messages[chatWith].push(massage);
+            return;
         }
-        else{
-            this.messages[chatWith] = [massage];
-            stateStoreService.updateUserMessages(this, chatWith);
-        }
+        this.messages[chatWith] = [massage];
+        return ({user:this, chatWith});
     }
 
     public removeParent(parentNode:IGroup){
