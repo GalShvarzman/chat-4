@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {ERROR_MSG} from "../App";
-import {IMessage} from '../components/chat';
+import {IMessage} from "../models/message";
 import './message-textarea.css';
 import send from '../images/send.png';
 interface IMassageTextAreaProps {
     data: {
-        loggedInUser: string | null,
+        loggedInUser: {name:string, id:string} | null,
         errorMsg: ERROR_MSG,
         counter: number,
         redirect:boolean

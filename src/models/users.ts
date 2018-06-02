@@ -6,7 +6,7 @@ export interface IUsersDb {
     deleteUser(username:string):boolean,
     addUser(user:IUser):void,
     getUserNamesList():string[],
-    getUser(userName:string|undefined):IUser|undefined,
+    getUser(userName:string):IUser,
     getUsers():IUser[]
 }
 
@@ -44,9 +44,15 @@ class UsersDb implements IUsersDb{
         })
     }
     public getUser(userName:string){
-        return this.users.find((user)=>{
+        const user = this.users.find((user)=>{
             return user.name === userName;
-        })
+        });
+        if(user){
+             return user;
+        }
+        else{
+            throw new Error("No user was Found");
+        }
     }
     public getUsers(){
         return this.users;

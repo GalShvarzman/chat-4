@@ -1,7 +1,7 @@
-import {IMessage} from "../components/chat";
+import {IMessage} from "../models/message";
 
 class MessagesDb{
-    private messages : {};
+    private messages:{};
     constructor(){
         this.messages = {};
     }
@@ -27,17 +27,25 @@ class MessagesDb{
     }
 
     getGroupMessages(groupId:string){
-        return this.messages[groupId];
+        if(this.messages[groupId]){
+            return this.messages[groupId];
+        }
+        return [];
     }
 
     getUsersConversationMessages(user1Id:string, user2Id:string){
         const conversationId = this.createUniqIdForUsersConversatuin(user1Id, user2Id);
-        return this.messages[conversationId];
+        if(this.messages[conversationId]){
+            return this.messages[conversationId];
+        }
+        return [];
     }
 
     createUniqIdForUsersConversatuin(user1Id:string, user2Id:string){
+        console.log("create uniq id",user1Id, user2Id);
         return [user1Id, user2Id].sort().join("_");
     }
 }
 
-export const messagedDb = new MessagesDb();
+export const messagesDb = new MessagesDb();
+debugger

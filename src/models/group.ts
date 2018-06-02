@@ -1,6 +1,6 @@
 import User from './user';
 import IUser from './user';
-import {IMessage} from '../components/chat';
+import {IMessage} from "../models/message";
 let i = 0;
 
 function create_UUID(){
@@ -28,8 +28,8 @@ export default interface IGroup{
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
     getGroupsList():IGroup[],
-    addMessage(message:IMessage):void,
-    getMessages():IMessage[]
+    // addMessage(message:IMessage):void,
+    // getMessages():IMessage[]
 }
 
 export default class Group implements IGroup{
@@ -351,13 +351,13 @@ export default class Group implements IGroup{
         }
     }
 
-    public addMessage(message:IMessage){
-        this.messages.push(message);
-    }
-
-    public getMessages(){
-        return this.messages.map((message)=>{
-            return message;
-        })
-    }
+    // public addMessage(message:IMessage){
+    //     this.messages.push(message);
+    // }
+    //
+    // public getMessages(){
+    //     return this.messages.map((message)=>{
+    //         return message;
+    //     })
+    // }
 }

@@ -5,16 +5,11 @@ import MessageTextarea from "./message-textarea";
 import './chat.css';
 import {ERROR_MSG} from "../App";
 import {stateStoreService} from "../state/state-store";
-
-export interface IMessage{
-    message:string,
-    date:string,
-    sender?:string|null
-}
-
+import {IMessage} from "../models/message";
+import {Message} from '../models/message';
 interface IChatProps {
     data:{
-        loggedInUser: string | null,
+        loggedInUser: {name:string, id:string} | null,
         errorMsg: ERROR_MSG,
         counter: number,
         redirect:boolean
@@ -24,7 +19,7 @@ interface IChatProps {
 interface IChatState {
     selectedName? : string,
     selectedId?:string,
-    // selectedA?:HTMLElement,
+    selectedType?:string,
     message:IMessage,
     selectedMassages?:IMessage[],
 }
@@ -32,36 +27,39 @@ interface IChatState {
 class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps) {
         super(props);
-            this.state = {message:{message:'', date:''}}
+            this.state = {message:{message:''}};
     }
 
-    public getSelected = (event:any) => {
-        if(event.target.tagName !== 'UL' && event.target.tagName !== 'LI'){
-            this.setState({selectedName: event.target.innerHTML.substr(1), selectedId:event.target.id /*selectedA:event.target*/}, ()=>{
-                // (this.state.selectedA as HTMLElement).classList.add('active');
-                if(this.props.data.loggedInUser){
-                    this.getSelectedMessageHistory();
-                }
-                else{
-                    alert("You need to login first...")
-                }
-            });
-        }
-        // if(this.state.selectedA && this.state.selectedA != event.target){
-        //     (this.state.selectedA as HTMLElement).classList.remove('active');
-        // }
+    public logOut = () => {
+        this.setState({selectedId:"", selectedType:"", selectedName:""})
+    };
 
+    public getSelected = (event:any) => {
+        if(this.props.data.loggedInUser) {
+            if (event.target.tagName !== 'UL' && event.target.tagName !== 'LI') {
+                this.setState({
+                    selectedName: event.target.innerHTML.substr(1),
+                    selectedId: event.target.id,
+                    selectedType:event.target.type
+                }, () => {
+                    this.getSelectedMessageHistory();
+                });
+            }
+        }
+        else{
+            alert("You need to login first...")
+        }
     };
 
     private getSelectedMessageHistory = () => {
-        if(this.state.selectedName){debugger
-            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selectedId, this.state.selectedName, this.props.data.loggedInUser);
-            this.setState({selectedMassages:messagesList, message:{message:'', date:''}});
+        if(this.state.selectedId && this.props.data.loggedInUser){
+            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selectedType, this.state.selectedId, this.props.data.loggedInUser.id);
+            this.setState({selectedMassages:messagesList, message:{message:""}});
         }
     };
 
     public handleChange = (event: any):void => {
-        this.setState({message : {message: event.target.value, date:''}});
+        this.setState({message : {message: event.target.value}});
     };
 
     public keyDownListener = (event:any) => {
@@ -79,9 +77,9 @@ class Chat extends React.Component<IChatProps, IChatState> {
         }
     };
 
-    public addMessage = ()=>{
+    public addMessage = ()=>{debugger
         this.setState({message:{message:this.state.message.message, date:new Date().toLocaleString().slice(0, -3)}}, ()=>{
-            stateStoreService.addMessage(this.state.selectedId, this.state.message, this.state.selectedName, this.props.data.loggedInUser);
+            stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3)), this.props.data.loggedInUser);
             this.getSelectedMessageHistory();
         });
     };
@@ -93,7 +91,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     <LeftTree getSelected={this.getSelected}/>
                 </div>
                 <div className="chat-right">
-                    <div className="massages" hidden={!this.state.selectedId || !this.props.data.loggedInUser}>
+                    <div className="massages">
                         <ChatMessages loggedInUser={this.props.data.loggedInUser} selectedName={this.state.selectedName} messages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">

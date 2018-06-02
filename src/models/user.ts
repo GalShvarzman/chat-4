@@ -1,5 +1,4 @@
 import IGroup from './group';
-import {IMessage} from '../components/chat';
 
 function create_UUID(){
     let dt = new Date().getTime();
@@ -20,8 +19,8 @@ export default interface IUser {
     type:string;
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean,
-    addMessage(massage:{}, chatWith:string|null):{user:IUser, chatWith:string}|void,
-    getMessages(loggedInUserName:string|null|undefined):IMessage[]
+    // addMessage(massage:{}, chatWith:string|null):{user:IUser, chatWith:string}|void,
+    // getMessages(loggedInUserName:string|null|undefined):IMessage[]
 }
 
 export default class User implements IUser{
@@ -34,6 +33,7 @@ export default class User implements IUser{
     public id:string;
 
     constructor(username:string, age:number, password:string){
+        if(username == 'Roni'){debugger}
         this.name = username;
         this.age = age;
         this.password = password;
@@ -43,13 +43,13 @@ export default class User implements IUser{
         this.id = create_UUID();
     }
 
-    public addMessage(massage:string, chatWith:string){
-        if(this.messages[chatWith]){
-            this.messages[chatWith].push(massage);
-            return;
-        }
-        this.messages[chatWith] = [massage];
-    }
+    // public addMessage(massage:string, chatWith:string){
+    //     if(this.messages[chatWith]){
+    //         this.messages[chatWith].push(massage);
+    //         return;
+    //     }
+    //     this.messages[chatWith] = [massage];
+    // }
 
     public removeParent(parentNode:IGroup){
         if(this.parents.length){
@@ -89,13 +89,13 @@ export default class User implements IUser{
         return enteredPassword === this.password
     }
 
-    public getMessages(loggedInUserName:string|null){debugger
-        if(loggedInUserName && this.messages[loggedInUserName]) {
-            return this.messages[loggedInUserName]
-        }
-        // else if(loggedInUserName){
-        //     return (this.messages[loggedInUserName] = []);
-        // }
-    }
+    // public getMessages(loggedInUserName:string|null){debugger
+    //     if(loggedInUserName && this.messages[loggedInUserName]) {
+    //         return this.messages[loggedInUserName]
+    //     }
+    //     // else if(loggedInUserName){
+    //     //     return (this.messages[loggedInUserName] = []);
+    //     // }
+    // }
 }
 

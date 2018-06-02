@@ -14,13 +14,14 @@ export enum ERROR_MSG{
 }
 
 interface IAppState {
-    loggedInUser: string | null,
+    loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
     redirect:boolean
 }
 
 class App extends React.Component<{}, IAppState> {
+    public chatMessagesChild:any;
 
     constructor(props:{}) {
         super(props);
@@ -37,21 +38,22 @@ class App extends React.Component<{}, IAppState> {
         });
     }
 
-    public auth = (user: {name:string, password:string}): boolean => {
+    public auth = (user: {name:string, password:string}) => {
         return stateStoreService.auth(user);
     };
 
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
-        if(this.auth(user)){
+        const userId = this.auth(user);
+        if(userId){
             this.setState({
-                loggedInUser: user.name,
+                loggedInUser: {name: user.name, id:userId},
                 errorMsg: ERROR_MSG.allGood,
                 redirect: true
             })
 
         }
         else{
-            if(this.state.counter===2){
+            if(this.state.counter === 2){
                 this.setState({
                     loggedInUser: null,
                     errorMsg: ERROR_MSG.locked
@@ -69,10 +71,11 @@ class App extends React.Component<{}, IAppState> {
 
     public loginRender = (props:any)=>(this.state.redirect ? <Redirect to={{ pathname: '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat ref={instance=>{this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
     public logOut = () => {
         this.setState({loggedInUser:null, redirect:false, errorMsg: ERROR_MSG.none});
+        this.chatMessagesChild.logOut();
     };
 
     public render() {
@@ -87,8 +90,8 @@ class App extends React.Component<{}, IAppState> {
                     <div className="nav-right">
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
-                    <div className='nav-right'>
-                        <div hidden={!this.state.loggedInUser} className="app-logged-in">You are logged in as: <span className='logged-in-name'>{this.state.loggedInUser}</span></div>
+                    <div hidden={!this.state.loggedInUser} className='nav-right'>
+                        <div className="app-logged-in">You are logged in as: <span className='logged-in-name'>{this.state.loggedInUser ? this.state.loggedInUser.name : ""}</span></div>
                     </div>
                 </nav>
                 <div className="switch">

@@ -1,9 +1,10 @@
 import * as React from 'react';
 import './message-list-item.css';
+import {IMessage} from "../models/message";
 
 interface IMessageListItemProps {
-    message:{message:string, date:string},
-    className?:string
+    className?:string,
+    message:IMessage
 }
 interface IChatMessageListItemState {
 
@@ -21,7 +22,7 @@ class MessageListItem extends React.Component<IMessageListItemProps, IChatMessag
             className = this.props.className
         }
         return (
-            <li className="message-li">
+            <li key={this.props.message.id}  className="message-li">
                 <div className={"message-text "+ className}>
                     {this.props.message.message}
                     <div className="message-date">{this.props.message.date}</div>

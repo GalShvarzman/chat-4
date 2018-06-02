@@ -1,12 +1,8 @@
 import {IUsersDb, usersDb} from "../models/users";
-import IUser from "../models/user";
-import User from '../models/user';
 import {nTree} from '../models/tree';
 import NTree from '../models/tree';
-import IGroup from "../models/group";
-import Group from '../models/group';
-import {IMessage} from '../components/chat';
-import {messagedDb} from "../models/messages";
+import {IMessage} from "../models/message";
+import {messagesDb} from "../models/messages";
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -30,59 +26,46 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
-    public addMessage(selectedId:string|undefined, message:IMessage, selected:string|undefined, loggedInUser:string|null){
-        message.sender = loggedInUser;
-        const selectedObj = this.locatingSelected(selectedId);
-        if(selectedObj instanceof Group){
-            selectedObj.addMessage(message);
+    public addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
+        if(loggedInUser && selectedId){
+            message.sender = loggedInUser.name;
+            if(selectedType === 'group'){
+                // StateStore.getInstance().messagesDb.addMessageToGroup();
+                messagesDb.addMessageToGroup(message, selectedId);
+            }
+            else{
+                messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
+            }
+            this.onStoreChanged();
         }
-        else if(selectedObj instanceof User && loggedInUser){
-            selectedObj.addMessage(message, loggedInUser);
-            this.updateOtherUserMessages(selectedObj, loggedInUser)
-        }
-        this.onStoreChanged();
     }
 
     public locatingSelected (selectedId:string|undefined) {
         return this.search(selectedId);
     }
 
-    public getSelectedMessagesHistory(selectedId:string|undefined,selected:string|undefined, loggedInUser?:string|null){
-       if(selected && selectedId){
-           const selectedObj:IUser|IGroup = this.locatingSelected(selectedId);
-           if(selectedObj){
-               if(selectedObj instanceof Group){
-                   return this.getMessages(selectedObj);
+    public getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
+       if(selectedId && selectedType && loggedInUserId){
+               if(selectedType === 'group'){
+                   return messagesDb.getGroupMessages(selectedId);
                }
-               return this.getMessages(selectedObj, loggedInUser);
-           }
-           throw new Error("Locating selected failed");
+               return messagesDb.getUsersConversationMessages(selectedId, loggedInUserId);
        }
-       throw new Error("No selected")
+       return [];
     }
 
-    private getMessages(match: IUser | IGroup , loggedInUserName?:string|null){
-        if(match){
-            if(match instanceof User){
-                return match.getMessages(loggedInUserName)
-            }
-            return match.getMessages();
-        }
-        throw new Error("No match");
-    }
+    //
+    // public updateOtherUserMessages(selectedObj:IUser, loggedInUser:string|null){
+    //     if(loggedInUser){
+    //         const chatWithUserObj = this.getUser(loggedInUser);
+    //         if(!(chatWithUserObj as IUser).messages[selectedObj.name]){}
+    //         (chatWithUserObj as IUser).messages[selectedObj.name] = selectedObj.messages[loggedInUser];
+    //     }
+    // }
 
-
-    public updateOtherUserMessages(selectedObj:IUser, loggedInUser:string|null){
-        if(loggedInUser){
-            const chatWithUserObj = this.getUser(loggedInUser);
-            if(!(chatWithUserObj as IUser).messages[selectedObj.name]){}
-            (chatWithUserObj as IUser).messages[selectedObj.name] = selectedObj.messages[loggedInUser];
-        }
-    }
-
-    private getUser(name:string|undefined){
-        return StateStore.getInstance().users.getUser(name);
-    }
+    // private getUser(name:string|undefined){
+    //     return StateStore.getInstance().users.getUser(name);
+    // }
 
     public search(id:string|undefined){
         return StateStore.getInstance().tree.search(id);
@@ -91,7 +74,12 @@ export class StateStoreService implements IStateStoreService{
     public auth(user:{name:string, password:string}){
         const currentUser = StateStore.getInstance().users.getUser(user.name);
         if(currentUser) {
-            return currentUser.auth(user.password)
+            if(currentUser.auth(user.password)){
+                return currentUser.id;
+            }
+            else{
+                return false;
+            }
         }
         else{
             return false
@@ -117,14 +105,15 @@ export class StateStoreService implements IStateStoreService{
 
 interface IStateStore {
     users : IUsersDb,
-    tree:NTree
+    tree:NTree,
+    messagesDb:{}
 }
 
 
 class StateStore implements IStateStore {
     public users:IUsersDb = usersDb;
     public tree:NTree = nTree;
-    public messages = messagedDb;
+    public messagesDb = messagesDb;
 
     static instance: IStateStore;
 
