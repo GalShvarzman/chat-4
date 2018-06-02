@@ -1,9 +1,10 @@
 import * as React from 'react';
 import MessageListItem from "./message-list-item";
 import './chat-messages.css';
+import {IMessage} from '../components/chat';
 
 interface IChatMessagesProps {
-    messages:any[],
+    messages:IMessage[]|undefined,
     selectedName:string|undefined,
     loggedInUser: string|null
 }
@@ -25,7 +26,7 @@ class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesStat
 
     public render() {
         let messagesHistory;
-        if(this.props.messages.length){
+        if(this.props.messages){
              messagesHistory = this.props.messages.map((message, idx)=>{
                  if(message.sender === this.props.loggedInUser){
                      return(<div className='me-left'> <MessageListItem className='me' key={idx} message={message}/></div>)
@@ -36,8 +37,8 @@ class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesStat
             })
         }
         return (
-            <div hidden={!this.props.loggedInUser || !this.props.selectedName} className='messages-wrapper'>
-                <div hidden={!this.props.selectedName}>
+            <div hidden={!this.props.selectedName || !this.props.loggedInUser} className='messages-wrapper'>
+                <div>
                     <h1 className='messages-on'>{this.props.selectedName}</h1>
                  </div>
                 <div style={this.ulWrapper}>

@@ -49,7 +49,6 @@ export default class User implements IUser{
             return;
         }
         this.messages[chatWith] = [massage];
-        return ({user:this, chatWith});
     }
 
     public removeParent(parentNode:IGroup){
@@ -90,13 +89,13 @@ export default class User implements IUser{
         return enteredPassword === this.password
     }
 
-    public getMessages(loggedInUserName:string|null){
+    public getMessages(loggedInUserName:string|null){debugger
         if(loggedInUserName && this.messages[loggedInUserName]) {
             return this.messages[loggedInUserName]
         }
-        else{
-            return [];
-        }
+        // else if(loggedInUserName){
+        //     return (this.messages[loggedInUserName] = []);
+        // }
     }
 }
 

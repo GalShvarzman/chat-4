@@ -29,10 +29,8 @@ class App extends React.Component<{}, IAppState> {
             loggedInUser: null,
             errorMsg: ERROR_MSG.none,
             counter: 0,
-            redirect:false,
+            redirect:false
         };
-
-
 
         stateStoreService.subscribe(() => {
             this.forceUpdate();

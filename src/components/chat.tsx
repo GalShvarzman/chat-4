@@ -26,13 +26,13 @@ interface IChatState {
     selectedId?:string,
     // selectedA?:HTMLElement,
     message:IMessage,
-    selectedMassages:IMessage[],
+    selectedMassages?:IMessage[],
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps) {
         super(props);
-            this.state = {message:{message:'', date:''}, selectedMassages: []}
+            this.state = {message:{message:'', date:''}}
     }
 
     public getSelected = (event:any) => {
@@ -54,7 +54,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     private getSelectedMessageHistory = () => {
-        if(this.state.selectedName){
+        if(this.state.selectedName){debugger
             const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selectedId, this.state.selectedName, this.props.data.loggedInUser);
             this.setState({selectedMassages:messagesList, message:{message:'', date:''}});
         }
@@ -93,7 +93,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     <LeftTree getSelected={this.getSelected}/>
                 </div>
                 <div className="chat-right">
-                    <div className="massages">
+                    <div className="massages" hidden={!this.state.selectedId || !this.props.data.loggedInUser}>
                         <ChatMessages loggedInUser={this.props.data.loggedInUser} selectedName={this.state.selectedName} messages={this.state.selectedMassages}/>
                     </div>
                     <div className="massage-text-area">

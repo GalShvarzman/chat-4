@@ -6,6 +6,7 @@ import NTree from '../models/tree';
 import IGroup from "../models/group";
 import Group from '../models/group';
 import {IMessage} from '../components/chat';
+import {messagedDb} from "../models/messages";
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -35,11 +36,9 @@ export class StateStoreService implements IStateStoreService{
         if(selectedObj instanceof Group){
             selectedObj.addMessage(message);
         }
-        else if(selectedObj instanceof User){
-            const result = selectedObj.addMessage(message, loggedInUser);
-            if(result){
-                this.updateOtherUserMessages(result.user,result.chatWith)
-            }
+        else if(selectedObj instanceof User && loggedInUser){
+            selectedObj.addMessage(message, loggedInUser);
+            this.updateOtherUserMessages(selectedObj, loggedInUser)
         }
         this.onStoreChanged();
     }
@@ -57,9 +56,9 @@ export class StateStoreService implements IStateStoreService{
                }
                return this.getMessages(selectedObj, loggedInUser);
            }
-           return [];
+           throw new Error("Locating selected failed");
        }
-       return [];
+       throw new Error("No selected")
     }
 
     private getMessages(match: IUser | IGroup , loggedInUserName?:string|null){
@@ -69,16 +68,16 @@ export class StateStoreService implements IStateStoreService{
             }
             return match.getMessages();
         }
-        return [];
+        throw new Error("No match");
     }
 
 
-    public updateOtherUserMessages(selectedUser:IUser, chatWith:string){
-        if(chatWith && selectedUser){
-            const chatWithUserObj = this.getUser(chatWith);
-            (chatWithUserObj as IUser).messages[selectedUser.name] = selectedUser.messages[chatWith];
+    public updateOtherUserMessages(selectedObj:IUser, loggedInUser:string|null){
+        if(loggedInUser){
+            const chatWithUserObj = this.getUser(loggedInUser);
+            if(!(chatWithUserObj as IUser).messages[selectedObj.name]){}
+            (chatWithUserObj as IUser).messages[selectedObj.name] = selectedObj.messages[loggedInUser];
         }
-
     }
 
     private getUser(name:string|undefined){
@@ -125,6 +124,7 @@ interface IStateStore {
 class StateStore implements IStateStore {
     public users:IUsersDb = usersDb;
     public tree:NTree = nTree;
+    public messages = messagedDb;
 
     static instance: IStateStore;
 
