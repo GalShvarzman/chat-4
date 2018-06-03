@@ -12,7 +12,7 @@ interface listItem{
 }
 
 interface ILeftTreeProps {
-    getSelected(event:any):void
+    getSelected(eventTarget:any):void
 }
 
 interface ILeftTreeState {
@@ -27,20 +27,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     }
 
-    // public load = () => {
-        // this.ul.remove();
-        // if(this.ul.children.length){
-        //     this.removeChildren(this.ul);
-        // }
-         //const tree:any[] = this.walkTree(items, 0);
-         //this.ul = this.getList(tree);
-        // for(let item of this.tree){
-        //     this.ul.appendChild(item);
-        // }
-
-        // document.body.insertBefore(this.ul,document.body.firstChild);
-    // };
-
     public load =  ()=>{
         return this.walkTree(items, 0);
     };
@@ -48,7 +34,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
         const keyName = e.key;
         if(e.target){
-            // this.props.getSelected(e);
             if((e.target as HTMLElement).className === "left tree"){
                 ((e.target as HTMLElement).children[0].querySelector(":scope > a") as HTMLElement).focus();
             }
@@ -59,7 +44,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
                 this.closeChildren((e.target as HTMLElement));
             }
             else if(keyName === "ArrowDown" || keyName === "ArrowUp"){
-                this.getAllLi((e.target as HTMLElement), keyName);
+                this.getAllLi((e.target as HTMLElement), keyName, e);
             }
             else if(keyName === "Enter"){
                 this.toggleExpandOrCollapse((e.target as HTMLElement))
@@ -73,7 +58,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public getAllLi = (element:HTMLElement, keyName:string)=>{
+    public getAllLi = (element:HTMLElement, keyName:string, e:any)=>{
         const selectedLi = element.parentElement;
         const allLi = document.querySelectorAll("li");
 
@@ -97,20 +82,28 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
             return result;
         }
         const index = findIndex();
-        if(index !== undefined && index !== -1){
-            if(keyName === "ArrowDown"){
-                const nextLi=index+1;
-                if(nextLi < displayedLi.length){
-                    (displayedLi[nextLi].querySelector(":scope>a") as HTMLElement).focus();
+        if(index !== undefined && index !== -1) {
+            let next: HTMLElement;
+            if (keyName === "ArrowDown") {
+                const nextLi = index + 1;
+                if (nextLi < displayedLi.length) {
+                    next = (displayedLi[nextLi].querySelector(":scope>a") as HTMLElement);
+                    this.goToNext(next);
                 }
             }
-            else if(keyName === "ArrowUp"){
-                const nextLi=index-1;
-                if(nextLi >= 0){
-                    (displayedLi[nextLi].querySelector(":scope>a") as HTMLElement).focus();
+            else if (keyName === "ArrowUp") {
+                const nextLi = index - 1;
+                if (nextLi >= 0) {
+                    next = (displayedLi[nextLi].querySelector(":scope>a") as HTMLElement);
+                    this.goToNext(next);
                 }
             }
         }
+    };
+
+    public goToNext = (next:HTMLElement)=>{
+        next.focus();
+        this.props.getSelected(next);
     };
 
     public openChildren = (element:HTMLElement)=>{
@@ -170,10 +163,10 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     };
 
-    public clickListener=(e:React.MouseEvent<HTMLElement>)=>{
+    public clickListener = (e:React.MouseEvent<HTMLElement>) => {
         (e.target as HTMLElement).focus();
         e.stopPropagation();
-        this.props.getSelected(e);
+        this.props.getSelected(e.target);
     };
 
     public shouldComponentUpdate(nextProps:any, nextState:any) {
@@ -220,22 +213,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name", id:item.id, type:item.type}, "☺"+item.name);
         return React.createElement("li", {key:item.id}, a);
     };
-
-
-    // public removeChildren=(element:HTMLElement)=>{
-    //     let length = element.children.length;
-    //     while(length > 0){
-    //         element.children[--length].remove();
-    //     }
-    // };
-
-    // public clear = () =>{
-    //     if(this.ul.children.length){
-    //         this.ul.remove();
-    //         this.removeChildren(this.ul);
-    //         document.body.insertBefore(this.ul,document.body.firstChild);
-    //     }
-    // };
 
     public render() {
         const list = this.load();

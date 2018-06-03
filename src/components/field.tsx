@@ -5,7 +5,7 @@ interface IFieldProps {
     name: string,
     type?: string,
     onChange(field:string, value:string):void,
-    className:string
+    className?:string
 }
 
 const Field:React.StatelessComponent<IFieldProps> = (props) => {

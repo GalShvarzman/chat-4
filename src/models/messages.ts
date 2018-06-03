@@ -1,6 +1,6 @@
 import {IMessage} from "../models/message";
 
-class MessagesDb{
+export class MessagesDb{
     private messages:{};
     constructor(){
         this.messages = {};
@@ -42,10 +42,8 @@ class MessagesDb{
     }
 
     createUniqIdForUsersConversatuin(user1Id:string, user2Id:string){
-        console.log("create uniq id",user1Id, user2Id);
         return [user1Id, user2Id].sort().join("_");
     }
 }
 
 export const messagesDb = new MessagesDb();
-debugger

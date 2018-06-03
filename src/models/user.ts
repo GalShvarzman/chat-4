@@ -1,14 +1,6 @@
 import IGroup from './group';
+import {create_UUID} from '../utils/uuid';
 
-function create_UUID(){
-    let dt = new Date().getTime();
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = (dt + Math.random()*16)%16 | 0;
-        dt = Math.floor(dt/16);
-        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-}
 export default interface IUser {
     id:string,
     name:string,
@@ -18,9 +10,7 @@ export default interface IUser {
     messages : {},
     type:string;
     removeParent(parentNode:IGroup):boolean,
-    auth(enteredPassword:string):boolean,
-    // addMessage(massage:{}, chatWith:string|null):{user:IUser, chatWith:string}|void,
-    // getMessages(loggedInUserName:string|null|undefined):IMessage[]
+    auth(enteredPassword:string):boolean
 }
 
 export default class User implements IUser{
@@ -33,7 +23,6 @@ export default class User implements IUser{
     public id:string;
 
     constructor(username:string, age:number, password:string){
-        if(username == 'Roni'){debugger}
         this.name = username;
         this.age = age;
         this.password = password;
@@ -42,14 +31,6 @@ export default class User implements IUser{
         this.type = 'user';
         this.id = create_UUID();
     }
-
-    // public addMessage(massage:string, chatWith:string){
-    //     if(this.messages[chatWith]){
-    //         this.messages[chatWith].push(massage);
-    //         return;
-    //     }
-    //     this.messages[chatWith] = [massage];
-    // }
 
     public removeParent(parentNode:IGroup){
         if(this.parents.length){
@@ -88,14 +69,5 @@ export default class User implements IUser{
     public auth(enteredPassword:string){
         return enteredPassword === this.password
     }
-
-    // public getMessages(loggedInUserName:string|null){debugger
-    //     if(loggedInUserName && this.messages[loggedInUserName]) {
-    //         return this.messages[loggedInUserName]
-    //     }
-    //     // else if(loggedInUserName){
-    //     //     return (this.messages[loggedInUserName] = []);
-    //     // }
-    // }
 }
 

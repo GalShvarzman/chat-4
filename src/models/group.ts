@@ -1,17 +1,9 @@
 import User from './user';
 import IUser from './user';
 import {IMessage} from "../models/message";
-let i = 0;
+import {create_UUID} from '../utils/uuid';
 
-function create_UUID(){
-    let dt = new Date().getTime();
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = (dt + Math.random()*16)%16 | 0;
-        dt = Math.floor(dt/16);
-        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-}
+let i = 0;
 
 export default interface IGroup{
     parent : IGroup,
@@ -22,14 +14,12 @@ export default interface IGroup{
     messages:IMessage[],
     type:string;
     getParents() : IGroup[],
-    isNodeExistInGroup(name:string):boolean,
+    isNodeExistInGroup(nodeId:string):boolean,
     add(node:IGroup| IUser, parentNode?:IGroup):void,
     search(nodeId:string|undefined): IUser|IGroup,
     removeGroup(node:IGroup):boolean,
     printFullTree():any[],
-    getGroupsList():IGroup[],
-    // addMessage(message:IMessage):void,
-    // getMessages():IMessage[]
+    getGroupsList():IGroup[]
 }
 
 export default class Group implements IGroup{
@@ -202,7 +192,7 @@ export default class Group implements IGroup{
     public checkForOthersGroup(groupChildren:IGroup[]|IUser[], newNode:IUser|IGroup, parentGroup:IGroup){
         const groupOthers = parentGroup.others;
         if (groupOthers) {
-            if((groupOthers as IGroup).isNodeExistInGroup(newNode.name)){
+            if((groupOthers as IGroup).isNodeExistInGroup(newNode.id)){
                 return false;
             }
             else{
@@ -311,9 +301,9 @@ export default class Group implements IGroup{
         return parents;
     }
 
-    public isNodeExistInGroup(name:string) {
+    public isNodeExistInGroup(nodeId:string) {
         const nodeIndex = this.children.findIndex((child:IGroup|IUser) => {
-            return child.name === name;
+            return child.id === nodeId;
         });
         return nodeIndex !== -1;
     }
@@ -350,14 +340,4 @@ export default class Group implements IGroup{
             return false;
         }
     }
-
-    // public addMessage(message:IMessage){
-    //     this.messages.push(message);
-    // }
-    //
-    // public getMessages(){
-    //     return this.messages.map((message)=>{
-    //         return message;
-    //     })
-    // }
 }

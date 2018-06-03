@@ -3,6 +3,9 @@ import {nTree} from '../models/tree';
 import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
+import {MessagesDb} from '../models/messages';
+import User from "../models/user";
+import IGroup from "../models/group";
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -26,15 +29,29 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
+    public addNewUser(newUser:{name:string, age?:number, password:string}){
+        if(StateStore.getInstance().users.isUserExists(newUser.name)){
+            return false;
+        }
+        else{
+            StateStore.getInstance().users.addUser(new User(newUser.name, newUser.age!, newUser.password));
+            return true;
+        }
+    }
+
+    public isUserExistInGroup(groupId:string, userId:string){
+        const group = StateStore.getInstance().tree.search(groupId);
+        return (group as IGroup).isNodeExistInGroup(userId);
+    }
+
     public addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
         if(loggedInUser && selectedId){
-            message.sender = loggedInUser.name;
+            message.sender = loggedInUser;
             if(selectedType === 'group'){
-                // StateStore.getInstance().messagesDb.addMessageToGroup();
-                messagesDb.addMessageToGroup(message, selectedId);
+                StateStore.getInstance().messagesDb.addMessageToGroup(message, selectedId);
             }
             else{
-                messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
+                StateStore.getInstance().messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
             }
             this.onStoreChanged();
         }
@@ -106,14 +123,14 @@ export class StateStoreService implements IStateStoreService{
 interface IStateStore {
     users : IUsersDb,
     tree:NTree,
-    messagesDb:{}
+    messagesDb:MessagesDb
 }
 
 
 class StateStore implements IStateStore {
     public users:IUsersDb = usersDb;
     public tree:NTree = nTree;
-    public messagesDb = messagesDb;
+    public messagesDb:MessagesDb = messagesDb;
 
     static instance: IStateStore;
 

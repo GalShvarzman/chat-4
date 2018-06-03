@@ -34,21 +34,32 @@ class Chat extends React.Component<IChatProps, IChatState> {
         this.setState({selectedId:"", selectedType:"", selectedName:""})
     };
 
-    public getSelected = (event:any) => {
+    public getSelected = (eventTarget:any) => {
         if(this.props.data.loggedInUser) {
-            if (event.target.tagName !== 'UL' && event.target.tagName !== 'LI') {
-                this.setState({
-                    selectedName: event.target.innerHTML.substr(1),
-                    selectedId: event.target.id,
-                    selectedType:event.target.type
-                }, () => {
-                    this.getSelectedMessageHistory();
-                });
+            if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI') {
+                if(eventTarget.type === 'group'){
+                    if(stateStoreService.isUserExistInGroup(eventTarget.id, this.props.data.loggedInUser.id)){
+                        this.setStateOnSelected(eventTarget);
+                    }
+                }
+                else{
+                    this.setStateOnSelected(eventTarget);
+                }
             }
         }
         else{
             alert("You need to login first...")
         }
+    };
+
+    private setStateOnSelected = (eventTarget:any) => {
+        this.setState({
+            selectedName: eventTarget.innerHTML.substr(1),
+            selectedId: eventTarget.id,
+            selectedType:eventTarget.type
+        }, () => {
+            this.getSelectedMessageHistory();
+        });
     };
 
     private getSelectedMessageHistory = () => {
@@ -77,9 +88,9 @@ class Chat extends React.Component<IChatProps, IChatState> {
         }
     };
 
-    public addMessage = ()=>{debugger
-        this.setState({message:{message:this.state.message.message, date:new Date().toLocaleString().slice(0, -3)}}, ()=>{
-            stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3)), this.props.data.loggedInUser);
+    public addMessage = ()=>{
+        this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3))}, ()=>{
+            stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
             this.getSelectedMessageHistory();
         });
     };

@@ -17,7 +17,8 @@ interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
-    redirect:boolean
+    redirectToChat:boolean,
+    redirectToLogin?:boolean
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -30,7 +31,8 @@ class App extends React.Component<{}, IAppState> {
             loggedInUser: null,
             errorMsg: ERROR_MSG.none,
             counter: 0,
-            redirect:false
+            redirectToChat:false,
+            redirectToLogin:false
         };
 
         stateStoreService.subscribe(() => {
@@ -48,7 +50,7 @@ class App extends React.Component<{}, IAppState> {
             this.setState({
                 loggedInUser: {name: user.name, id:userId},
                 errorMsg: ERROR_MSG.allGood,
-                redirect: true
+                redirectToChat: true
             })
 
         }
@@ -69,12 +71,23 @@ class App extends React.Component<{}, IAppState> {
         }
     };
 
-    public loginRender = (props:any)=>(this.state.redirect ? <Redirect to={{ pathname: '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public onSignUpSubmitHandler = (user:{name:string, age?:number, password:string}) => {
+        if(!stateStoreService.addNewUser(user)){
+            this.setState({errorMsg: ERROR_MSG.credentials})
+        }
+        else{
+            this.setState({redirectToLogin:true});
+        }
+    };
+
+    public loginRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+
+    public signUpRender = (props:any)=>(this.state.redirectToLogin ? <Redirect to={{ pathname : '/login'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat ref={instance=>{this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
     public logOut = () => {
-        this.setState({loggedInUser:null, redirect:false, errorMsg: ERROR_MSG.none});
+        this.setState({loggedInUser:null, redirectToChat:false, errorMsg: ERROR_MSG.none});
         this.chatMessagesChild.logOut();
     };
 
@@ -97,7 +110,7 @@ class App extends React.Component<{}, IAppState> {
                 <div className="switch">
                     <Switch>
                         <Route exact={true} path='/chat' render={this.chatRender}/>
-                        <Route path='/sign-up' component={SignUp}/>
+                        <Route path='/sign-up' render={this.signUpRender}/>
                         <Route path='/' render={this.chatRender}/>
                     </Switch>
                 </div>
