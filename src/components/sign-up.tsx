@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Link} from 'react-router-dom';
 import Field from "./field";
 import {ERROR_MSG} from "../App";
+import './sign-up.css'
 
 interface ISignUpProps {
     onSubmit(user:{name:string, age?:number, password:string}):void,
@@ -49,23 +50,21 @@ class SignUp extends React.Component<ISignUpProps, ISignUpState> {
 
     public render() {
         return (
-            <div>
-                <form>
-                    <div>
-                        <Link to='/'><button>X</button></Link>
-                    </div>
-                    <div>
-                        <Field name={'name'} type={'text'} onChange={this.updateField}/>
-                        <Field name={'age'} type={'number'} onChange={this.updateField}/>
-                        <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                        <button disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Sign up</button>
-                        <p style={{color:this.colors[this.props.signUpStatus]}}>{this.messages[this.props.signUpStatus]}</p>
-                        {/*<input type="text" placeholder="name"/>*/}
-                        {/*<input type="number" placeholder="age"/>*/}
-                        {/*<input type="password" placeholder="password"/>*/}
-                        {/*<Link to='/login'><input type="button" value="Submit"/></Link>*/}
-                    </div>
-                </form>
+            <div className="sign-up-wrapper">
+                <div className="sign-up-form-wrapper">
+                    <form className="sign-up-form">
+                        <div>
+                            <Link to='/'><button className='sign-up-x'>X</button></Link>
+                        </div>
+                        <div className="sign-up-fields">
+                            <Field name={'name'} type={'text'} onChange={this.updateField}/>
+                            <Field name={'age'} type={'number'} onChange={this.updateField}/>
+                            <Field name={'password'} type={'password'} onChange={this.updateField}/>
+                            <button className='sign-up-btn' disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Sign up</button>
+                            <p style={{color:this.colors[this.props.signUpStatus]}}>{this.messages[this.props.signUpStatus]}</p>
+                        </div>
+                    </form>
+                </div>
             </div>
         );
     }

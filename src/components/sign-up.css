@@ -1,22 +1,22 @@
-.login-form{
+.sign-up-form{
     padding: 0;
     vertical-align: middle;
 }
 
-.login-btn, .login-X{
+.sign-up-btn, .sign-up-X{
     color: darkslateblue;
     background-color: lightblue;
     border: 2px solid darkslateblue;
     border-radius: 5px;
 }
 
-.login-btn{
+.sign-up-btn{
     margin-top:2em;
     font-size:1em;
     padding:0.5em 1em;
 }
 
-.login-form-wrapper{
+.sign-up-form-wrapper{
     display: block;
     position: relative;
     top: 50%;
@@ -28,7 +28,7 @@
     background-color: white;
 }
 
-.login-wrapper{
+.sign-up-wrapper{
     background-color: rgba(0,0,0, 0.5);
     position: fixed;
     width: 100%;
@@ -41,13 +41,13 @@
     z-index: 1;
 }
 
-.login-X{
+.sign-up-X{
     margin-left:5px;
     margin-top: 5px;
     text-decoration: none;
 }
 
-.login-fields{
+.sign-up-fields{
     text-align: center;
     padding-top: 2em;
 }

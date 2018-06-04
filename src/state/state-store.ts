@@ -57,50 +57,37 @@ export class StateStoreService implements IStateStoreService{
         }
     }
 
-    public locatingSelected (selectedId:string|undefined) {
-        return this.search(selectedId);
-    }
-
     public getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
        if(selectedId && selectedType && loggedInUserId){
                if(selectedType === 'group'){
-                   return messagesDb.getGroupMessages(selectedId);
+                   return StateStore.getInstance().messagesDb.getGroupMessages(selectedId);
                }
-               return messagesDb.getUsersConversationMessages(selectedId, loggedInUserId);
+               return StateStore.getInstance().messagesDb.getUsersConversationMessages(selectedId, loggedInUserId);
        }
        return [];
     }
-
-    //
-    // public updateOtherUserMessages(selectedObj:IUser, loggedInUser:string|null){
-    //     if(loggedInUser){
-    //         const chatWithUserObj = this.getUser(loggedInUser);
-    //         if(!(chatWithUserObj as IUser).messages[selectedObj.name]){}
-    //         (chatWithUserObj as IUser).messages[selectedObj.name] = selectedObj.messages[loggedInUser];
-    //     }
-    // }
-
-    // private getUser(name:string|undefined){
-    //     return StateStore.getInstance().users.getUser(name);
-    // }
 
     public search(id:string|undefined){
         return StateStore.getInstance().tree.search(id);
     }
 
-    public auth(user:{name:string, password:string}){
-        const currentUser = StateStore.getInstance().users.getUser(user.name);
-        if(currentUser) {
+    public auth(user:{name:string, password:string}):string{
+        try{
+            const currentUser = StateStore.getInstance().users.getUser(user.name);
             if(currentUser.auth(user.password)){
                 return currentUser.id;
             }
             else{
-                return false;
+                throw new Error("Authentication failed");
             }
         }
-        else{
-            return false
+        catch(error){
+            throw new Error("Authentication failed");
         }
+    }
+
+    public getUserId(userName:string){
+        return StateStore.getInstance().users.getUser(userName).id;
     }
 
     public walkTree(){

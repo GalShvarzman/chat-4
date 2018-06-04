@@ -61,7 +61,7 @@ export default class Group implements IGroup{
                 });
                 return result;
             }
-           return false // check
+           return true;
         }
         else{
             return false
@@ -83,9 +83,8 @@ export default class Group implements IGroup{
                     childrenParent.push(...this.walkAllChildrenAndGetParent(child, node));
                 }
             });
-            return childrenParent;
         }
-        return childrenParent; // check
+        return childrenParent;
     }
 
     public getNumberOfChildren(){
@@ -103,7 +102,6 @@ export default class Group implements IGroup{
                     allChildren += this.walkChildren(child);
                 }
             });
-            // return allChildren;
         }
         return allChildren;
     }
@@ -207,14 +205,6 @@ export default class Group implements IGroup{
             (newNode as User).parents.push(parentGroup.others);
             return true;
         }
-
-        // if(parentGroup.others){ // fixme
-        //     (newNode as User).parents.push(parentGroup.others);
-        //     return true;
-        // }
-        // else{
-        //     return false;
-        // }
     }
 
 
@@ -323,7 +313,6 @@ export default class Group implements IGroup{
                     results.push(...this.internalSearchAllGroups(child));
                 }
             });
-            // return results;
         }
         return results;
     }

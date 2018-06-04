@@ -17,8 +17,7 @@ interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
-    redirectToChat:boolean,
-    redirectToLogin?:boolean
+    redirectToChat:boolean
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -32,7 +31,6 @@ class App extends React.Component<{}, IAppState> {
             errorMsg: ERROR_MSG.none,
             counter: 0,
             redirectToChat:false,
-            redirectToLogin:false
         };
 
         stateStoreService.subscribe(() => {
@@ -40,13 +38,9 @@ class App extends React.Component<{}, IAppState> {
         });
     }
 
-    public auth = (user: {name:string, password:string}) => {
-        return stateStoreService.auth(user);
-    };
-
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
-        const userId = this.auth(user);
-        if(userId){
+        try{
+            const userId = stateStoreService.auth(user);
             this.setState({
                 loggedInUser: {name: user.name, id:userId},
                 errorMsg: ERROR_MSG.allGood,
@@ -54,7 +48,7 @@ class App extends React.Component<{}, IAppState> {
             })
 
         }
-        else{
+        catch(error){
             if(this.state.counter === 2){
                 this.setState({
                     loggedInUser: null,
@@ -68,7 +62,9 @@ class App extends React.Component<{}, IAppState> {
                     counter: this.state.counter + 1
                 }));
             }
+
         }
+
     };
 
     public onSignUpSubmitHandler = (user:{name:string, age?:number, password:string}) => {
@@ -76,13 +72,14 @@ class App extends React.Component<{}, IAppState> {
             this.setState({errorMsg: ERROR_MSG.credentials})
         }
         else{
-            this.setState({redirectToLogin:true});
+            const userId = stateStoreService.getUserId(user.name);
+            this.setState({loggedInUser:{name:user.name, id:userId},redirectToChat:true});
         }
     };
 
     public loginRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
-    public signUpRender = (props:any)=>(this.state.redirectToLogin ? <Redirect to={{ pathname : '/login'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat ref={instance=>{this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
@@ -95,6 +92,7 @@ class App extends React.Component<{}, IAppState> {
         return (
             <div className="App">
                 <Route path='/login' render={this.loginRender}/>
+                <Route path='/sign-up' render={this.signUpRender}/>
                 <nav>
                     <div className="nav-left">
                         <Link to="/login"><button className="btn-login">login</button></Link>
@@ -110,7 +108,6 @@ class App extends React.Component<{}, IAppState> {
                 <div className="switch">
                     <Switch>
                         <Route exact={true} path='/chat' render={this.chatRender}/>
-                        <Route path='/sign-up' render={this.signUpRender}/>
                         <Route path='/' render={this.chatRender}/>
                     </Switch>
                 </div>

@@ -21,10 +21,12 @@ class UsersDb implements IUsersDb{
             return username === user.name;
         })
     }
+
     public isUserExists(username:string){
         const i = this.findUserIndex(username);
         return (i !== -1);
     }
+
     public deleteUser(username:string){
         const i = this.findUserIndex(username);
         if(i !== -1){
@@ -35,6 +37,7 @@ class UsersDb implements IUsersDb{
             return false;
         }
     }
+
     public addUser(user:IUser){
         this.users.push(user);
     }
@@ -43,20 +46,23 @@ class UsersDb implements IUsersDb{
             return user.name
         })
     }
+
     public getUser(userName:string){
         const user = this.users.find((user)=>{
             return user.name === userName;
         });
         if(user){
-             return user;
+            return user;
         }
         else{
             throw new Error("No user was Found");
         }
     }
+
     public getUsers(){
         return this.users;
     }
+
 }
 
 export const usersDb: IUsersDb = new UsersDb();
