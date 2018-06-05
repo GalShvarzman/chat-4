@@ -81,7 +81,7 @@ class App extends React.Component<{}, IAppState> {
 
     public signUpRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat ref={instance=>{this.chatMessagesChild = instance}} {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
     public logOut = () => {
         this.setState({loggedInUser:null, redirectToChat:false, errorMsg: ERROR_MSG.none});
