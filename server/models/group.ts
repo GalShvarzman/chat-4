@@ -1,7 +1,7 @@
 import User from './user';
 import IUser from './user';
 import {IMessage} from "./message";
-import {create_UUID} from '../utils/uuid';
+import {create_UUID} from '../../src/utils/uuid';
 
 let i = 0;
 

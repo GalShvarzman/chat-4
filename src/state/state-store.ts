@@ -1,4 +1,4 @@
-import {IUsersDb, usersDb} from "../models/users";
+import {IUsersDb} from "../models/users";
 import {nTree} from '../models/tree';
 import NTree from '../models/tree';
 import {IMessage} from "../models/message";
@@ -6,6 +6,7 @@ import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import User from "../models/user";
 import IGroup from "../models/group";
+import {getUsers} from '../server-api';
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -115,12 +116,17 @@ interface IStateStore {
 
 
 class StateStore implements IStateStore {
-    public users:IUsersDb = usersDb;
+    public users:any = this.getUsers();
     public tree:NTree = nTree;
     public messagesDb:MessagesDb = messagesDb;
 
     static instance: IStateStore;
 
+    async getUsers(){
+        const data = await getUsers();
+        debugger;
+        return data;
+    }
     static getInstance() {
         if (!StateStore.instance) {
             StateStore.instance = new StateStore();

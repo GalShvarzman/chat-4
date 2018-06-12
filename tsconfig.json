@@ -11,10 +11,10 @@
     "moduleResolution": "node",
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noImplicitThis": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
@@ -25,6 +25,7 @@
     "acceptance-tests",
     "webpack",
     "jest",
+    "server",
     "src/setupTests.ts"
   ]
 }
