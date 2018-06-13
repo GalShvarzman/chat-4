@@ -1,6 +1,6 @@
-export async function getUsers():Promise<any>{
-    return await fetch('/users')
+export function getUsers():Promise<any>{
+    return fetch('/users')
         .then((res)=>{
-            return res
+            return (res.json());
         })
 }

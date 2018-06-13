@@ -1,0 +1,46 @@
+.admin{
+    display: inline-block;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0.3em 0.6em;
+    color: #ffffff;
+    font-size: 1em;
+    margin-top: 0.2em;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.menu{
+    display: inline-block;
+    width:6em;
+    height: auto;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 1;
+    margin-top: 2.12em;
+    left: 8em;
+    background: #ffffff;
+    box-shadow: 0 0.5em 1em 0 rgba(0,0,0,0.2);
+}
+
+.menu li button{
+    color: #4e009c;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 1em;
+}
+
+.menu li{
+    text-align: center;
+    box-sizing: border-box;
+    margin:0;
+    padding:0.3em;
+}
+
+.menu li:hover {
+    background-color: #f1f1f1
+}

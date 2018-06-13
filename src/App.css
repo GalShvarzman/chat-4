@@ -5,6 +5,7 @@
 .switch{
   height: 95%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 .nav-left{
   float:left;

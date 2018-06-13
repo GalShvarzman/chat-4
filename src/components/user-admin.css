@@ -1,0 +1,24 @@
+.delete-user-btn{
+    border:none;
+    background: white;
+    cursor: pointer;
+    outline: none;
+    margin-right: 1em;
+}
+
+.table{
+    width:80%;
+    text-align: center;
+    margin: auto;
+    overflow: auto;
+}
+
+a.user-age, a.user-name{
+    text-decoration: none;
+    font-size:1em;
+    color:black;
+}
+
+.users-header{
+    text-align: center;
+}

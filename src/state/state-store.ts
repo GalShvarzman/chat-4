@@ -97,6 +97,11 @@ export class StateStoreService implements IStateStoreService{
         return JSON.stringify(treeToPrint);
     }
 
+    public async getUsers(){
+        const res = await getUsers();
+        return res.data;
+    }
+
     public subscribe(listener:any){
         this.listeners.push(listener);
     }
@@ -116,17 +121,12 @@ interface IStateStore {
 
 
 class StateStore implements IStateStore {
-    public users:any = this.getUsers();
+    public users:any;
     public tree:NTree = nTree;
     public messagesDb:MessagesDb = messagesDb;
 
     static instance: IStateStore;
 
-    async getUsers(){
-        const data = await getUsers();
-        debugger;
-        return data;
-    }
     static getInstance() {
         if (!StateStore.instance) {
             StateStore.instance = new StateStore();

@@ -5,6 +5,9 @@ import './App.css';
 import SignUp from "./components/sign-up";
 import {stateStoreService} from "./state/state-store";
 import Chat from "./components/chat";
+import Menu from "./components/menu";
+import UserAdmin from "./components/user-admin";
+import UserEdit from "./components/user-edit";
 
 export enum ERROR_MSG{
     none,
@@ -17,11 +20,13 @@ interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
-    redirectToChat:boolean
+    redirectToChat:boolean,
+    users:any
 }
 
 class App extends React.Component<{}, IAppState> {
     public chatMessagesChild:any;
+    public menu:any;
 
     constructor(props:{}) {
         super(props);
@@ -31,11 +36,16 @@ class App extends React.Component<{}, IAppState> {
             errorMsg: ERROR_MSG.none,
             counter: 0,
             redirectToChat:false,
+            users: null
         };
 
         stateStoreService.subscribe(() => {
             this.forceUpdate();
         });
+    }
+
+    async componentDidMount(){
+         this.setState({users: await stateStoreService.getUsers()})
     }
 
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
@@ -88,6 +98,10 @@ class App extends React.Component<{}, IAppState> {
         this.chatMessagesChild.logOut();
     };
 
+    public usersRender = () => (<UserAdmin refMenu={this.menu} users={this.state.users}/>);
+
+    public userEditRender = (props:any) => (<UserEdit {...props}/>);
+
     public render() {
         return (
             <div className="App">
@@ -97,6 +111,7 @@ class App extends React.Component<{}, IAppState> {
                     <div className="nav-left">
                         <Link to="/login"><button className="btn-login">login</button></Link>
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
+                        <Menu ref={instance => {this.menu = instance}}/>
                     </div>
                     <div className="nav-right">
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
@@ -108,7 +123,9 @@ class App extends React.Component<{}, IAppState> {
                 <div className="switch">
                     <Switch>
                         <Route exact={true} path='/chat' render={this.chatRender}/>
-                        <Route path='/' render={this.chatRender}/>
+                        <Route exact={true} path='/' render={this.chatRender}/>
+                        <Route exact={true} path='/users' render={this.usersRender}/>
+                        <Route exact={true} path='/users/:id/edit' render={this.userEditRender}/>
                     </Switch>
                 </div>
             </div>
