@@ -2,25 +2,25 @@ import IGroup from './group';
 import {create_UUID} from '../utils/uuid';
 
 export default interface IUser {
-    id:string,
+    id?:string,
     name:string,
     age?:number,
-    password:string,
-    parents : IGroup[],
-    messages : {},
-    type:string;
-    removeParent(parentNode:IGroup):boolean,
-    auth(enteredPassword:string):boolean
+    password?:string,
+    parents? : IGroup[],
+    messages? : {},
+    type?:string;
+    removeParent?(parentNode:IGroup):boolean,
+    auth?(enteredPassword:string):boolean
 }
 
 export default class User implements IUser{
     public name:string;
     public age?:number;
-    public password:string;
-    public parents:IGroup[];
-    public messages:{};
-    public type:string;
-    public id:string;
+    public password?:string;
+    public parents?:IGroup[];
+    public messages?:{};
+    public type?:string;
+    public id?:string;
 
     constructor(username:string, age:number, password:string){
         this.name = username;
@@ -32,7 +32,7 @@ export default class User implements IUser{
         this.id = create_UUID();
     }
 
-    public removeParent(parentNode:IGroup){
+    public removeParent?(parentNode:IGroup){
         if(this.parents.length){
             const i = this.parents.findIndex((parent)=>{
                 return parent  === parentNode
@@ -48,16 +48,16 @@ export default class User implements IUser{
         return false;
     }
 
-    public updateAge(newAge:number){
+    public updateAge?(newAge:number){
         this.age = newAge;
         return true;
     }
-    public updatePassword(newPassword:any){
+    public updatePassword?(newPassword:any){
         this.password = newPassword;
         return true;
     }
 
-    public getParentsToPrint(){
+    public getParentsToPrint?(){
         if(this.parents.length){
             return this.parents.map((parent)=>{
                 return parent.name;
@@ -66,7 +66,7 @@ export default class User implements IUser{
         return false;
     }
 
-    public auth(enteredPassword:string){
+    public auth?(enteredPassword:string){
         return enteredPassword === this.password
     }
 }

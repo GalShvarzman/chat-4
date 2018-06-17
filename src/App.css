@@ -28,7 +28,7 @@ nav{
   background-color: #8fb3ae;
 }
 
-.btn-sign-up, .btn-login, .btn-log-out{
+.btn-sign-up, .btn-login, .btn-log-out, .btn-home{
   border: none;
   background: transparent;
   cursor: pointer;

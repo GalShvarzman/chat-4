@@ -8,19 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const users_1 = require("../models/users");
-class UsersService {
-    getAllUsers() {
+const services = require("../services");
+class UsersController {
+    saveUserDetails(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_1.default.getUsers();
+            try {
+                yield services.usersService.saveUserDetails(req.body);
+                res.status(200).json({ message: "User details have been updated" });
+            }
+            catch (e) {
+                res.status(500).json({ message: e });
+            }
         });
     }
-    saveUserDetails(userDetails) {
+    getAllUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_1.default.updateUserDetails(userDetails);
+            const data = yield services.usersService.getAllUsers();
+            res.status(200).json(data);
         });
     }
 }
-const usersService = new UsersService();
-exports.default = usersService;
-//# sourceMappingURL=users-service.js.map
+const usersController = new UsersController();
+exports.default = usersController;
+//# sourceMappingURL=users-controller.js.map

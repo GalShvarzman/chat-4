@@ -1,7 +1,7 @@
 import Group from './group';
 import IGroup from './group';
 import IUser from "./user";
-import {usersDb} from "./users";
+import users from "./users";
 
 export default class NTree{
     public root:IGroup;
@@ -35,9 +35,9 @@ export const nTree:NTree = new NTree();
 const friends = new Group(nTree.root, "Friends", []);
 const bestFriends = new Group(friends, "Best Friends", []);
 
-nTree.add(friends);
-nTree.add(bestFriends, friends);
-nTree.add(usersDb.getUser('Tommy'), bestFriends);
-nTree.add(usersDb.getUser('Udi'), bestFriends);
-nTree.add(usersDb.getUser('Ori'));
-nTree.add(usersDb.getUser('Roni'));
+// nTree.add(friends);
+// nTree.add(bestFriends, friends);
+// nTree.add(users.getUser('Tommy'), bestFriends);
+// nTree.add(users.getUser('Udi'), bestFriends);
+// nTree.add(users.getUser('Ori'));
+// nTree.add(users.getUser('Roni'));

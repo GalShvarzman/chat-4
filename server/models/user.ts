@@ -11,6 +11,8 @@ export default interface IUser {
     type:string;
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean
+    updateAge(newAge:number):boolean,
+    updatePassword(newPassword:string):boolean
 }
 
 export default class User implements IUser{
@@ -52,7 +54,7 @@ export default class User implements IUser{
         this.age = newAge;
         return true;
     }
-    public updatePassword(newPassword:any){
+    public updatePassword(newPassword:string){
         this.password = newPassword;
         return true;
     }

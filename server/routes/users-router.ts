@@ -1,11 +1,13 @@
 import * as express from 'express';
-import {usersDb} from '../lib/DB';
+import * as controllers from '../controllers';
 
 const usersRouter = express.Router();
 
-usersRouter.get('/', (req,res)=>{
-   const data = usersDb.getData();
-   res.status(200).json(data);
-});
+usersRouter.put('/:id/edit', controllers.usersController.saveUserDetails);
+
+usersRouter.delete('/:id', controllers.usersController.deleteUser);
+
+usersRouter.get('/', controllers.usersController.getAllUsers);
+
 
 export default usersRouter;

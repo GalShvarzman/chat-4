@@ -1,13 +1,15 @@
 import IUser from "./user";
 import User from "./user"
+import {db} from '../lib/DB';
 
 export interface IUsersDb {
     isUserExists(username:string):boolean,
-    deleteUser(username:string):boolean,
+    deleteUser(username:string):Promise<boolean>,
     addUser(user:IUser):void,
     getUserNamesList():string[],
-    getUser(userName:string):IUser,
-    getUsers():IUser[]
+    getUser(userName:string):Promise<IUser>,
+    getUsers():Promise<{data:{name:string, age:number, id:string}[]}>,
+    updateUserDetails(user:IUser):Promise<boolean>
 }
 
 class UsersDb implements IUsersDb{
@@ -27,15 +29,17 @@ class UsersDb implements IUsersDb{
         return (i !== -1);
     }
 
-    public deleteUser(username:string){
-        const i = this.findUserIndex(username);
-        if(i !== -1){
-            this.users.splice(i, 1);
-            return true;
-        }
-        else{
-            return false;
-        }
+    public async deleteUser(username:string):Promise<boolean>{
+        return await db.deleteUser(username);
+
+        // const i = this.findUserIndex(username);
+        // if(i !== -1){
+        //     this.users.splice(i, 1);
+        //     return true;
+        // }
+        // else{
+        //     return false;
+        // }
     }
 
     public addUser(user:IUser){
@@ -47,8 +51,9 @@ class UsersDb implements IUsersDb{
         })
     }
 
-    public getUser(userName:string){
-        const user = this.users.find((user)=>{
+    public async getUser(userName:string){
+        const users:{data:any[]} = await this.getUsers();
+        const user = users.data.find((user)=>{
             return user.name === userName;
         });
         if(user){
@@ -59,10 +64,17 @@ class UsersDb implements IUsersDb{
         }
     }
 
-    public getUsers(){
-        return this.users;
+    public async getUsers():Promise<{data:{name:string, age:number, id:string}[]}>{
+        // return this.users;
+        return await db.getUsersList();
+    }
+
+    public async updateUserDetails(userNewDetails):Promise<boolean>{
+        return await db.updateUserDetails(userNewDetails);
     }
 
 }
 
-export const usersDb: IUsersDb = new UsersDb();
+const users: IUsersDb = new UsersDb();
+
+export default users;

@@ -8,6 +8,7 @@ import Chat from "./components/chat";
 import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
 import UserEdit from "./components/user-edit";
+import IUser from "./models/user";
 
 export enum ERROR_MSG{
     none,
@@ -39,14 +40,18 @@ class App extends React.Component<{}, IAppState> {
             users: null
         };
 
-        stateStoreService.subscribe(() => {
-            this.forceUpdate();
+        stateStoreService.subscribe(async() => {
+            this.setState({users: await stateStoreService.getUsers()});
         });
     }
 
     async componentDidMount(){
          this.setState({users: await stateStoreService.getUsers()})
     }
+
+    public onEditUserDetails = async (user:IUser)=>{
+        return await stateStoreService.saveUserDetails(user);
+    };
 
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
         try{
@@ -100,7 +105,7 @@ class App extends React.Component<{}, IAppState> {
 
     public usersRender = () => (<UserAdmin refMenu={this.menu} users={this.state.users}/>);
 
-    public userEditRender = (props:any) => (<UserEdit {...props}/>);
+    public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
     public render() {
         return (
@@ -109,6 +114,7 @@ class App extends React.Component<{}, IAppState> {
                 <Route path='/sign-up' render={this.signUpRender}/>
                 <nav>
                     <div className="nav-left">
+                        <Link to="/"><button className="btn-home">Home</button></Link>
                         <Link to="/login"><button className="btn-login">login</button></Link>
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
                         <Menu ref={instance => {this.menu = instance}}/>

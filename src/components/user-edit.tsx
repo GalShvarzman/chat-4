@@ -1,17 +1,22 @@
 import * as React from 'react';
 import Field from "./field";
+import IUser from "../models/user";
+import './user-edit.css';
+import {Link} from "react-router-dom";
 
 interface IUserEditProps {
-    location:any
+    location:any,
+    onEditUserDetails(user:IUser):{message:string}
 }
 
 interface IUserEditState {
     user: {
         name:string,
-        age:number,
+        age?:number,
         id:string,
         password?:string
-    }
+    },
+    message?:string
 }
 
 class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
@@ -25,6 +30,11 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
             }
         }
     }
+
+    public save = async () => {
+        const result:{message:string} = await this.props.onEditUserDetails(this.state.user);
+        this.setState({message:result.message});
+    };
 
     public updateField = (fieldName: string, value: string) => {
         this.setState(prevState => {
@@ -40,11 +50,15 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
     render(){
         return(
             <div>
-                <h3>Edit {this.state.user.name}'s details</h3>
-                <Field name={'age'} type={'number'} user={this.state.user.age} onChange={this.updateField}/>
-                <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                <button disabled={!this.state.user.age || !this.state.user.password} type="button">Save</button>
-                {/*<p style={{color:this.colors[this.props.signUpStatus]}}>{this.messages[this.props.signUpStatus]}</p>*/}
+                <Link to='/users'><button className="edit-back-btn">Back</button></Link>
+                <div className="edit-wrapper">
+                    <h3 className="edit-name">Edit {this.state.user.name}'s details</h3>
+                    <Field name={'age'} type={'number'} user={this.state.user.age} onChange={this.updateField}/>
+                    <Field name={'password'} type={'password'} onChange={this.updateField}/>
+                    <button className="edit-save-btn"  type="button" onClick={this.save}>Save</button>
+                    <p hidden={!this.state.message}>{this.state.message}</p>
+
+                </div>
             </div>
         )
     }

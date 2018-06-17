@@ -4,9 +4,9 @@ import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
-import User from "../models/user";
+import User, {default as IUser} from "../models/user";
 import IGroup from "../models/group";
-import {getUsers} from '../server-api';
+import {getUsers, saveUserDetails} from '../server-api';
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -54,7 +54,7 @@ export class StateStoreService implements IStateStoreService{
             else{
                 StateStore.getInstance().messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
             }
-            this.onStoreChanged();
+            // this.onStoreChanged();
         }
     }
 
@@ -100,6 +100,12 @@ export class StateStoreService implements IStateStoreService{
     public async getUsers(){
         const res = await getUsers();
         return res.data;
+    }
+
+    public async saveUserDetails(user:IUser){
+        const result = await saveUserDetails(user);
+        this.onStoreChanged();
+        return result;
     }
 
     public subscribe(listener:any){

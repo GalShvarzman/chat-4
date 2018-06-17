@@ -44,13 +44,13 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
             }, {
                 Header: 'Age',
                 accessor: 'age',
-                Cell: (props: any) => <Link className="user-age" to={{pathname: `/users/${props.original.id}/edit`}}>{props.value}</Link>
+                Cell: (props: any) => <Link className="user-age" to={{pathname: `/users/${props.original.id}/edit`, state:{user:props.original}}}>{props.value}</Link>
         }];
 
         return(
             <>
                 <h1 className="users-header">Users</h1>
-                <ReactTable defaultPageSize={13} minRows={13} className="table" data={data} columns={columns}/>
+                <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={13} minRows={13} className="table" data={data} columns={columns}/>
             </>
         )
     }

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const group_1 = require("./group");
-const users_1 = require("./users");
 class NTree {
     constructor() {
         this.root = new group_1.default(this.root, "treeRoot", []);
@@ -29,10 +28,10 @@ exports.default = NTree;
 exports.nTree = new NTree();
 const friends = new group_1.default(exports.nTree.root, "Friends", []);
 const bestFriends = new group_1.default(friends, "Best Friends", []);
-exports.nTree.add(friends);
-exports.nTree.add(bestFriends, friends);
-exports.nTree.add(users_1.usersDb.getUser('Tommy'), bestFriends);
-exports.nTree.add(users_1.usersDb.getUser('Udi'), bestFriends);
-exports.nTree.add(users_1.usersDb.getUser('Ori'));
-exports.nTree.add(users_1.usersDb.getUser('Roni'));
+// nTree.add(friends);
+// nTree.add(bestFriends, friends);
+// nTree.add(users.getUser('Tommy'), bestFriends);
+// nTree.add(users.getUser('Udi'), bestFriends);
+// nTree.add(users.getUser('Ori'));
+// nTree.add(users.getUser('Roni'));
 //# sourceMappingURL=tree.js.map
