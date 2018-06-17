@@ -10,21 +10,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const services = require("../services");
 class UsersController {
-    saveUserDetails(req, res) {
+    tryCatch(next, func) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield services.usersService.saveUserDetails(req.body);
-                res.status(200).json({ message: "User details have been updated" });
+                return yield func();
             }
-            catch (e) {
-                res.status(500).json({ message: e });
+            catch (err) {
+                next(err);
             }
         });
     }
-    getAllUsers(req, res) {
+    saveUserDetails(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = yield services.usersService.getAllUsers();
-            res.status(200).json(data);
+            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                yield services.usersService.saveUserDetails(req.body);
+                res.status(201).json({ message: "User details have been updated successfully" });
+            }));
+        });
+    }
+    getAllUsers(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                res.status(200).json(yield services.usersService.getAllUsers());
+            }));
+        });
+    }
+    deleteUser(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                return yield services.usersService.deleteUser(req.body);
+            }));
         });
     }
 }

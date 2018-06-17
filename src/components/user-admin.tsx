@@ -6,7 +6,8 @@ import './user-admin.css';
 
 interface IUserAdminProps {
     users:any,
-    refMenu:any
+    refMenu:any,
+    deleteUser(user:{name: string, age: string, id: string}):void
 }
 
 interface IUserAdminState {
@@ -30,6 +31,24 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
     //     }
     // };
 
+    // private onDelete= (e:React.MouseEvent<HTMLButtonElement>) => {
+    //     debugger;
+    //     this.props.deleteUser(e)
+    // };
+
+    private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
+        return {
+            onClick: (e:any, handleOriginal:any) => {
+                if(e.target.className === "fa fa-trash"){
+                    this.props.deleteUser(rowInfo.original)
+                }
+                if (handleOriginal) {
+                    handleOriginal();
+                }
+            }
+        };
+    };
+
     render(){
         const data = this.props.users;
         const columns = [
@@ -50,7 +69,7 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
         return(
             <>
                 <h1 className="users-header">Users</h1>
-                <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={13} minRows={13} className="table" data={data} columns={columns}/>
+                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={13} minRows={13} className="table" data={data} columns={columns}/>
             </>
         )
     }

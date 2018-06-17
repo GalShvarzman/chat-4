@@ -13,7 +13,19 @@ export function saveUserDetails(user:IUser):Promise<any>{
         body:JSON.stringify(user),
         headers:{'content-type': 'application/json'}
     })
-        .then((res)=>{
-            return res.json();
-        })
+    .then((res)=>{
+        return res.json();
+    })
+}
+
+export function deleteUser(user:{name:string, age:string, id:string}):Promise<boolean>{
+    debugger;
+    return fetch(`/users/${user.id}`, {
+        method:'DELETE',
+        body:JSON.stringify(user),
+        headers:{'content-type': 'application/json'}
+    })
+    .then((res)=>{
+        return res.json();
+    })
 }

@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const path = require("path");
 const hash_1 = require("../utils/hash");
+const usersFile = 'users.json';
 class DB {
     readFile(fileName) {
         return new Promise((resolve, reject) => {
@@ -29,13 +30,13 @@ class DB {
                 if (err)
                     reject(err);
                 console.log('The file has been saved!');
-                resolve();
+                resolve(true);
             });
         });
     }
     getUsersList() {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.readFile('users.json');
+            const result = yield this.readFile(usersFile); // fixme;
             result.data = result.data.map((user) => {
                 return { "name": user.name, "age": user.age, "id": user.id };
             });
@@ -44,22 +45,58 @@ class DB {
     }
     getUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.readFile('users.json');
+            try {
+                return yield this.readFile(usersFile);
+            }
+            catch (e) {
+                throw new Error("getUsersFailed");
+            }
+        });
+    }
+    getUserIndexByName(result, userName) {
+        return result.data.findIndex((user) => {
+            return user.name === userName;
         });
     }
     updateUserDetails(userNewDetails) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.getUsers();
-            let userIndex = result.data.findIndex((user) => {
-                return user.name === userNewDetails.name;
-            });
-            if (userNewDetails.age) {
-                result.data[userIndex].age = userNewDetails.age;
+            let userIndex = this.getUserIndexByName(result, userNewDetails.name);
+            if (userIndex !== -1) {
+                if (userNewDetails.age) {
+                    result.data[userIndex].age = userNewDetails.age;
+                }
+                if (userNewDetails.password) {
+                    result.data[userIndex].password = yield hash_1.createHash(userNewDetails.password);
+                }
+                try {
+                    return yield this.writeFile(result, usersFile);
+                }
+                catch (e) {
+                    throw new Error("updateUserDetailsFailed");
+                }
             }
-            if (userNewDetails.password) {
-                result.data[userIndex].password = yield hash_1.createHash(userNewDetails.password);
+            else {
+                throw new Error("userDoesNotExist");
             }
-            return yield this.writeFile(result, 'users.json');
+        });
+    }
+    deleteUser(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.readFile(usersFile);
+            const userIndex = this.getUserIndexByName(result, username);
+            if (userIndex !== -1) {
+                result.data.splice(userIndex, 1);
+                try {
+                    return yield this.writeFile(result, usersFile);
+                }
+                catch (e) {
+                    throw new Error("deleteUserFailed");
+                }
+            }
+            else {
+                throw new Error("userDoesNotExist");
+            }
         });
     }
 }

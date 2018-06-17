@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {createHash} from '../utils/hash';
+import {ClientError} from "../utils/client-error";
 const usersFile = 'users.json';
+
 class DB{
     readFile(fileName):Promise<{data:any[]}>{
         return new Promise((resolve, reject)=>{
@@ -25,7 +27,7 @@ class DB{
     }
 
     async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-        const result = await this.readFile(usersFile);
+        const result = await this.readFile(usersFile); // fixme;
 
         result.data = result.data.map((user)=>{
             return {"name":user.name, "age":user.age, "id":user.id}
@@ -35,49 +37,55 @@ class DB{
     }
 
     async getUsers():Promise<{data:{name:string, age:number, id:string, password:string}[]}>{
-        return await this.readFile(usersFile);
+        try{
+            return await this.readFile(usersFile);
+        }
+        catch(e){
+            throw new Error("getUsersFailed");
+        }
     }
 
-    getUserIndexByName(result, userName){
-        const userIndex = result.data.findIndex((user) => {
+    getUserIndexByName(result, userName) {
+        return result.data.findIndex((user) => {
             return user.name === userName;
         });
-
-        if(userIndex !== -1){
-            return userIndex
-        }
-        else{
-            return;
-        }
     }
 
     async updateUserDetails(userNewDetails):Promise<boolean> {
         const result = await this.getUsers();
         let userIndex = this.getUserIndexByName(result,userNewDetails.name);
-        if(userIndex){
+        if(userIndex !== -1){
             if(userNewDetails.age){
                 result.data[userIndex].age = userNewDetails.age;
             }
             if(userNewDetails.password){
                 result.data[userIndex].password  = await createHash(userNewDetails.password);
             }
-            return await this.writeFile(result, usersFile);
+            try{
+                return await this.writeFile(result, usersFile);
+            }
+            catch(e){
+                throw new Error("updateUserDetailsFailed");
+            }
+        }
+        else{
+            throw new Error("userDoesNotExist");
         }
     }
 
     async deleteUser(username:string):Promise<boolean> {
-        const result = await this.readFile(usersFile);
-        const userIndex = this.getUserIndexByName(result, username);
-        if (userIndex) {
-            try{
+        try {
+            const result = await this.readFile(usersFile);
+            const userIndex = this.getUserIndexByName(result, username);
+            if (userIndex !== -1) {
                 result.data.splice(userIndex, 1);
                 return await this.writeFile(result, usersFile);
             }
-            catch (e) {
-                // fixme;
-                return false;
-            }
         }
+        catch(e){
+            throw new ClientError(500,"deleteUserFailed");
+        }
+        throw new ClientError(404,"userDoesNotExist");
     }
 
 }

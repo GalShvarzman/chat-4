@@ -103,9 +103,14 @@ class App extends React.Component<{}, IAppState> {
         this.chatMessagesChild.logOut();
     };
 
-    public usersRender = () => (<UserAdmin refMenu={this.menu} users={this.state.users}/>);
+    public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.state.users}/>);
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
+
+    public  deleteUser = async(user:{name: string, age: string, id: string}) => {
+        await stateStoreService.deleteUser(user);
+    };
+
 
     public render() {
         return (

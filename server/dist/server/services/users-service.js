@@ -20,6 +20,11 @@ class UsersService {
             return yield users_1.default.updateUserDetails(userDetails);
         });
     }
+    deleteUser(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield users_1.default.deleteUser(user.name);
+        });
+    }
 }
 const usersService = new UsersService();
 exports.default = usersService;

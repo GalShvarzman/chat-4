@@ -24,14 +24,17 @@ class UsersDb {
         return (i !== -1);
     }
     deleteUser(username) {
-        const i = this.findUserIndex(username);
-        if (i !== -1) {
-            this.users.splice(i, 1);
-            return true;
-        }
-        else {
-            return false;
-        }
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.deleteUser(username);
+            // const i = this.findUserIndex(username);
+            // if(i !== -1){
+            //     this.users.splice(i, 1);
+            //     return true;
+            // }
+            // else{
+            //     return false;
+            // }
+        });
     }
     addUser(user) {
         this.users.push(user);
