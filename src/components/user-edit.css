@@ -1,15 +1,15 @@
-.edit-wrapper{
+.edit-user-wrapper{
     text-align: center;
     margin-top:4em;
 }
 
-.edit-name{
+.edit-user-name{
     color:#483D8B;
     margin-bottom: 1em;
     font-size: 1.6em;
 }
 
-.edit-save-btn, .edit-back-btn{
+.edit-user-save-btn, .edit-user-back-btn{
     color: darkslateblue;
     background-color: lightblue;
     border: 2px solid darkslateblue;

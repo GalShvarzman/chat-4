@@ -2,6 +2,7 @@ import Group from './group';
 import IGroup from './group';
 import IUser from "./user";
 import {usersDb} from "./users";
+// import * as CircularJSON from 'circular-json';
 
 export default class NTree{
     public root:IGroup;
@@ -41,3 +42,7 @@ nTree.add(usersDb.getUser('Tommy'), bestFriends);
 nTree.add(usersDb.getUser('Udi'), bestFriends);
 nTree.add(usersDb.getUser('Ori'));
 nTree.add(usersDb.getUser('Roni'));
+// const myTree = CircularJSON.stringify(nTree);
+// myTree
+// debugger;
+// const list = nTree.getTree()

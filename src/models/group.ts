@@ -1,6 +1,5 @@
 import User from './user';
 import IUser from './user';
-import {IMessage} from "./message";
 import {create_UUID} from '../utils/uuid';
 
 let i = 0;
@@ -11,7 +10,6 @@ export default interface IGroup{
     children : any[],
     id:string;
     others?:IGroup,
-    messages:IMessage[],
     type:string;
     getParents() : IGroup[],
     isNodeExistInGroup(nodeId:string):boolean,
@@ -28,14 +26,12 @@ export default class Group implements IGroup{
     public parent: IGroup;
     public name: string;
     public children: any[];
-    public messages: IMessage[];
     public type:string;
 
     constructor(parent:IGroup, name:string, children:IGroup[]|IUser[]) {
         this.parent = parent;
         this.name = name;
         this.children = this.array.concat(children||[]);
-        this.messages = [];
         this.id = create_UUID();
         this.type = 'group';
     }

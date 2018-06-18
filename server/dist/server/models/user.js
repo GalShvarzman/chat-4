@@ -7,7 +7,6 @@ class User {
         this.age = age;
         this.password = password;
         this.parents = [];
-        this.messages = {};
         this.type = 'user';
         this.id = uuid_1.create_UUID();
     }

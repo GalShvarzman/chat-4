@@ -7,7 +7,6 @@ export default interface IUser {
     age?:number,
     password:string,
     parents : IGroup[],
-    messages : {},
     type:string;
     removeParent(parentNode:IGroup):boolean,
     auth(enteredPassword:string):boolean
@@ -20,7 +19,6 @@ export default class User implements IUser{
     public age?:number;
     public password:string;
     public parents:IGroup[];
-    public messages:{};
     public type:string;
     public id:string;
 
@@ -29,7 +27,6 @@ export default class User implements IUser{
         this.age = age;
         this.password = password;
         this.parents = [];
-        this.messages = {};
         this.type = 'user';
         this.id = create_UUID();
     }

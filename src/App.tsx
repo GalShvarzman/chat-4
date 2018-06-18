@@ -10,6 +10,9 @@ import UserAdmin from "./components/user-admin";
 import UserEdit from "./components/user-edit";
 import IUser from "./models/user";
 import NewUser from "./components/new-user";
+import GroupAdmin from "./components/group-admin";
+import GroupEdit from "./components/group-edit";
+import NewGroup from "./components/new-group";
 
 export enum ERROR_MSG{
     none,
@@ -23,7 +26,8 @@ interface IAppState {
     errorMsg: ERROR_MSG,
     counter: number,
     redirectToChat:boolean,
-    users:any
+    users:any,
+    groups:any
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -38,7 +42,8 @@ class App extends React.Component<{}, IAppState> {
             errorMsg: ERROR_MSG.none,
             counter: 0,
             redirectToChat:false,
-            users: null
+            users: null,
+            groups:null
         };
 
         stateStoreService.subscribe(async() => {
@@ -47,7 +52,7 @@ class App extends React.Component<{}, IAppState> {
     }
 
     async componentDidMount(){
-         this.setState({users: await stateStoreService.getUsers()})
+         this.setState({users: await stateStoreService.getUsers(), groups: await stateStoreService.getGroups()})
     }
 
     public onEditUserDetails = async (user:IUser)=>{
@@ -106,6 +111,8 @@ class App extends React.Component<{}, IAppState> {
 
     public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.state.users}/>);
 
+    public groupsRender = () => (<GroupAdmin groups={this.state.groups}/>);
+
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
     public  deleteUser = async(user:{name: string, age: number, id: string}) => {
@@ -113,6 +120,10 @@ class App extends React.Component<{}, IAppState> {
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
+
+    public newGroupRender = (props:any) => (<NewGroup {...props}/>);
+
+    public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
 
     public onCreateNewUser = async (user:{name:string, age:number, password:string})=>{
         const result:{user:{name:string, age?:string, id:string}} | {message:{message:string}} = await stateStoreService.createNewUser(user);
@@ -150,6 +161,9 @@ class App extends React.Component<{}, IAppState> {
                         <Route exact={true} path='/chat' render={this.chatRender}/>
                         <Route exact={true} path='/' render={this.chatRender}/>
                         <Route exact={true} path='/users' render={this.usersRender}/>
+                        <Route exact={true} path='/groups' render={this.groupsRender}/>
+                        <Route exact={true} path='/groups/new' render={this.newGroupRender}/>
+                        <Route exact={true} path='/groups/:id/edit' render={this.groupEditRender}/>
                         <Route exact={true} path='/users/new' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id/edit' render={this.userEditRender}/>

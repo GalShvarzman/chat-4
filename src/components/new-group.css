@@ -1,0 +1,19 @@
+.create-new-group-btn{
+    display: block;
+}
+
+.new-group-field-set{
+    border:none;
+    padding:0;
+    margin:0;
+}
+
+.new-group-select-parent{
+    width:4em;
+    font-size:1.3em;
+    color: #483D8B;
+}
+
+.new-group-select-form{
+    display: inline-block;
+}

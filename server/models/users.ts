@@ -1,14 +1,10 @@
-import IUser from "./user";
-import User from "./user"
 import {db} from '../lib/DB';
 const usersFile = 'users.json';
 
-export interface IUsersDb {
+export interface IUsers {
     isUserExists(data:any,username:string):boolean,
     deleteUser(username:string):Promise<boolean>,
-    addUser(user:IUser):void,
-    getUserNamesList():string[],
-    getUser(userName:string):Promise<IUser>,
+    // getUser(userName:string):Promise<IUser>,
     getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
     updateUserDetails(newData):Promise<boolean>,
     createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>,
@@ -16,61 +12,30 @@ export interface IUsersDb {
     getUsersFullData():Promise<any>
 }
 
-class UsersDb implements IUsersDb{
-    private users: IUser[];
-    constructor(){
-        this.users = [new User("gal", 27, "123"), new User("Tommy", 24, "123"), new User("Ori", 30, "123"), new User("Udi", 34, "123"), new User("Roni", 5, "123")];
-    }
-
-    private findUserIndex(username:string){
-        return this.users.findIndex((user)=>{
-            return username === user.name;
-        })
-    }
+class Users implements IUsers{
 
     public isUserExists(data, username):boolean{
         return db.isObjExistsByName(data, username);
-        // const i = this.findUserIndex(username);
-        // return (i !== -1);
     }
 
     public async deleteUser(id:string):Promise<boolean>{
         return await db.deleteObj(id, usersFile);
-
-        // const i = this.findUserIndex(username);
-        // if(i !== -1){
-        //     this.users.splice(i, 1);
-        //     return true;
-        // }
-        // else{
-        //     return false;
-        // }
     }
 
-    public addUser(user:IUser){
-        this.users.push(user);
-    }
-    public getUserNamesList(){
-        return this.users.map((user)=>{
-            return user.name
-        })
-    }
-
-    public async getUser(userName:string){
-        const users:{data:any[]} = await this.getUsersList();
-        const user = users.data.find((user)=>{
-            return user.name === userName;
-        });
-        if(user){
-            return user;
-        }
-        else{
-            throw new Error("No user was Found");
-        }
-    }
+    // public async getUser(userName:string){
+    //     const users:{data:any[]} = await this.getUsersList();
+    //     const user = users.data.find((user)=>{
+    //         return user.name === userName;
+    //     });
+    //     if(user){
+    //         return user;
+    //     }
+    //     else{
+    //         throw new Error("No user was Found");
+    //     }
+    // }
 
     public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-        // return this.users;
         return await db.getData(usersFile);
     }
 
@@ -92,6 +57,6 @@ class UsersDb implements IUsersDb{
 
 }
 
-const users: IUsersDb = new UsersDb();
+const users: IUsers = new Users();
 
 export default users;

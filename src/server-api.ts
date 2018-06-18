@@ -39,3 +39,10 @@ export function createNewUser(user:{name:string, age:number, password:string}):P
             return res.json();
         })
 }
+
+export function getGroups():Promise<any>{
+    return fetch('/groups')
+        .then((res)=>{
+            return (res.json());
+        })
+}

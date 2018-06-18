@@ -36,7 +36,7 @@ class Menu extends React.Component<{}, IMenuState> {
         return (
             <>
                 <button className="admin" onClick={this.showMenu}>Admin</button>
-                {this.state.showMenu ? (<ul className="menu" ref={(element) => {this.dropDownMenu = element;}}><li><Link to='/users'><button>Users</button></Link></li><li><button>Groups</button></li></ul>) : (null)}
+                {this.state.showMenu ? (<ul className="menu" ref={(element) => {this.dropDownMenu = element;}}><li><Link to='/users'><button>Users</button></Link></li><li><Link to='/groups'><button>Groups</button></Link></li></ul>) : (null)}
             </>
         );
     }

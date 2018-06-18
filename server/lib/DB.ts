@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {createHash} from '../utils/hash';
 import {ClientError} from "../utils/client-error";
-import IUser from "../models/user";
+import IGroup from "../models/group";
 
 class DB{
     readFile(fileName):Promise<{data:any[]}>{
@@ -35,6 +34,7 @@ class DB{
                     return {"name":user.name, "age":user.age, "id":user.id}
                 });
             }
+
             return result;
         }
         catch(e){
@@ -110,7 +110,8 @@ class DB{
 
     }
 
-
 }
+
+
 
 export const db = new DB();

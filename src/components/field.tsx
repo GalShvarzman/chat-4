@@ -6,7 +6,8 @@ interface IFieldProps {
     type?: string,
     onChange(field:string, value:string):void,
     className?:string,
-    user?:any
+    user?:any,
+    group?:any
 }
 
 const Field:React.StatelessComponent<IFieldProps> = (props) => {
@@ -15,8 +16,8 @@ const Field:React.StatelessComponent<IFieldProps> = (props) => {
     };
 
     return(
-        <p>
-            {props.user ? (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input value={props.user} className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>) : (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>)}
+        <p className="field-wrapper">
+            {props.user || props.group ? (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input value={props.user || props.group} className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>) : (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>)}
         </p>
     )
 };

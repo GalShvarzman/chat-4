@@ -2,8 +2,11 @@ import Group from './group';
 import IGroup from './group';
 import IUser from "./user";
 import users from "./users";
+import User from "./user";
+import {db} from "../lib/DB";
+const groupFile = 'groups.json';
 
-export default class NTree{
+export class NTree{
     public root:IGroup;
     constructor(){
         this.root = new Group(this.root, "treeRoot", []);
@@ -22,8 +25,9 @@ export default class NTree{
     public printFullTree(){
         return this.root.printFullTree();
     }
-    public getGroupsList(){
-        return this.root.getGroupsList();
+    public async getTree(){
+        // return this.root.getTree();
+        return await db.getData(groupFile);
     }
     public isNodeExistInGroup(name:string){
         return this.root.isNodeExistInGroup(name);
@@ -32,12 +36,13 @@ export default class NTree{
 
 export const nTree:NTree = new NTree();
 
-const friends = new Group(nTree.root, "Friends", []);
-const bestFriends = new Group(friends, "Best Friends", []);
-
+// const friends = new Group(nTree.root, "Friends", []);
+// const bestFriends = new Group(friends, "Best Friends", []);
+//
 // nTree.add(friends);
 // nTree.add(bestFriends, friends);
-// nTree.add(users.getUser('Tommy'), bestFriends);
-// nTree.add(users.getUser('Udi'), bestFriends);
-// nTree.add(users.getUser('Ori'));
-// nTree.add(users.getUser('Roni'));
+// nTree.add(new User("Tommy", 27, "123"), bestFriends);
+// nTree.add(new User("Ori", 27, "123"), bestFriends);
+// nTree.add(new User("Roni", 27, "123"));
+// nTree.add(new User("Udi", 27, "123"));
+

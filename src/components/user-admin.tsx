@@ -70,7 +70,7 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
             <>
                 <Link to='/users/new'><button className='admin-create-new-user-btn'>Create new user</button></Link>
                 <h1 className="users-header">Users</h1>
-                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={10} minRows={10} className="table" data={data} columns={columns}/>
+                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={10} minRows={10} className="users-table" data={data} columns={columns}/>
             </>
         )
     }

@@ -1,6 +1,16 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const group_1 = require("./group");
+const DB_1 = require("../lib/DB");
+const groupFile = 'groups.json';
 class NTree {
     constructor() {
         this.root = new group_1.default(this.root, "treeRoot", []);
@@ -17,21 +27,25 @@ class NTree {
     printFullTree() {
         return this.root.printFullTree();
     }
-    getGroupsList() {
-        return this.root.getGroupsList();
+    getTree() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // return this.root.getTree();
+            return yield DB_1.db.getData(groupFile);
+        });
     }
     isNodeExistInGroup(name) {
         return this.root.isNodeExistInGroup(name);
     }
 }
-exports.default = NTree;
+exports.NTree = NTree;
 exports.nTree = new NTree();
-const friends = new group_1.default(exports.nTree.root, "Friends", []);
-const bestFriends = new group_1.default(friends, "Best Friends", []);
+// const friends = new Group(nTree.root, "Friends", []);
+// const bestFriends = new Group(friends, "Best Friends", []);
+//
 // nTree.add(friends);
 // nTree.add(bestFriends, friends);
-// nTree.add(users.getUser('Tommy'), bestFriends);
-// nTree.add(users.getUser('Udi'), bestFriends);
-// nTree.add(users.getUser('Ori'));
-// nTree.add(users.getUser('Roni'));
+// nTree.add(new User("Tommy", 27, "123"), bestFriends);
+// nTree.add(new User("Ori", 27, "123"), bestFriends);
+// nTree.add(new User("Roni", 27, "123"));
+// nTree.add(new User("Udi", 27, "123"));
 //# sourceMappingURL=tree.js.map
