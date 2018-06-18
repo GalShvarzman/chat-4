@@ -8,9 +8,11 @@
 
 .table{
     width:80%;
+    height: 80%;
     text-align: center;
     margin: auto;
     overflow: auto;
+    outline: none;
 }
 
 a.user-age, a.user-name{
@@ -21,4 +23,17 @@ a.user-age, a.user-name{
 
 .users-header{
     text-align: center;
+    color:#483D8B;
+    margin-top:0;
+}
+
+.admin-create-new-user-btn{
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 2px solid darkslateblue;
+    border-radius: 5px;
+    font-size:1em;
+    padding:0.5em 1em;
+    margin-top:0.5em;
+    margin-left:0.5em;
 }

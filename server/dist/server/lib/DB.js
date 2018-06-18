@@ -10,8 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const path = require("path");
-const hash_1 = require("../utils/hash");
-const usersFile = 'users.json';
+const client_error_1 = require("../utils/client-error");
 class DB {
     readFile(fileName) {
         return new Promise((resolve, reject) => {
@@ -34,68 +33,87 @@ class DB {
             });
         });
     }
-    getUsersList() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.readFile(usersFile); // fixme;
-            result.data = result.data.map((user) => {
-                return { "name": user.name, "age": user.age, "id": user.id };
-            });
-            return result;
-        });
-    }
-    getUsers() {
+    getData(fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.readFile(usersFile);
+                const result = yield this.readFile(fileName);
+                if (fileName === 'users.json') {
+                    result.data = result.data.map((user) => {
+                        return { "name": user.name, "age": user.age, "id": user.id };
+                    });
+                }
+                return result;
             }
             catch (e) {
-                throw new Error("getUsersFailed");
+                throw new client_error_1.ClientError(500, "getDataFailed");
             }
         });
     }
-    getUserIndexByName(result, userName) {
-        return result.data.findIndex((user) => {
-            return user.name === userName;
-        });
-    }
-    updateUserDetails(userNewDetails) {
+    getFullData(fileName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.getUsers();
-            let userIndex = this.getUserIndexByName(result, userNewDetails.name);
-            if (userIndex !== -1) {
-                if (userNewDetails.age) {
-                    result.data[userIndex].age = userNewDetails.age;
-                }
-                if (userNewDetails.password) {
-                    result.data[userIndex].password = yield hash_1.createHash(userNewDetails.password);
-                }
-                try {
-                    return yield this.writeFile(result, usersFile);
-                }
-                catch (e) {
-                    throw new Error("updateUserDetailsFailed");
-                }
+            try {
+                return yield this.readFile(fileName);
             }
-            else {
-                throw new Error("userDoesNotExist");
+            catch (e) {
+                throw new Error("getDataFailed");
             }
         });
     }
-    deleteUser(username) {
+    getObjIndexById(result, id) {
+        const index = result.data.findIndex((obj) => {
+            return obj.id === id;
+        });
+        if (index !== -1) {
+            return index;
+        }
+        else {
+            throw new client_error_1.ClientError(404, "objDoesNotExist");
+        }
+    }
+    isObjExistsByName(result, objName) {
+        const index = result.data.findIndex((obj) => {
+            return obj.name === objName;
+        });
+        return (index !== -1);
+    }
+    updateObjDetails(data, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.readFile(usersFile);
-            const userIndex = this.getUserIndexByName(result, username);
-            if (userIndex !== -1) {
-                result.data.splice(userIndex, 1);
-                try {
-                    return yield this.writeFile(result, usersFile);
-                }
-                catch (e) {
-                    throw new Error("deleteUserFailed");
+            try {
+                return yield this.writeFile(data, fileName);
+            }
+            catch (e) {
+                throw new client_error_1.ClientError(500, "updateDetailsFailed");
+            }
+        });
+    }
+    deleteObj(id, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.readFile(fileName);
+                const objIndex = this.getObjIndexById(result, id);
+                if (objIndex !== -1) {
+                    result.data.splice(objIndex, 1);
+                    return yield this.writeFile(result, fileName);
                 }
             }
-            else {
-                throw new Error("userDoesNotExist");
+            catch (e) {
+                throw new client_error_1.ClientError(500, "deleteFailed");
+            }
+            throw new client_error_1.ClientError(404, "objDoesNotExist");
+        });
+    }
+    createNew(obj, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.readFile(fileName);
+                result.data.push(obj);
+                yield this.writeFile(result, fileName);
+                if (fileName === 'users.json') {
+                    return { user: { name: obj.name, age: obj.age, id: obj.id } };
+                }
+            }
+            catch (e) {
+                throw new client_error_1.ClientError(500, "CreateNewFailed");
             }
         });
     }

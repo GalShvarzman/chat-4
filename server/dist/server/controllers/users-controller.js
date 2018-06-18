@@ -10,19 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const services = require("../services");
 class UsersController {
-    tryCatch(next, func) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield func();
-            }
-            catch (err) {
-                next(err);
-            }
-        });
-    }
     saveUserDetails(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
                 yield services.usersService.saveUserDetails(req.body);
                 res.status(201).json({ message: "User details have been updated successfully" });
             }));
@@ -30,18 +20,37 @@ class UsersController {
     }
     getAllUsers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
                 res.status(200).json(yield services.usersService.getAllUsers());
             }));
         });
     }
     deleteUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
-                return yield services.usersService.deleteUser(req.body);
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                yield services.usersService.deleteUser(req.body);
+                res.status(200).json({ message: "User deleted successfully" });
             }));
         });
     }
+    createNewUser(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                const user = yield services.usersService.createNewUser(req.body);
+                res.status(200).json(user);
+            }));
+        });
+    }
+}
+function tryCatch(next, func) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield func();
+        }
+        catch (err) {
+            next(err);
+        }
+    });
 }
 const usersController = new UsersController();
 exports.default = usersController;

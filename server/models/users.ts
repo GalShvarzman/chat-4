@@ -1,15 +1,19 @@
 import IUser from "./user";
 import User from "./user"
 import {db} from '../lib/DB';
+const usersFile = 'users.json';
 
 export interface IUsersDb {
-    isUserExists(username:string):boolean,
+    isUserExists(data:any,username:string):boolean,
     deleteUser(username:string):Promise<boolean>,
     addUser(user:IUser):void,
     getUserNamesList():string[],
     getUser(userName:string):Promise<IUser>,
-    getUsers():Promise<{data:{name:string, age:number, id:string}[]}>,
-    updateUserDetails(user:IUser):Promise<boolean>
+    getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
+    updateUserDetails(newData):Promise<boolean>,
+    createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>,
+    getUserIndexById(data, id):number,
+    getUsersFullData():Promise<any>
 }
 
 class UsersDb implements IUsersDb{
@@ -24,13 +28,14 @@ class UsersDb implements IUsersDb{
         })
     }
 
-    public isUserExists(username:string){
-        const i = this.findUserIndex(username);
-        return (i !== -1);
+    public isUserExists(data, username):boolean{
+        return db.isObjExistsByName(data, username);
+        // const i = this.findUserIndex(username);
+        // return (i !== -1);
     }
 
-    public async deleteUser(username:string):Promise<boolean>{
-        return await db.deleteUser(username);
+    public async deleteUser(id:string):Promise<boolean>{
+        return await db.deleteObj(id, usersFile);
 
         // const i = this.findUserIndex(username);
         // if(i !== -1){
@@ -52,7 +57,7 @@ class UsersDb implements IUsersDb{
     }
 
     public async getUser(userName:string){
-        const users:{data:any[]} = await this.getUsers();
+        const users:{data:any[]} = await this.getUsersList();
         const user = users.data.find((user)=>{
             return user.name === userName;
         });
@@ -64,13 +69,25 @@ class UsersDb implements IUsersDb{
         }
     }
 
-    public async getUsers():Promise<{data:{name:string, age:number, id:string}[]}>{
+    public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
         // return this.users;
-        return await db.getUsersList();
+        return await db.getData(usersFile);
     }
 
-    public async updateUserDetails(userNewDetails):Promise<boolean>{
-        return await db.updateUserDetails(userNewDetails);
+    public async updateUserDetails(newData):Promise<boolean>{
+        return await db.updateObjDetails(newData, usersFile);
+    }
+
+    public getUserIndexById(data, id):number{
+        return db.getObjIndexById(data, id);
+    }
+
+    public async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{
+        return await db.createNew(user, usersFile);
+    }
+
+    public async getUsersFullData():Promise<any>{
+        return await db.getFullData(usersFile);
     }
 
 }

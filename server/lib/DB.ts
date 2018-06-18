@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {createHash} from '../utils/hash';
 import {ClientError} from "../utils/client-error";
-const usersFile = 'users.json';
+import IUser from "../models/user";
 
 class DB{
     readFile(fileName):Promise<{data:any[]}>{
@@ -26,67 +26,90 @@ class DB{
         });
     }
 
-    async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-        const result = await this.readFile(usersFile); // fixme;
-
-        result.data = result.data.map((user)=>{
-            return {"name":user.name, "age":user.age, "id":user.id}
-        });
-
-        return result;
-    }
-
-    async getUsers():Promise<{data:{name:string, age:number, id:string, password:string}[]}>{
+    async getData(fileName):Promise<{data:{name:string, age:number, id:string}[]}>{
         try{
-            return await this.readFile(usersFile);
+            const result = await this.readFile(fileName);
+
+            if(fileName === 'users.json'){
+                result.data = result.data.map((user)=>{
+                    return {"name":user.name, "age":user.age, "id":user.id}
+                });
+            }
+            return result;
         }
         catch(e){
-            throw new Error("getUsersFailed");
+            throw new ClientError(500, "getDataFailed");
         }
     }
 
-    getUserIndexByName(result, userName) {
-        return result.data.findIndex((user) => {
-            return user.name === userName;
-        });
+    async getFullData(fileName){
+        try {
+            return await this.readFile(fileName);
+        }
+        catch(e){
+            throw new Error("getDataFailed");
+        }
     }
 
-    async updateUserDetails(userNewDetails):Promise<boolean> {
-        const result = await this.getUsers();
-        let userIndex = this.getUserIndexByName(result,userNewDetails.name);
-        if(userIndex !== -1){
-            if(userNewDetails.age){
-                result.data[userIndex].age = userNewDetails.age;
-            }
-            if(userNewDetails.password){
-                result.data[userIndex].password  = await createHash(userNewDetails.password);
-            }
-            try{
-                return await this.writeFile(result, usersFile);
-            }
-            catch(e){
-                throw new Error("updateUserDetailsFailed");
-            }
+    getObjIndexById(result, id) {
+        const index = result.data.findIndex((obj) => {
+            return obj.id === id;
+        });
+        if(index !== -1){
+            return index;
         }
         else{
-            throw new Error("userDoesNotExist");
+            throw new ClientError(404,"objDoesNotExist")
         }
     }
 
-    async deleteUser(username:string):Promise<boolean> {
+    isObjExistsByName(result, objName):boolean {
+        const index = result.data.findIndex((obj) => {
+            return obj.name === objName;
+        });
+        return (index !== -1)
+    }
+
+
+    async updateObjDetails(data, fileName):Promise<boolean> {
         try {
-            const result = await this.readFile(usersFile);
-            const userIndex = this.getUserIndexByName(result, username);
-            if (userIndex !== -1) {
-                result.data.splice(userIndex, 1);
-                return await this.writeFile(result, usersFile);
+            return await this.writeFile(data, fileName);
+        }
+        catch(e){
+            throw new ClientError(500,"updateDetailsFailed");
+        }
+    }
+
+    async deleteObj(id:string, fileName):Promise<boolean> {
+        try {
+            const result = await this.readFile(fileName);
+            const objIndex = this.getObjIndexById(result, id);
+            if (objIndex !== -1) {
+                result.data.splice(objIndex, 1);
+                return await this.writeFile(result, fileName);
             }
         }
         catch(e){
-            throw new ClientError(500,"deleteUserFailed");
+            throw new ClientError(500,"deleteFailed");
         }
-        throw new ClientError(404,"userDoesNotExist");
+        throw new ClientError(404,"objDoesNotExist");
     }
+
+     async createNew(obj, fileName):Promise<any> {
+        try{
+            const result = await this.readFile(fileName);
+            result.data.push(obj);
+            await this.writeFile(result, fileName);
+            if(fileName === 'users.json'){
+                return {user:{name:obj.name, age:obj.age, id:obj.id}}
+            }
+        }
+        catch(e){
+            throw new ClientError(500, "CreateNewFailed")
+        }
+
+    }
+
 
 }
 

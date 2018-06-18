@@ -7,7 +7,7 @@ import './user-admin.css';
 interface IUserAdminProps {
     users:any,
     refMenu:any,
-    deleteUser(user:{name: string, age: string, id: string}):void
+    deleteUser(user:{name: string, age: number, id: string}):void
 }
 
 interface IUserAdminState {
@@ -33,7 +33,7 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
 
     // private onDelete= (e:React.MouseEvent<HTMLButtonElement>) => {
     //     debugger;
-    //     this.props.deleteUser(e)
+    //     this.props.deleteObj(e)
     // };
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
@@ -68,8 +68,9 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
 
         return(
             <>
+                <Link to='/users/new'><button className='admin-create-new-user-btn'>Create new user</button></Link>
                 <h1 className="users-header">Users</h1>
-                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={13} minRows={13} className="table" data={data} columns={columns}/>
+                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={10} minRows={10} className="table" data={data} columns={columns}/>
             </>
         )
     }

@@ -9,6 +9,7 @@ import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
 import UserEdit from "./components/user-edit";
 import IUser from "./models/user";
+import NewUser from "./components/new-user";
 
 export enum ERROR_MSG{
     none,
@@ -107,10 +108,23 @@ class App extends React.Component<{}, IAppState> {
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
-    public  deleteUser = async(user:{name: string, age: string, id: string}) => {
+    public  deleteUser = async(user:{name: string, age: number, id: string}) => {
         await stateStoreService.deleteUser(user);
     };
 
+    public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
+
+    public onCreateNewUser = async (user:{name:string, age:number, password:string})=>{
+        const result:{user:{name:string, age?:string, id:string}} | {message:{message:string}} = await stateStoreService.createNewUser(user);
+        if(result.user){
+            this.setState((prevState)=>{
+                return{
+                    users:[...prevState.users, result.user]
+                }
+            });
+        }
+        return result;
+    };
 
     public render() {
         return (
@@ -136,6 +150,8 @@ class App extends React.Component<{}, IAppState> {
                         <Route exact={true} path='/chat' render={this.chatRender}/>
                         <Route exact={true} path='/' render={this.chatRender}/>
                         <Route exact={true} path='/users' render={this.usersRender}/>
+                        <Route exact={true} path='/users/new' render={this.newUserRender}/>
+                        <Route exact={true} path='/users/:id' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id/edit' render={this.userEditRender}/>
                     </Switch>
                 </div>
