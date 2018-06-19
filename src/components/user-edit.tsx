@@ -32,8 +32,8 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
     }
 
     public save = async () => {
-        const result:{message:string} = await this.props.onEditUserDetails(this.state.user);
-        this.setState({message:result.message});
+        await this.props.onEditUserDetails(this.state.user);
+        this.setState({message:"Users details updated successfully"});
     };
 
     public updateField = (fieldName: string, value: string) => {

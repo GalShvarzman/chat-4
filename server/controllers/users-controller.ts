@@ -5,8 +5,7 @@ class UsersController{
 
     async saveUserDetails(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async ()=>{
-            await services.usersService.saveUserDetails(req.body);
-            res.status(201).json({message: "User details have been updated successfully"});
+            res.status(201).json(await services.usersService.saveUserDetails(req.body));
         });
     }
 
@@ -19,7 +18,7 @@ class UsersController{
     async deleteUser(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async ()=>{
             await services.usersService.deleteUser(req.params.id);
-            res.status(200).json({message:"User deleted successfully"});
+            res.status(204).send("");
         })
     }
 

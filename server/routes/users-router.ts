@@ -3,7 +3,7 @@ import * as controllers from '../controllers';
 
 const usersRouter = express.Router();
 
-usersRouter.put('/:id/edit', controllers.usersController.saveUserDetails);
+usersRouter.patch('/:id', controllers.usersController.saveUserDetails);
 
 usersRouter.delete('/:id', controllers.usersController.deleteUser);
 

@@ -108,15 +108,12 @@ export class StateStoreService implements IStateStoreService{
     }
 
     public async saveUserDetails(user:{name:string, age?:number, password?:string, id:string}){
-        const result = await saveUserDetails(user);
-        this.onStoreChanged();
-        return result;
+       return await saveUserDetails(user);
     }
 
-    public async deleteUser(user:{name:string, age:number, id:string}):Promise<boolean>{
-        const result = await deleteUser(user);
-        this.onStoreChanged();
-        return result;
+    public async deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
+        return await deleteUser(user);
+
     }
 
     public async getGroupData(groupId:string){

@@ -20,7 +20,7 @@ class GroupsService{
                 return group.id === groupConnector.pId;
             });
             if(!groupParent){
-                groupParent = 'root';
+                groupParent = {name:'No parent', id:""};
             }
             const groupChildrenConnectors = connectorsList.data.filter((obj)=>{
                 return obj.pId === groupId;
@@ -34,20 +34,21 @@ class GroupsService{
             if(groupChildrenConnectors[0].type === 'user'){
                 const usersList = await users.getUsersList(); // fixme האם זה בסדר לגשת מפה ליוזרים?
 
-                groupChildren = this.arrayDiff(usersList.data, groupChildrenIds);
+                groupChildren = this.findAll(usersList.data, groupChildrenIds, 'user');
+            }
+            else{
+                groupChildren = this.findAll(groups.data, groupChildrenIds, 'group')
             }
 
             return ({data:[{groupParent}, {groupChildren}]});
     }
 
 
-    arrayDiff(arr1, arr2) {
+    findAll(arr1, arr2, type) {
         const result = [];
-        arr1.sort();
-        arr2.sort();
-        for(let i = 0; i < arr1.length; i += 1) {
+        for(let i = 0; i < arr1.length; i++){
             if(arr2.indexOf(arr1[i].id) > -1){
-                result.push({name:arr1[i].name, age:arr1[i].age, id: arr1[i].id});
+                result.push({name:arr1[i].name, id: arr1[i].id, type});
             }
         }
         return result;

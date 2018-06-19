@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const controllers = require("../controllers");
 const usersRouter = express.Router();
-usersRouter.put('/:id/edit', controllers.usersController.saveUserDetails);
+usersRouter.patch('/:id', controllers.usersController.saveUserDetails);
 usersRouter.delete('/:id', controllers.usersController.deleteUser);
 usersRouter.get('/', controllers.usersController.getAllUsers);
 usersRouter.post('/', controllers.usersController.createNewUser);

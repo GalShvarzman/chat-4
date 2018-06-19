@@ -46,7 +46,7 @@ class App extends React.Component<{}, IAppState> {
         };
 
         stateStoreService.subscribe(async() => {
-            this.setState({users: await stateStoreService.getUsers()});
+            // this.setState({users: await stateStoreService.getUsers()});
         });
     }
 
@@ -55,7 +55,11 @@ class App extends React.Component<{}, IAppState> {
     }
 
     public onEditUserDetails = async (user:{name:string, age?:number, password?:string, id:string})=>{
-        return await stateStoreService.saveUserDetails(user);
+        const updatedUser = await stateStoreService.saveUserDetails(user);
+        const usersClone = [...this.state.users];
+        const updatedUsersIndex = usersClone.findIndex(userClone => user.id === userClone.id);
+        usersClone[updatedUsersIndex] = updatedUser.user;
+        this.setState({users:usersClone});
     };
 
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
@@ -116,6 +120,10 @@ class App extends React.Component<{}, IAppState> {
 
     public  deleteUser = async(user:{name: string, age: number, id: string}) => {
         await stateStoreService.deleteUser(user);
+        const usersClone = [...this.state.users];
+        const deletedUsersIndex = usersClone.findIndex(userClone=>user.id === userClone.id);
+        usersClone.splice(deletedUsersIndex, 1);
+        this.setState({users:usersClone});
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);

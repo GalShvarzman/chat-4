@@ -1,6 +1,10 @@
 {
   "data": [
     {
+      "name": "root",
+      "id": "0f5383e5-69b8-4611-9f95-fd3bbf851d4a"
+    },
+    {
       "name": "Friends",
       "id": "0078aabf-f428-4a43-b3a6-a1519fca6b4b"
     },

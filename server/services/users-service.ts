@@ -14,7 +14,7 @@ class UsersService{
         return result;
     }
 
-    async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<boolean>{
+    async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<{user:{name:string, age:string, id:string}}> {
         const usersData = await users.getUsersFullData();
         const userIndex = users.getUserIndexById(usersData, userDetails.id);
         if (userDetails.age) {
@@ -23,8 +23,10 @@ class UsersService{
         if (userDetails.password) {
             usersData.data[userIndex].password = await createHash(userDetails.password); // fixme
         }
-        return await users.updateUserDetails(usersData);
+        await users.updateUserDetails(usersData);
+        return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
     }
+
 
     async deleteUser(id):Promise<boolean>{
         return await users.deleteUser(id);

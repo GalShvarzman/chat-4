@@ -3,10 +3,10 @@ export function getUsers():Promise<any>{
 }
 
 export function saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<any>{
-    return put(`/users/${user.id}/edit`, user);
+    return patch(`/users/${user.id}`, user);
 }
 
-export function deleteUser(user:{name:string, age:number, id:string}):Promise<boolean>{
+export function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
     return remove(`/users/${user.id}`);
 }
 
@@ -33,9 +33,9 @@ function post(url:string, body:any){
         })
 }
 
-function put(url:string, body:any){
+function patch(url:string, body:any){
     return fetch(url, {
-        method:'PUT',
+        method:'PATCH',
         body:JSON.stringify(body),
         headers:{'content-type': 'application/json'}
     })
@@ -55,7 +55,7 @@ function remove(url:string){
     return fetch(url, {
         method:'DELETE'
     })
-        .then((res)=>{
-            return res.json();
+        .then(()=>{
+            return;
         })
 }

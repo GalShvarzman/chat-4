@@ -48,13 +48,13 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     };
 
     async componentDidMount(){
-        const groupData:{data:[{groupParent:string},{groupChildren:any[]}]}= await stateStoreService.getGroupData(this.props.location.state.group.id);
+        const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}]} = await stateStoreService.getGroupData(this.props.location.state.group.id);
         this.setState(prevState=>{
             return{
                 group:{
                     ...prevState.group,
                     children:groupData.data[1].groupChildren,
-                    parent:groupData.data[0].groupParent
+                    parent:groupData.data[0].groupParent.name + " " + groupData.data[0].groupParent.id
                 }
             }
         })

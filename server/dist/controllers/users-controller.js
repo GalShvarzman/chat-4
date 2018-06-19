@@ -13,8 +13,7 @@ class UsersController {
     saveUserDetails(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
-                yield services.usersService.saveUserDetails(req.body);
-                res.status(201).json({ message: "User details have been updated successfully" });
+                res.status(201).json(yield services.usersService.saveUserDetails(req.body));
             }));
         });
     }
@@ -29,7 +28,7 @@ class UsersController {
         return __awaiter(this, void 0, void 0, function* () {
             return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
                 yield services.usersService.deleteUser(req.params.id);
-                res.status(200).json({ message: "User deleted successfully" });
+                res.status(204).send("");
             }));
         });
     }

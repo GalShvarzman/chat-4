@@ -32,7 +32,8 @@ class UsersService {
             if (userDetails.password) {
                 usersData.data[userIndex].password = yield hash_1.createHash(userDetails.password); // fixme
             }
-            return yield users_1.default.updateUserDetails(usersData);
+            yield users_1.default.updateUserDetails(usersData);
+            return ({ user: { name: usersData.data[userIndex].name, age: usersData.data[userIndex].age, id: usersData.data[userIndex].id } });
         });
     }
     deleteUser(id) {

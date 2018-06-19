@@ -43,11 +43,11 @@
 .parent-name{
     font-size: 1.2em;
     text-align: left;
-    margin-left:2em;
+    margin-left:0.4em;
 }
 
 .parent-wrapper{
-    margin-right: 9.5em;
+    margin-left: 5em;
 }
 
 .delete-child-btn{
