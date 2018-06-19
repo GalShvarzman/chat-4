@@ -8,6 +8,12 @@ class GroupsController{
             res.status(200).json(await services.groupService.getAllGroups());
         })
     }
+
+    async getGroupData(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async()=>{
+            res.status(200).json(await services.groupService.getGroupData(req.params.id));
+        })
+    }
 }
 
 async function tryCatch(next, func){

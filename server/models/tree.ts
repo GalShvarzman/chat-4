@@ -4,7 +4,8 @@ import IUser from "./user";
 import users from "./users";
 import User from "./user";
 import {db} from "../lib/DB";
-const groupFile = 'groups.json';
+const groupsFile = 'groups.json';
+const connectorsFile = 'connectors.json';
 
 export class NTree{
     public root:IGroup;
@@ -27,8 +28,13 @@ export class NTree{
     }
     public async getGroups(){
         // return this.root.getGroups();
-        return await db.getData(groupFile);
+        return await db.getData(groupsFile);
     }
+
+    public async getConnectorsList(){
+        return await db.getData(connectorsFile);
+    }
+
     public isNodeExistInGroup(name:string){
         return this.root.isNodeExistInGroup(name);
     }

@@ -10,7 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const group_1 = require("./group");
 const DB_1 = require("../lib/DB");
-const groupFile = 'groups.json';
+const groupsFile = 'groups.json';
+const connectorsFile = 'connectors.json';
 class NTree {
     constructor() {
         this.root = new group_1.default(this.root, "treeRoot", []);
@@ -30,7 +31,12 @@ class NTree {
     getGroups() {
         return __awaiter(this, void 0, void 0, function* () {
             // return this.root.getGroups();
-            return yield DB_1.db.getData(groupFile);
+            return yield DB_1.db.getData(groupsFile);
+        });
+    }
+    getConnectorsList() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.getData(connectorsFile);
         });
     }
     isNodeExistInGroup(name) {

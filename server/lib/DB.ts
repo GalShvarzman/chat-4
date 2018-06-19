@@ -27,15 +27,7 @@ class DB{
 
     async getData(fileName):Promise<{data:any[]}>{
         try{
-            const result = await this.readFile(fileName);
-
-            if(fileName === 'users.json'){
-                result.data = result.data.map((user)=>{
-                    return {"name":user.name, "age":user.age, "id":user.id}
-                });
-            }
-
-            return result;
+            return await this.readFile(fileName);
         }
         catch(e){
             throw new ClientError(500, "getDataFailed");

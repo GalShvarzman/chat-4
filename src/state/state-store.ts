@@ -4,9 +4,9 @@ import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
-import User, {default as IUser} from "../models/user";
+import User from "../models/user";
 import IGroup from "../models/group";
-import {getUsers, saveUserDetails, deleteUser, createNewUser, getGroups} from '../server-api';
+import {getUsers, saveUserDetails, deleteUser, createNewUser, getGroups, getGroupData} from '../server-api';
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -107,7 +107,7 @@ export class StateStoreService implements IStateStoreService{
         return res.data;
     }
 
-    public async saveUserDetails(user:IUser){
+    public async saveUserDetails(user:{name:string, age?:number, password?:string, id:string}){
         const result = await saveUserDetails(user);
         this.onStoreChanged();
         return result;
@@ -117,6 +117,10 @@ export class StateStoreService implements IStateStoreService{
         const result = await deleteUser(user);
         this.onStoreChanged();
         return result;
+    }
+
+    public async getGroupData(groupId:string){
+        return await getGroupData(groupId);
     }
 
     public async createNewUser(user:{name:string, age:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{

@@ -5,5 +5,6 @@ const groupsRouter = express.Router();
 
 groupsRouter.get('/', controllers.groupsController.getAllGroups);
 
+groupsRouter.get('/:id', controllers.groupsController.getGroupData);
 
 export default groupsRouter;

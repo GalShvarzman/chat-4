@@ -17,6 +17,13 @@ class GroupsController {
             }));
         });
     }
+    getGroupData(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                res.status(200).json(yield services.groupService.getGroupData(req.params.id));
+            }));
+        });
+    }
 }
 function tryCatch(next, func) {
     return __awaiter(this, void 0, void 0, function* () {

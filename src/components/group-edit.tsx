@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-edit.css';
+import {stateStoreService} from "../state/state-store";
 
 interface IGroupEditProps {
     location:any,
@@ -13,8 +14,8 @@ interface IGroupEditState {
     group: {
         name:string,
         id:string,
-        children:any[],
-        parent:string
+        children?:any[],
+        parent?:string
     },
     message?:string
 }
@@ -25,9 +26,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
         this.state = {
             group:{
                 name:props.location.state.group.name,
-                id:props.location.state.group.id,
-                children:props.location.state.group.children,
-                parent:props.location.state.group.parent
+                id:props.location.state.group.id
             }
         }
     }
@@ -47,6 +46,19 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
             }
         })
     };
+
+    async componentDidMount(){
+        const groupData:{data:[{groupParent:string},{groupChildren:any[]}]}= await stateStoreService.getGroupData(this.props.location.state.group.id);
+        this.setState(prevState=>{
+            return{
+                group:{
+                    ...prevState.group,
+                    children:groupData.data[1].groupChildren,
+                    parent:groupData.data[0].groupParent
+                }
+            }
+        })
+    }
 
     render(){
         const data = this.state.group.children;

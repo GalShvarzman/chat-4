@@ -2,7 +2,7 @@ export function getUsers():Promise<any>{
     return get('/users');
 }
 
-export function saveUserDetails(user:{name:string, age?:number, password:string, id:string}):Promise<any>{
+export function saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<any>{
     return put(`/users/${user.id}/edit`, user);
 }
 
@@ -16,6 +16,10 @@ export function createNewUser(user:{name:string, age:number, password:string}):P
 
 export function getGroups():Promise<any>{
    return get('/groups');
+}
+
+export function getGroupData(groupId:string):Promise<any>{
+    return get(`/groups/${groupId}`)
 }
 
 function post(url:string, body:any){

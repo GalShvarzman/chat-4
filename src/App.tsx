@@ -8,7 +8,6 @@ import Chat from "./components/chat";
 import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
 import UserEdit from "./components/user-edit";
-import IUser from "./models/user";
 import NewUser from "./components/new-user";
 import GroupAdmin from "./components/group-admin";
 import GroupEdit from "./components/group-edit";
@@ -55,7 +54,7 @@ class App extends React.Component<{}, IAppState> {
          this.setState({users: await stateStoreService.getUsers(), groups: await stateStoreService.getGroups()})
     }
 
-    public onEditUserDetails = async (user:IUser)=>{
+    public onEditUserDetails = async (user:{name:string, age?:number, password?:string, id:string})=>{
         return await stateStoreService.saveUserDetails(user);
     };
 

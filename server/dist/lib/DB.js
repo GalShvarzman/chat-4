@@ -36,13 +36,7 @@ class DB {
     getData(fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield this.readFile(fileName);
-                if (fileName === 'users.json') {
-                    result.data = result.data.map((user) => {
-                        return { "name": user.name, "age": user.age, "id": user.id };
-                    });
-                }
-                return result;
+                return yield this.readFile(fileName);
             }
             catch (e) {
                 throw new client_error_1.ClientError(500, "getDataFailed");
@@ -88,6 +82,7 @@ class DB {
     }
     deleteObj(id, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
+            // fixme אחרי שמוחקים את היוזר גם צריך למחוק אותו מכל הקבוצות שלהן הוא שייך
             try {
                 const result = yield this.readFile(fileName);
                 const objIndex = this.getObjIndexById(result, id);

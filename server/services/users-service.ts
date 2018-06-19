@@ -7,7 +7,11 @@ import * as uuidv4 from 'uuid/v4';
 class UsersService{
 
     async getAllUsers():Promise<{data:{name:string, age:number, id:string}[]}>{
-        return await users.getUsersList();
+        const result =  await users.getUsersList();
+        result.data = result.data.map((user)=>{
+            return {"name":user.name, "age":user.age, "id":user.id}
+        });
+        return result;
     }
 
     async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<boolean>{

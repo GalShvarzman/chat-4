@@ -15,7 +15,11 @@ const uuidv4 = require("uuid/v4");
 class UsersService {
     getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_1.default.getUsersList();
+            const result = yield users_1.default.getUsersList();
+            result.data = result.data.map((user) => {
+                return { "name": user.name, "age": user.age, "id": user.id };
+            });
+            return result;
         });
     }
     saveUserDetails(userDetails) {
