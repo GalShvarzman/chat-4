@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "type": "user",
+      "id": "5a23ebcc-3b7f-406d-86c9-158bd83d6ab2",
+      "pId": "0078aabf-f428-4a43-b3a6-a1519fca6b4b"
+    },
+    {
+      "type":"group",
+      "id": "0078aabf-f428-4a43-b3a6-a1519fca6b4b",
+      "pId":""
+    },
+    {
+      "type":"group",
+      "id":"6c6a69ea-6b71-4410-b1ae-8169e4edf743",
+      "pId":"0078aabf-f428-4a43-b3a6-a1519fca6b4b"
+    }
+  ]
+}

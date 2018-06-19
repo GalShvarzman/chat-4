@@ -25,8 +25,8 @@ export class NTree{
     public printFullTree(){
         return this.root.printFullTree();
     }
-    public async getTree(){
-        // return this.root.getTree();
+    public async getGroups(){
+        // return this.root.getGroups();
         return await db.getData(groupFile);
     }
     public isNodeExistInGroup(name:string){

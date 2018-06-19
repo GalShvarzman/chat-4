@@ -1,4 +1,4 @@
-import {create_UUID} from '../../src/utils/uuid';
+import * as uuidv4 from 'uuid/v4';
 
 export interface IMessage{
     message:string,
@@ -14,7 +14,7 @@ export class Message implements IMessage{
     public id:string;
 
     constructor(message:string, date:string){
-        this.id = create_UUID();
+        this.id = uuidv4();
         this.message = message;
         this.date = date;
     }

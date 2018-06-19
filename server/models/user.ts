@@ -1,5 +1,5 @@
 import IGroup from './group';
-import {create_UUID} from '../../src/utils/uuid';
+import * as uuidv4 from 'uuid/v4';
 
 export default interface IUser {
     id:string,
@@ -28,7 +28,7 @@ export default class User implements IUser{
         this.password = password;
         this.parents = [];
         this.type = 'user';
-        this.id = create_UUID();
+        this.id = uuidv4();
     }
 
     public removeParent(parentNode:IGroup){

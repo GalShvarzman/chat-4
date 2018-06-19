@@ -1,7 +1,8 @@
 import users from '../models/users';
-import {create_UUID} from "../utils/uuid";
 import {createHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
+import * as uuidv4 from 'uuid/v4';
+
 
 class UsersService{
 
@@ -21,8 +22,8 @@ class UsersService{
         return await users.updateUserDetails(usersData);
     }
 
-    async deleteUser(user):Promise<boolean>{
-        return await users.deleteUser(user.id);
+    async deleteUser(id):Promise<boolean>{
+        return await users.deleteUser(id);
     }
 
     async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{
@@ -32,7 +33,7 @@ class UsersService{
         }
         else{
             user.password = await createHash(user.password);
-            user.id = create_UUID();
+            user.id = uuidv4();
             return await users.createNewUser(user);
         }
     }

@@ -45,4 +45,4 @@ nTree.add(usersDb.getUser('Roni'));
 // const myTree = CircularJSON.stringify(nTree);
 // myTree
 // debugger;
-// const list = nTree.getTree()
+// const list = nTree.getGroups()

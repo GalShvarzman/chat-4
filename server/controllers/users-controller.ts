@@ -18,7 +18,7 @@ class UsersController{
 
     async deleteUser(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async ()=>{
-            await services.usersService.deleteUser(req.body);
+            await services.usersService.deleteUser(req.params.id);
             res.status(200).json({message:"User deleted successfully"});
         })
     }

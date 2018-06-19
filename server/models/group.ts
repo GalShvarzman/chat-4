@@ -1,7 +1,8 @@
 import User from './user';
 import IUser from './user';
 import {IMessage} from "./message";
-import {create_UUID} from '../../src/utils/uuid';
+import * as uuidv4 from 'uuid/v4';
+
 
 let i = 0;
 
@@ -36,7 +37,7 @@ export default class Group implements IGroup{
         this.name = name;
         this.children = this.array.concat(children||[]);
         this.messages = [];
-        this.id = create_UUID();
+        this.id = uuidv4();
         this.type = 'group';
     }
 
