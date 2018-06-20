@@ -147,6 +147,7 @@ class DB {
                 if (fileName === 'users.json') {
                     return { user: { name: obj.name, age: obj.age, id: obj.id } };
                 }
+                return obj;
             }
             catch (e) {
                 throw new client_error_1.ClientError(500, "CreateNewFailed");

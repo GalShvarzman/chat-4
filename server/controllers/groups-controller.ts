@@ -21,6 +21,13 @@ class GroupsController{
             res.status(204).send("");
         });
     }
+
+    async createNewGroup(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async () => {
+            const group = await services.groupService.createNewGroup(req.body);
+            res.status(200).json(group)
+        })
+    }
 }
 
 async function tryCatch(next, func){

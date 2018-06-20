@@ -6,7 +6,7 @@ import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import User from "../models/user";
 import IGroup from "../models/group";
-import {getUsers, saveUserDetails, deleteUser, createNewUser, getGroups, getGroupData, deleteGroup} from '../server-api';
+import {getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup} from '../server-api';
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -125,6 +125,10 @@ export class StateStoreService implements IStateStoreService{
 
     public async createNewUser(user:{name:string, age:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
         return await createNewUser(user);
+    }
+
+    public async createNewGroup(group:{name:string, parent:string}):Promise<{group:{name:string, id:string}}>{
+        return await createNewGroup(group);
     }
 
     public subscribe(listener:any){

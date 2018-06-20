@@ -19,6 +19,11 @@ class NTree {
     add(node, parentNode) {
         this.root.add(node, parentNode);
     }
+    createNew(newDetails, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.createNew(newDetails, fileName);
+        });
+    }
     search(nodeId) {
         return this.root.search(nodeId);
     }

@@ -7,10 +7,12 @@ import Select from "./select";
 
 interface INewGroupProps {
     history:any;
+    groups:{name:string, id:string}[],
+    onCreateNewGroup(group:{name:string, parent:string}):{name:string, id:string}
 }
 
 interface INewGroupState {
-    group: {name: string},
+    group: {name: string, parent:string},
     message?:string
 }
 
@@ -18,9 +20,21 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
     constructor(props:INewGroupProps){
         super(props);
         this.state = {
-            group: {name: ''}
+            group: {name: '', parent: 'select'},
         };
     }
+
+    public handleSelect = (parent:any) => {
+        this.setState((prevState)=>{
+            return{
+                group:{
+                    name:prevState.group.name,
+                    parent: parent
+                }
+            }
+        })
+    };
+
 
     public updateField = (fieldName: string, value: string) => {
         this.setState(prevState => {
@@ -34,20 +48,15 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
     };
 
     private onCreateNewGroup = async () => {
-        // try{
-        //     const result = await this.props.onCreateNewUser(this.state.user);
-        //     if(result.user){
-        //         const id = result.user.id;
-        //         this.props.history.push(id);
-        //         this.setState({message:"User created successfully"});
-        //     }
-        //     else{
-        //         this.setState({message:"Username already exist, choose a different name"});
-        //     }
-        // }
-        // catch(e){
-        //     this.setState({message:"Something went wrong..."}); // fixme;
-        // }
+        try {
+            const group = await this.props.onCreateNewGroup(this.state.group);
+            const id = group.id;
+            this.props.history.push(id);
+            this.setState({message: "Group created successfully"});
+        }
+        catch(e){
+            this.setState({message:"Something went wrong..."}); // fixme;
+        }
     };
 
     render(){
@@ -58,13 +67,9 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
                     <h2 className='new-group-header'>Create new group</h2>
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
                     <div className="new-group-select-parent">Parent:</div>
-                    <form className="new-group-select-form">
-                        <fieldset className="new-group-field-set">
-                            <Select />
-                        </fieldset>
-                    </form>
+                    <Select parent={this.state.group.parent} handleSelect={this.handleSelect} groups={this.props.groups}/>
                     <p hidden={!this.state.message}>{this.state.message}</p>
-                    <button onClick={this.onCreateNewGroup} className="create-new-group-btn" disabled={!this.state.group.name} type="button">Create</button>
+                    <button onClick={this.onCreateNewGroup} className="create-new-group-btn" disabled={!this.state.group.name || !this.state.group.parent} type="button">Create</button>
                 </div>
             </>
         )

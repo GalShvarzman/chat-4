@@ -10,10 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const tree_1 = require("../models/tree");
 const users_1 = require("../models/users");
+const uuidv4 = require("uuid/v4");
 class GroupsService {
     getAllGroups() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield tree_1.nTree.getGroups();
+        });
+    }
+    createNewGroup(newGroupDetails) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const groupParent = newGroupDetails.parent;
+            // לבדוק מי הילדים של אותה הקבוצה.... אם הם יוזרים להעביר אותם
+            // לייצר רשומה בקונקטורס
+            return yield tree_1.nTree.createNew({ name: newGroupDetails.name, id: uuidv4() }, 'groups.json');
         });
     }
     deleteGroup(groupId) {
@@ -23,7 +32,6 @@ class GroupsService {
             const childrenConnectorsTypeGroup = allChildrenConnectors.filter(child => child.type === 'group');
             const childrenConnectorsTypeGroupIds = childrenConnectorsTypeGroup.map(connector => connector.id);
             yield tree_1.nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
-            // const allChildrenConnectorsIds = allChildrenConnectors.map(connector => connector.id);
             const groupConnector = this.getGroupConnector(groupId, connectorsList);
             yield tree_1.nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
         });

@@ -1,16 +1,1 @@
-{
-  "data": [
-    {
-      "name": "root",
-      "id": "0f5383e5-69b8-4611-9f95-fd3bbf851d4a"
-    },
-    {
-      "name": "Friends",
-      "id": "0078aabf-f428-4a43-b3a6-a1519fca6b4b"
-    },
-    {
-      "name": "Best Friends",
-      "id": "6c6a69ea-6b71-4410-b1ae-8169e4edf743"
-    }
-  ]
-}
+{"data":[{"name":"root","id":"0f5383e5-69b8-4611-9f95-fd3bbf851d4a"},{"name":"Friends","id":"0078aabf-f428-4a43-b3a6-a1519fca6b4b"},{"name":"mygroup","id":"7e3b0232-0726-43ca-afd3-24f5d6c28583"},{"name":"mygroup","id":"4ab7da52-3854-4381-9127-1ac37aa911dd"},{"name":"mygroup2","id":"e4e2ba01-4e33-4409-be82-fe3157902aff"},{"name":"galgol","id":"bea5770e-94d2-4136-b087-8414f442f55b"},{"name":"Roni","id":"fdad0d60-13c5-4d97-bba2-8cb05909345e"},{"name":"Roni","id":"2d5adc1b-af72-4382-892b-ef96449cd1ee"},{"name":"Ori","id":"f11bd5a3-bb2d-4d8f-87a4-9c7277830207"},{"name":"Ori","id":"252800ed-7cc6-4b30-a076-0488314f3e80"},{"name":"gal","id":"af98c49a-296a-4ca7-8533-54e896f57e2e"}]}

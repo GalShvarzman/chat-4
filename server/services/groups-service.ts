@@ -1,10 +1,18 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
+import * as uuidv4 from 'uuid/v4';
 
 class GroupsService{
 
     async getAllGroups():Promise<{data:{name:string, id:string}[]}>{
         return await nTree.getGroups();
+    }
+
+    async createNewGroup(newGroupDetails):Promise<{name:string, id:string}>{
+        const groupParent = newGroupDetails.parent;
+        // לבדוק מי הילדים של אותה הקבוצה.... אם הם יוזרים להעביר אותם
+        // לייצר רשומה בקונקטורס
+        return await nTree.createNew({name:newGroupDetails.name, id:uuidv4()}, 'groups.json');
     }
 
     async deleteGroup(groupId):Promise<void> {
@@ -13,7 +21,6 @@ class GroupsService{
         const childrenConnectorsTypeGroup = allChildrenConnectors.filter(child => child.type === 'group');
         const childrenConnectorsTypeGroupIds = childrenConnectorsTypeGroup.map(connector => connector.id);
         await nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
-        // const allChildrenConnectorsIds = allChildrenConnectors.map(connector => connector.id);
         const groupConnector = this.getGroupConnector(groupId, connectorsList);
         await nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
     }

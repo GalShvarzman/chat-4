@@ -25,8 +25,8 @@ interface IAppState {
     errorMsg: ERROR_MSG,
     counter: number,
     redirectToChat:boolean,
-    users:any,
-    groups:any
+    users:any[],
+    groups:any[]
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -41,8 +41,8 @@ class App extends React.Component<{}, IAppState> {
             errorMsg: ERROR_MSG.none,
             counter: 0,
             redirectToChat:false,
-            users: null,
-            groups:null
+            users: [],
+            groups:[]
         };
 
         stateStoreService.subscribe(async() => {
@@ -128,17 +128,12 @@ class App extends React.Component<{}, IAppState> {
 
     public deleteGroup = async(group:{id:string, name:string}) => {
         await stateStoreService.deleteGroup(group);
-        const groupsClone = [...this.state.groups];
-        const deletedGroupIndex = groupsClone.findIndex((groupClone)=>{
-            return groupClone.id === group.id;
-        });
-        groupsClone.splice(deletedGroupIndex, 1);
-        this.setState({groups:groupsClone});
+        this.setState({groups:await stateStoreService.getGroups()});
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup {...props}/>);
+    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup} groups={this.state.groups}/>);
 
     public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
 
@@ -151,6 +146,17 @@ class App extends React.Component<{}, IAppState> {
                 }
             });
         }
+        return result;
+    };
+
+    public onCreateNewGroup = async (group:{name:string, parent:string})=>{
+        const result = await stateStoreService.createNewGroup(group);
+        this.setState((prevState)=>{
+            return{
+                groups:[...prevState.groups, result]
+            }
+        });
+
         return result;
     };
 
@@ -180,6 +186,7 @@ class App extends React.Component<{}, IAppState> {
                         <Route exact={true} path='/users' render={this.usersRender}/>
                         <Route exact={true} path='/groups' render={this.groupsRender}/>
                         <Route exact={true} path='/groups/new' render={this.newGroupRender}/>
+                        <Route exact={true} path='/groups/:id' render={this.newGroupRender}/>
                         <Route exact={true} path='/groups/:id/edit' render={this.groupEditRender}/>
                         <Route exact={true} path='/users/new' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id' render={this.newUserRender}/>

@@ -5,6 +5,8 @@ const groupsRouter = express.Router();
 
 groupsRouter.get('/', controllers.groupsController.getAllGroups);
 
+groupsRouter.post('/', controllers.groupsController.createNewGroup);
+
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
 
 groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);

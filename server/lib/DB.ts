@@ -136,14 +136,16 @@ class DB{
     }
 
      async createNew(obj, fileName):Promise<any> {
-        try{
+        try {
             const result = await this.readFile(fileName);
             result.data.push(obj);
             await this.writeFile(result, fileName);
-            if(fileName === 'users.json'){
-                return {user:{name:obj.name, age:obj.age, id:obj.id}}
+            if (fileName === 'users.json') {
+                return {user: {name: obj.name, age: obj.age, id: obj.id}}
             }
+            return obj;
         }
+
         catch(e){
             throw new ClientError(500, "CreateNewFailed")
         }

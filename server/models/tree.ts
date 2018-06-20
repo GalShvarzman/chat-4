@@ -16,6 +16,11 @@ export class NTree{
     public add(node:IGroup| IUser, parentNode?:IGroup){
         this.root.add(node, parentNode);
     }
+
+    public async createNew(newDetails, fileName){
+        return await db.createNew(newDetails, fileName);
+    }
+
     public search(nodeId:string|undefined){
         return this.root.search(nodeId)
     }

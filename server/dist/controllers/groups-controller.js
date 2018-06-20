@@ -32,6 +32,14 @@ class GroupsController {
             }));
         });
     }
+    createNewGroup(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                const group = yield services.groupService.createNewGroup(req.body);
+                res.status(200).json(group);
+            }));
+        });
+    }
 }
 function tryCatch(next, func) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -18,6 +18,10 @@ export function createNewUser(user:{name:string, age:number, password:string}):P
     return post('/users', user);
 }
 
+export function createNewGroup(group:{name:string, parent:string}) {
+    return post('/groups', group);
+}
+
 export function getGroups():Promise<any>{
    return get('/groups');
 }
