@@ -5,5 +5,6 @@ const controllers = require("../controllers");
 const groupsRouter = express.Router();
 groupsRouter.get('/', controllers.groupsController.getAllGroups);
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
+groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);
 exports.default = groupsRouter;
 //# sourceMappingURL=groups-router.js.map

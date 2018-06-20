@@ -28,6 +28,9 @@ class DB{
     async getData(fileName):Promise<{data:any[]}>{
         try{
             return await this.readFile(fileName);
+            // const result = await this.readFile(fileName);
+            // const data = [...result.data];
+            // return {data};
         }
         catch(e){
             throw new ClientError(500, "getDataFailed");
@@ -55,6 +58,18 @@ class DB{
         }
     }
 
+    getObjIndex(result, obj){
+        const index = result.data.findIndex((object) => {
+            return (JSON.stringify(obj) === JSON.stringify(object));
+        });
+        if(index !== -1){
+            return index;
+        }
+        else{
+            throw new ClientError(404,"objDoesNotExist")
+        }
+    }
+
     isObjExistsByName(result, objName):boolean {
         const index = result.data.findIndex((obj) => {
             return obj.name === objName;
@@ -72,21 +87,52 @@ class DB{
         }
     }
 
+    async deleteMultipleObj(objects:{}[], fileName){
+        try {
+            const result = await this.readFile(fileName);
+
+            objects.forEach(async(obj)=>{
+                const objIndex = this.getObjIndex(result, obj);
+                result.data.splice(objIndex, 1);
+            });
+            return await this.writeFile(result, fileName);
+        }
+        catch(e){
+            throw new ClientError(500,"deleteFailed");
+        }
+    }
+
+
+    async deleteMultipleObjById(ids:string[], fileName):Promise<boolean>{
+        try {
+            const result = await this.readFile(fileName);
+
+            ids.forEach(async(id)=>{
+                const objIndex = this.getObjIndexById(result, id);
+                result.data.splice(objIndex, 1);
+            });
+            return await this.writeFile(result, fileName);
+        }
+        catch(e){
+            throw new ClientError(500,"deleteFailed");
+        }
+    }
+
+
     async deleteObj(id:string, fileName):Promise<boolean> {
         // fixme אחרי שמוחקים את היוזר גם צריך למחוק אותו מכל הקבוצות שלהן הוא שייך
 
         try {
             const result = await this.readFile(fileName);
             const objIndex = this.getObjIndexById(result, id);
-            if (objIndex !== -1) {
-                result.data.splice(objIndex, 1);
-                return await this.writeFile(result, fileName);
-            }
+
+            result.data.splice(objIndex, 1);
+            return await this.writeFile(result, fileName);
+
         }
         catch(e){
             throw new ClientError(500,"deleteFailed");
         }
-        throw new ClientError(404,"objDoesNotExist");
     }
 
      async createNew(obj, fileName):Promise<any> {

@@ -37,6 +37,9 @@ class DB {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return yield this.readFile(fileName);
+                // const result = await this.readFile(fileName);
+                // const data = [...result.data];
+                // return {data};
             }
             catch (e) {
                 throw new client_error_1.ClientError(500, "getDataFailed");
@@ -64,6 +67,17 @@ class DB {
             throw new client_error_1.ClientError(404, "objDoesNotExist");
         }
     }
+    getObjIndex(result, obj) {
+        const index = result.data.findIndex((object) => {
+            return (JSON.stringify(obj) === JSON.stringify(object));
+        });
+        if (index !== -1) {
+            return index;
+        }
+        else {
+            throw new client_error_1.ClientError(404, "objDoesNotExist");
+        }
+    }
     isObjExistsByName(result, objName) {
         const index = result.data.findIndex((obj) => {
             return obj.name === objName;
@@ -80,21 +94,48 @@ class DB {
             }
         });
     }
+    deleteMultipleObj(objects, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.readFile(fileName);
+                objects.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                    const objIndex = this.getObjIndex(result, obj);
+                    result.data.splice(objIndex, 1);
+                }));
+                return yield this.writeFile(result, fileName);
+            }
+            catch (e) {
+                throw new client_error_1.ClientError(500, "deleteFailed");
+            }
+        });
+    }
+    deleteMultipleObjById(ids, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.readFile(fileName);
+                ids.forEach((id) => __awaiter(this, void 0, void 0, function* () {
+                    const objIndex = this.getObjIndexById(result, id);
+                    result.data.splice(objIndex, 1);
+                }));
+                return yield this.writeFile(result, fileName);
+            }
+            catch (e) {
+                throw new client_error_1.ClientError(500, "deleteFailed");
+            }
+        });
+    }
     deleteObj(id, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             // fixme אחרי שמוחקים את היוזר גם צריך למחוק אותו מכל הקבוצות שלהן הוא שייך
             try {
                 const result = yield this.readFile(fileName);
                 const objIndex = this.getObjIndexById(result, id);
-                if (objIndex !== -1) {
-                    result.data.splice(objIndex, 1);
-                    return yield this.writeFile(result, fileName);
-                }
+                result.data.splice(objIndex, 1);
+                return yield this.writeFile(result, fileName);
             }
             catch (e) {
                 throw new client_error_1.ClientError(500, "deleteFailed");
             }
-            throw new client_error_1.ClientError(404, "objDoesNotExist");
         });
     }
     createNew(obj, fileName) {

@@ -19,9 +19,26 @@ export class NTree{
     public search(nodeId:string|undefined){
         return this.root.search(nodeId)
     }
-    public removeGroup(node:IGroup){
-        return this.root.removeGroup(node);
+
+    async removeGroup(id:string){
+        return await db.deleteObj(id, groupsFile);
+        // return this.root.removeGroup(node);
     }
+
+    async removeMultipleGroups(ids:string[]){
+        return await db.deleteMultipleObjById(ids, groupsFile);
+    }
+
+    async removeConnector(id:string){
+        return await db.deleteObj(id, connectorsFile);
+        // return this.root.removeGroup(node);
+    }
+
+    async removeMultipleConnectors(connectors:string[]){
+        return await db.deleteMultipleObj(connectors, connectorsFile);
+        // return this.root.removeGroup(node);
+    }
+
 
     public printFullTree(){
         return this.root.printFullTree();
@@ -31,7 +48,7 @@ export class NTree{
         return await db.getData(groupsFile);
     }
 
-    public async getConnectorsList(){
+    public async getConnectorsList():Promise<{data:{type:string, id:string, pId:string}[]}>{
         return await db.getData(connectorsFile);
     }
 

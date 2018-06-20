@@ -7,4 +7,6 @@ groupsRouter.get('/', controllers.groupsController.getAllGroups);
 
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
 
+groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);
+
 export default groupsRouter;

@@ -22,8 +22,28 @@ class NTree {
     search(nodeId) {
         return this.root.search(nodeId);
     }
-    removeGroup(node) {
-        return this.root.removeGroup(node);
+    removeGroup(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.deleteObj(id, groupsFile);
+            // return this.root.removeGroup(node);
+        });
+    }
+    removeMultipleGroups(ids) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.deleteMultipleObjById(ids, groupsFile);
+        });
+    }
+    removeConnector(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.deleteObj(id, connectorsFile);
+            // return this.root.removeGroup(node);
+        });
+    }
+    removeMultipleConnectors(connectors) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.deleteMultipleObj(connectors, connectorsFile);
+            // return this.root.removeGroup(node);
+        });
     }
     printFullTree() {
         return this.root.printFullTree();

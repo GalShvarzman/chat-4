@@ -114,7 +114,7 @@ class App extends React.Component<{}, IAppState> {
 
     public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.state.users}/>);
 
-    public groupsRender = () => (<GroupAdmin groups={this.state.groups}/>);
+    public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.state.groups}/>);
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
@@ -124,6 +124,16 @@ class App extends React.Component<{}, IAppState> {
         const deletedUsersIndex = usersClone.findIndex(userClone=>user.id === userClone.id);
         usersClone.splice(deletedUsersIndex, 1);
         this.setState({users:usersClone});
+    };
+
+    public deleteGroup = async(group:{id:string, name:string}) => {
+        await stateStoreService.deleteGroup(group);
+        const groupsClone = [...this.state.groups];
+        const deletedGroupIndex = groupsClone.findIndex((groupClone)=>{
+            return groupClone.id === group.id;
+        });
+        groupsClone.splice(deletedGroupIndex, 1);
+        this.setState({groups:groupsClone});
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);

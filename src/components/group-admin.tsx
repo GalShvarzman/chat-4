@@ -5,7 +5,8 @@ import 'react-table/react-table.css';
 import './group-admin.css';
 
 interface IGroupAdminProps {
-    groups:any
+    groups:any,
+    deleteGroup(group:{id:string, name:string}):void
 }
 
 interface IGroupAdminState {
@@ -21,7 +22,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
         return {
             onClick: (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    // this.props.deleteUser(rowInfo.original)
+                    this.props.deleteGroup(rowInfo.original);
                 }
                 if (handleOriginal) {
                     handleOriginal();

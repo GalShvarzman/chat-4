@@ -14,6 +14,13 @@ class GroupsController{
             res.status(200).json(await services.groupService.getGroupData(req.params.id));
         })
     }
+
+    async deleteGroup(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async () => {
+            await services.groupService.deleteGroup(req.params.id);
+            res.status(204).send("");
+        });
+    }
 }
 
 async function tryCatch(next, func){

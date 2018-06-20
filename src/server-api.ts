@@ -10,6 +10,10 @@ export function deleteUser(user:{name:string, age:number, id:string}):Promise<vo
     return remove(`/users/${user.id}`);
 }
 
+export function deleteGroup(group:{id:string, name:string}):Promise<void>{
+    return remove(`groups/${group.id}`);
+}
+
 export function createNewUser(user:{name:string, age:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
     return post('/users', user);
 }

@@ -6,7 +6,7 @@ import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import User from "../models/user";
 import IGroup from "../models/group";
-import {getUsers, saveUserDetails, deleteUser, createNewUser, getGroups, getGroupData} from '../server-api';
+import {getUsers, saveUserDetails, deleteUser, createNewUser, getGroups, getGroupData, deleteGroup} from '../server-api';
 
 interface IStateStoreService {
     set(key: string, val: any): void,
@@ -113,7 +113,10 @@ export class StateStoreService implements IStateStoreService{
 
     public async deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
         return await deleteUser(user);
+    }
 
+    public async deleteGroup(group:{id:string, name:string}){
+        return await deleteGroup(group);
     }
 
     public async getGroupData(groupId:string){
