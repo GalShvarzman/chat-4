@@ -10,10 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const services = require("../services");
 class GroupsController {
-    getAllGroups(req, res, next) {
+    getGroups(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
-                res.status(200).json(yield services.groupService.getAllGroups());
+                if (req.query['groups_with_children'] == 'true') {
+                    res.status(200).json(yield services.groupService.getGroupsWithGroupsChildren());
+                }
+                else {
+                    res.status(200).json(yield services.groupService.getAllGroups());
+                }
             }));
         });
     }

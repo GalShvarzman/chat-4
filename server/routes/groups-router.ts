@@ -3,7 +3,7 @@ import * as controllers from "../controllers";
 
 const groupsRouter = express.Router();
 
-groupsRouter.get('/', controllers.groupsController.getAllGroups);
+groupsRouter.get('/', controllers.groupsController.getGroups);
 
 groupsRouter.post('/', controllers.groupsController.createNewGroup);
 

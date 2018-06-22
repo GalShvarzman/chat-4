@@ -6,8 +6,9 @@ import {Link} from "react-router-dom";
 
 interface IUserEditProps {
     location:any,
-    onEditUserDetails(user:IUser):{message:string}
+    onEditUserDetails(user:IUser):void
 }
+
 
 interface IUserEditState {
     user: {
@@ -53,7 +54,8 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
                 <Link to='/users'><button className="edit-user-back-btn">Back</button></Link>
                 <div className="edit-user-wrapper">
                     <h3 className="edit-user-name">Edit {this.state.user.name}'s details</h3>
-                    <Field name={'age'} type={'number'} user={this.state.user.age} onChange={this.updateField}/>
+                    <Field name={'age'} type={'number'} user={this.state.user.age}
+                           onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
                     <button className="edit-user-save-btn" type="button" onClick={this.save}>Save</button>
                     <p hidden={!this.state.message}>{this.state.message}</p>

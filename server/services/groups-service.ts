@@ -8,6 +8,28 @@ class GroupsService{
         return await nTree.getGroups();
     }
 
+    async getGroupsWithGroupsChildren():Promise<{data:{name:string, id:string}[]}>{
+        const allGroups = await nTree.getGroups();
+        const connectorsList = await this.getConnectorsList();
+        const groupsConnectors = connectorsList.data.filter((connector)=>{
+            return connector.type === 'group';
+        });
+        const groupsWithGroupsChildrenIds = [];
+        groupsConnectors.forEach((groupConnector)=>{
+           const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList) ;
+           if(connectorChildren[0].type === 'group'){
+               groupsWithGroupsChildrenIds.push(groupConnector.id);
+           }
+        });
+
+        return {
+            data: this.getObjData(allGroups.data, groupsWithGroupsChildrenIds)
+        }
+    }
+
+
+
+
     async createNewGroup(newGroupDetails):Promise<{name:string, id:string}>{
         const groupParent = newGroupDetails.parent;
         // לבדוק מי הילדים של אותה הקבוצה.... אם הם יוזרים להעביר אותם
@@ -60,10 +82,10 @@ class GroupsService{
         if(groupChildrenConnectors[0].type === 'user'){
             const usersList = await users.getUsersList();
 
-            groupChildren = this.getChildrenData(usersList.data, groupChildrenIds, 'user');
+            groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
         }
         else{
-            groupChildren = this.getChildrenData(groups.data, groupChildrenIds, 'group')
+            groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group')
         }
 
         return ({data:[{groupParent: groupParentDetails}, {groupChildren}]});
@@ -85,7 +107,7 @@ class GroupsService{
         });
     }
 
-    getChildrenData(arr1, arr2, type) {
+    getObjData(arr1, arr2, type?):{name:string, id:string, type?}[]{
         const result = [];
         for(let i = 0; i < arr1.length; i++){
             if(arr2.indexOf(arr1[i].id) > -1){

@@ -1,33 +1,37 @@
-export function getUsers():Promise<any>{
-    return get('/users');
+export async function getUsers():Promise<any>{
+    return await get('/users');
 }
 
-export function saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<any>{
-    return patch(`/users/${user.id}`, user);
+export async function saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<any>{
+    return await patch(`/users/${user.id}`, user);
 }
 
-export function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
-    return remove(`/users/${user.id}`);
+export async function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
+    return await remove(`/users/${user.id}`);
 }
 
-export function deleteGroup(group:{id:string, name:string}):Promise<void>{
-    return remove(`groups/${group.id}`);
+export async function deleteGroup(group:{id:string, name:string}):Promise<void>{
+    return await remove(`groups/${group.id}`);
 }
 
-export function createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
-    return post('/users', user);
+export async function createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
+    return await post('/users', user);
 }
 
-export function createNewGroup(group:{name:string, parent:string}) {
-    return post('/groups', group);
+export async function createNewGroup(group:{name:string, parent:string}) {
+    return await post('/groups', group);
 }
 
-export function getGroups():Promise<any>{
-   return get('/groups');
+export async function getGroups():Promise<{data :{name:string, id:string}[]}>{
+   return await get('/groups');
 }
 
-export function getGroupData(groupId:string):Promise<any>{
-    return get(`/groups/${groupId}`)
+export async function getGroupData(groupId:string):Promise<any>{
+    return await get(`/groups/${groupId}`)
+}
+
+export async function getGroupsWithGroupsChildren():Promise<{data :{name:string, id:string}[]}>{
+    return await get('/groups?groups_with_children=true')
 }
 
 function post(url:string, body:any){

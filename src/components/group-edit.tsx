@@ -17,7 +17,9 @@ interface IGroupEditState {
         children?:any[],
         parent?:string
     },
-    message?:string
+    message?:string,
+    columns:any[],
+    addNewUserBtnIsHidden:boolean
 }
 
 class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
@@ -27,8 +29,24 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
             group:{
                 name:props.location.state.group.name,
                 id:props.location.state.group.id
-            }
+            },
+            columns : [
+                {
+                    Header: 'ID',
+                    accessor: 'id',
+                    Cell:(props:any)=> (<><button className="delete-child-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></>)
+                }, {
+                    Header: 'Name',
+                    accessor: 'name',
+                },
+                {
+                    Header: 'Type',
+                    accessor: 'type',
+                }],
+
+            addNewUserBtnIsHidden:false
         }
+
     }
 
     // public save = async () => {
@@ -49,6 +67,9 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     async componentDidMount(){
         const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}]} = await stateStoreService.getGroupData(this.props.location.state.group.id);
+        if(groupData.data[1].groupChildren[0].type === 'group'){
+            this.setState({addNewUserBtnIsHidden : true});
+        }
         this.setState(prevState=>{
             return{
                 group:{
@@ -61,20 +82,6 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     }
 
     render(){
-        const data = this.state.group.children;
-        const columns = [
-            {
-                Header: 'ID',
-                accessor: 'id',
-                Cell:(props:any)=> (<><button className="delete-child-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></>)
-            }, {
-                Header: 'Name',
-                accessor: 'name',
-            },
-            {
-                Header: 'Type',
-                accessor: 'type',
-            }];
         return(
             <div>
                 <Link to='/groups'><button className="edit-group-back-btn">Back</button></Link>
@@ -85,12 +92,16 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     <p hidden={!this.state.message}>{this.state.message}</p>
                     <div>
                         <p className="parent-wrapper">
-                            <span className="parent">Parent:</span><span className="parent-name">{this.state.group.parent}</span>
+                            <span className="parent">Parent:</span><span className="parent-name">
+                            {this.state.group.parent}
+                            </span>
                         </p>
                         <div className="children-wrapper">
-                            <button>Add user to group</button>
+                            {!this.state.addNewUserBtnIsHidden && <button>Add user to group</button>}
                             <h2 className="children-header">Children</h2>
-                            <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={5} minRows={5} className="children-table" data={data} columns={columns}/>
+                            <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={5}
+                                        minRows={5} className="children-table" data={this.state.group.children}
+                                        columns={this.state.columns}/>
                         </div>
                     </div>
                 </div>

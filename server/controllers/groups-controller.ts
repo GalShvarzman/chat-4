@@ -3,9 +3,14 @@ import {Request, Response, NextFunction} from "express";
 
 class GroupsController{
 
-    async getAllGroups(req:Request,res:Response, next:NextFunction){
+    async getGroups(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async()=>{
-            res.status(200).json(await services.groupService.getAllGroups());
+            if(req.query['groups_with_children']=='true'){
+                res.status(200).json(await services.groupService.getGroupsWithGroupsChildren());
+            }
+            else{
+                res.status(200).json(await services.groupService.getAllGroups());
+            }
         })
     }
 

@@ -17,6 +17,25 @@ class GroupsService {
             return yield tree_1.nTree.getGroups();
         });
     }
+    getGroupsWithGroupsChildren() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allGroups = yield tree_1.nTree.getGroups();
+            const connectorsList = yield this.getConnectorsList();
+            const groupsConnectors = connectorsList.data.filter((connector) => {
+                return connector.type === 'group';
+            });
+            const groupsWithGroupsChildrenIds = [];
+            groupsConnectors.forEach((groupConnector) => {
+                const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList);
+                if (connectorChildren[0].type === 'group') {
+                    groupsWithGroupsChildrenIds.push(groupConnector.id);
+                }
+            });
+            return {
+                data: this.getObjData(allGroups.data, groupsWithGroupsChildrenIds)
+            };
+        });
+    }
     createNewGroup(newGroupDetails) {
         return __awaiter(this, void 0, void 0, function* () {
             const groupParent = newGroupDetails.parent;
@@ -65,10 +84,10 @@ class GroupsService {
             let groupChildren;
             if (groupChildrenConnectors[0].type === 'user') {
                 const usersList = yield users_1.default.getUsersList();
-                groupChildren = this.getChildrenData(usersList.data, groupChildrenIds, 'user');
+                groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
             }
             else {
-                groupChildren = this.getChildrenData(groups.data, groupChildrenIds, 'group');
+                groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group');
             }
             return ({ data: [{ groupParent: groupParentDetails }, { groupChildren }] });
         });
@@ -88,7 +107,7 @@ class GroupsService {
             return obj.pId === id;
         });
     }
-    getChildrenData(arr1, arr2, type) {
+    getObjData(arr1, arr2, type) {
         const result = [];
         for (let i = 0; i < arr1.length; i++) {
             if (arr2.indexOf(arr1[i].id) > -1) {

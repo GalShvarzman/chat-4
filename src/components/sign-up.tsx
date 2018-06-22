@@ -60,7 +60,8 @@ class SignUp extends React.Component<ISignUpProps, ISignUpState> {
                             <Field name={'name'} type={'text'} onChange={this.updateField}/>
                             <Field name={'age'} type={'number'} onChange={this.updateField}/>
                             <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                            <button className='sign-up-btn' disabled={!this.state.user.name || !this.state.user.password} type="button" onClick={this.submitHandler}>Sign up</button>
+                            <button className='sign-up-btn' disabled={!this.state.user.name || !this.state.user.password}
+                                    type="button" onClick={this.submitHandler}>Sign up</button>
                             <p style={{color:this.colors[this.props.signUpStatus]}}>{this.messages[this.props.signUpStatus]}</p>
                         </div>
                     </form>

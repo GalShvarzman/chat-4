@@ -11,12 +11,35 @@ interface IUserAdminProps {
 }
 
 interface IUserAdminState {
-
+    columns:any[]
 }
 
 class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
     constructor(props:IUserAdminProps){
-        super(props)
+        super(props);
+        this.state = {
+            columns : [
+                {
+                    Header: 'ID',
+                    accessor: 'id',
+                    Cell:(props:any)=> (<><button className="delete-user-btn">
+                                            <i className="fa fa-trash"/></button><span>{props.value}</span></>)
+                }, {
+                    Header: 'Name',
+                    accessor: 'name',
+                    Cell: (props: any) => (<Link className="user-name"
+                                                 to={{pathname: `/users/${props.original.id}/edit`,
+                                                     state:{user:props.original}}}>{props.value}
+                                           </Link>)
+                }, {
+                    Header: 'Age',
+                    accessor: 'age',
+                    Cell: (props: any) => (<Link className="user-age"
+                                                 to={{pathname: `/users/${props.original.id}/edit`,
+                                                     state:{user:props.original}}}>{props.value}
+                                           </Link>)
+                }]
+        }
     }
 
     // componentWillMount(){
@@ -50,27 +73,13 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
     };
 
     render(){
-        const data = this.props.users;
-        const columns = [
-            {
-                Header: 'ID',
-                accessor: 'id',
-                Cell:(props:any)=> (<><button className="delete-user-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></>)
-            }, {
-                Header: 'Name',
-                accessor: 'name',
-                Cell: (props: any) => <Link className="user-name" to={{pathname: `/users/${props.original.id}/edit`, state:{user:props.original}}}>{props.value}</Link>
-            }, {
-                Header: 'Age',
-                accessor: 'age',
-                Cell: (props: any) => <Link className="user-age" to={{pathname: `/users/${props.original.id}/edit`, state:{user:props.original}}}>{props.value}</Link>
-        }];
-
         return(
             <>
                 <Link to='/users/new'><button className='admin-create-new-user-btn'>Create new user</button></Link>
                 <h1 className="users-header">Users</h1>
-                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={10} minRows={10} className="users-table" data={data} columns={columns}/>
+                <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
+                            defaultPageSize={10} minRows={10} className="users-table" data={this.props.users}
+                            columns={this.state.columns}/>
             </>
         )
     }

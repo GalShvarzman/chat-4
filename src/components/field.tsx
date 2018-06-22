@@ -17,7 +17,16 @@ const Field:React.StatelessComponent<IFieldProps> = (props) => {
 
     return(
         <p className="field-wrapper">
-            {props.user || props.group ? (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input value={props.user || props.group} className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>) : (<><label className="field-label" htmlFor={props.name}>{props.name}:</label> <input className="field-input" type={props.type || 'text'} name={props.name} onChange={extractValue}/></>)}
+            {props.user || props.group ?
+                (<>
+                    <label className="field-label" htmlFor={props.name}>{props.name}:</label>
+                    <input value={props.user || props.group} className="field-input"
+                           type={props.type || 'text'} name={props.name} onChange={extractValue}/></>)
+                : (<>
+                    <label className="field-label" htmlFor={props.name}>{props.name}:</label>
+                    <input className="field-input" type={props.type || 'text'} name={props.name}
+                           onChange={extractValue}/>
+                </>)}
         </p>
     )
 };

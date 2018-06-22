@@ -4,7 +4,7 @@ import './new-user.css';
 import {Link} from "react-router-dom";
 
 interface INewUserProps {
-    onCreateNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age?:string, id:string}}>
+    onCreateNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>
     history:any;
 }
 
@@ -59,7 +59,8 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
                     <Field name={'age'} type={'number'} onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
                     <p hidden={!this.state.message}>{this.state.message}</p>
-                    <button onClick={this.onCreateNewUser} className="create-new-user-btn" disabled={!this.state.user.name || !this.state.user.password} type="button">Create</button>
+                    <button onClick={this.onCreateNewUser} className="create-new-user-btn"
+                            disabled={!this.state.user.name || !this.state.user.password} type="button">Create</button>
                 </div>
             </>
         )

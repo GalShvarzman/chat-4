@@ -20,13 +20,21 @@ export enum ERROR_MSG{
     locked
 }
 
+const changeOptions = {
+    'users' : stateStoreService.getUsers.bind(stateStoreService),
+    'groups' : stateStoreService.getGroups.bind(stateStoreService),
+    'groupsWithGroupsChildren': stateStoreService.getGroupsWithGroupsChildren.bind(stateStoreService)
+};
+
 interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
     redirectToChat:boolean,
-    users:any[],
-    groups:any[]
+    users:{name:string, age:string, id:string}[],
+    groups:{name:string, id:string}[],
+    groupsWithGroupsChildren:{name:string, id:string}[],
+    [key: string] : any
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -42,24 +50,35 @@ class App extends React.Component<{}, IAppState> {
             counter: 0,
             redirectToChat:false,
             users: [],
-            groups:[]
+            groups:[],
+            groupsWithGroupsChildren:[]
         };
 
-        stateStoreService.subscribe(async() => {
-            // this.setState({users: await stateStoreService.getUsers()});
-        });
     }
 
-    async componentDidMount(){
-         this.setState({users: await stateStoreService.getUsers(), groups: await stateStoreService.getGroups()})
+    componentWillMount(){
+        stateStoreService.subscribe(this.onSubscribe);
     }
 
-    public onEditUserDetails = async (user:{name:string, age?:number, password?:string, id:string})=>{
-        const updatedUser = await stateStoreService.saveUserDetails(user);
-        const usersClone = [...this.state.users];
-        const updatedUsersIndex = usersClone.findIndex(userClone => user.id === userClone.id);
-        usersClone[updatedUsersIndex] = updatedUser.user;
-        this.setState({users:usersClone});
+    componentWillUnmount(){
+        stateStoreService.unsubscribe(this.onSubscribe);
+    };
+
+    componentDidMount(){
+        this.setState({users: stateStoreService.get('users'), groups: stateStoreService.get('groups'), groupsWithGroupsChildren:stateStoreService.get('groupsWithGroupsChildren')})
+    }
+
+    private onSubscribe = async (event:{changed:string[]}) => {
+        if(event.changed){
+            event.changed.forEach((change)=>{
+                const result  = changeOptions[change]();
+                this.setState({[change]:result});
+            })
+        }
+    };
+
+    public onEditUserDetails = async (user:{name:string, age?:number, password?:string, id:string}) => {
+        await stateStoreService.saveUserDetails(user);
     };
 
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
@@ -118,46 +137,27 @@ class App extends React.Component<{}, IAppState> {
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
-    public  deleteUser = async(user:{name: string, age: number, id: string}) => {
+    public  deleteUser = async(user:{name: string, age: number, id: string}):Promise<void> => {
         await stateStoreService.deleteUser(user);
-        const usersClone = [...this.state.users];
-        const deletedUsersIndex = usersClone.findIndex(userClone=>user.id === userClone.id);
-        usersClone.splice(deletedUsersIndex, 1);
-        this.setState({users:usersClone});
     };
 
     public deleteGroup = async(group:{id:string, name:string}) => {
         await stateStoreService.deleteGroup(group);
-        this.setState({groups:await stateStoreService.getGroups()});
+        this.setState({groups: stateStoreService.getGroups()});
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup} groups={this.state.groups}/>);
+    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup} groupsWithGroupsChildren={this.state.groupsWithGroupsChildren}/>);
 
     public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
 
-    public onCreateNewUser = async (user:{name:string, age:number, password:string})=>{
-        const result:{user:{name:string, age?:string, id:string}} | {message:{message:string}} = await stateStoreService.createNewUser(user);
-        if(result.user){
-            this.setState((prevState)=>{
-                return{
-                    users:[...prevState.users, result.user]
-                }
-            });
-        }
-        return result;
+    public onCreateNewUser = async (user:{name:string, age:number, password:string})=> {
+        return await stateStoreService.createNewUser(user);
     };
 
     public onCreateNewGroup = async (group:{name:string, parent:string})=>{
-        const result = await stateStoreService.createNewGroup(group);
-        this.setState((prevState)=>{
-            return{
-                groups:[...prevState.groups, result]
-            }
-        });
-
-        return result;
+        return await stateStoreService.createNewGroup(group);
     };
 
     public render() {
@@ -176,7 +176,11 @@ class App extends React.Component<{}, IAppState> {
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
                     <div hidden={!this.state.loggedInUser} className='nav-right'>
-                        <div className="app-logged-in">You are logged in as: <span className='logged-in-name'>{this.state.loggedInUser ? this.state.loggedInUser.name : ""}</span></div>
+                        <div className="app-logged-in">You are logged in as:
+                            <span className='logged-in-name'>
+                                {this.state.loggedInUser ? this.state.loggedInUser.name : ""}
+                            </span>
+                        </div>
                     </div>
                 </nav>
                 <div className="switch">
