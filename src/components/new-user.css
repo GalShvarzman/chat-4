@@ -1,5 +1,9 @@
 .new-user-back-btn{
-
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 1px solid darkslateblue;
+    border-radius: 5px;
+    padding:0.5em 1em;
 }
 
 .create-new-user-btn{

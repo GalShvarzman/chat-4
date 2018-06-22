@@ -1,0 +1,14 @@
+.select{
+    color:#483D8B;
+    background-color: azure;
+    font-size:1em;
+    border:1px solid #483D8B;
+    max-height: 1000px;
+    overflow: auto;
+    outline: none;
+    padding:0.2em;
+}
+
+.select:focus{
+    cursor: pointer;
+}

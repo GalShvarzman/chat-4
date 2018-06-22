@@ -62,11 +62,11 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
     render(){
         return(
             <>
-                <Link to='/users'><button className="new-group-back-btn">Back</button></Link>
+                <Link to='/groups'><button className="new-group-back-btn">Back</button></Link>
                 <div className='new-group-wrapper'>
                     <h2 className='new-group-header'>Create new group</h2>
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
-                    <div className="new-group-select-parent">Parent:</div>
+                    <div className="new-group-select-parent">Parent</div>
                     <Select parent={this.state.group.parent} handleSelect={this.handleSelect} groups={this.props.groups}/>
                     <p hidden={!this.state.message}>{this.state.message}</p>
                     <button onClick={this.onCreateNewGroup} className="create-new-group-btn" disabled={!this.state.group.name || !this.state.group.parent} type="button">Create</button>

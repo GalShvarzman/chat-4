@@ -4,7 +4,6 @@ import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
-import User from "../models/user";
 import IGroup from "../models/group";
 import {getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup} from '../server-api';
 
@@ -30,15 +29,15 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance()[key] || null;
     }
 
-    public addNewUser(newUser:{name:string, age?:number, password:string}){
-        if(StateStore.getInstance().users.isUserExists(newUser.name)){
-            return false;
-        }
-        else{
-            StateStore.getInstance().users.addUser(new User(newUser.name, newUser.age!, newUser.password));
-            return true;
-        }
-    }
+    // public addNewUser(newUser:{name:string, age?:number, password:string}){
+    //     if(StateStore.getInstance().users.isUserExists(newUser.name)){
+    //         return false;
+    //     }
+    //     else{
+    //         StateStore.getInstance().users.addUser(new User(newUser.name, newUser.age!, newUser.password));
+    //         return true;
+    //     }
+    // }
 
     public isUserExistInGroup(groupId:string, userId:string){
         const group = StateStore.getInstance().tree.search(groupId);
@@ -73,6 +72,7 @@ export class StateStoreService implements IStateStoreService{
     }
 
     public auth(user:{name:string, password:string}):string{
+        // fixme לאמת את היוזר בשרת....
         try{
             const currentUser = StateStore.getInstance().users.getUser(user.name);
             if(currentUser.auth(user.password)){
@@ -100,11 +100,13 @@ export class StateStoreService implements IStateStoreService{
     public async getUsers(){
         const res = await getUsers();
         return res.data;
+        // return StateStore.getInstance().users;
     }
 
     public async getGroups(){
         const res = await getGroups();
         return res.data;
+        // return StateStore.getInstance().groups;
     }
 
     public async saveUserDetails(user:{name:string, age?:number, password?:string, id:string}){
@@ -123,7 +125,7 @@ export class StateStoreService implements IStateStoreService{
         return await getGroupData(groupId);
     }
 
-    public async createNewUser(user:{name:string, age:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
+    public async createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age?:string, id:string}}>{
         return await createNewUser(user);
     }
 
@@ -146,14 +148,31 @@ export class StateStoreService implements IStateStoreService{
 interface IStateStore {
     users : IUsersDb,
     tree:NTree,
-    messagesDb:MessagesDb
+    messagesDb:MessagesDb,
+    groups:{name:string, id:string}[]
 }
 
 
 class StateStore implements IStateStore {
     public users:any;
     public tree:NTree = nTree;
+    public groups:{name:string, id:string}[];
     public messagesDb:MessagesDb = messagesDb;
+
+    constructor(){
+        this.getGroups();
+        this.getUsers();
+    }
+
+    public async getGroups(){
+        const res = await getGroups();
+        this.groups = res.data;
+    }
+
+    public async getUsers(){
+        const res = await await getUsers();
+        this.users = res.data;
+    }
 
     static instance: IStateStore;
 

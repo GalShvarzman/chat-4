@@ -1,9 +1,34 @@
-.create-new-group-btn{
-    display: block;
-}
-
 .new-group-select-parent{
-    width:4em;
     font-size:1.3em;
     color: #483D8B;
+    margin-bottom: 0.5em;
+}
+
+.new-group-header{
+    color:#483D8B;
+    margin-bottom: 1em;
+    font-size: 1.6em;
+}
+
+.create-new-group-btn{
+    display: block;
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 2px solid darkslateblue;
+    border-radius: 5px;
+    margin:2em auto;
+    font-size:1em;
+    padding:0.5em 1em;
+}
+
+.new-group-back-btn{
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 1px solid darkslateblue;
+    border-radius: 5px;
+    padding:0.5em 1em;
+}
+
+.new-group-wrapper{
+    text-align: center;
 }
