@@ -17,7 +17,7 @@ class GroupsService{
         const groupsWithGroupsChildrenIds = [];
         groupsConnectors.forEach((groupConnector)=>{
            const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList) ;
-           if(connectorChildren[0].type === 'group'){
+           if(connectorChildren.length && connectorChildren[0].type === 'group'){
                groupsWithGroupsChildrenIds.push(groupConnector.id);
            }
         });
@@ -31,10 +31,13 @@ class GroupsService{
 
 
     async createNewGroup(newGroupDetails):Promise<{name:string, id:string}>{
-        const groupParent = newGroupDetails.parent;
-        // לבדוק מי הילדים של אותה הקבוצה.... אם הם יוזרים להעביר אותם
-        // לייצר רשומה בקונקטורס
-        return await nTree.createNew({name:newGroupDetails.name, id:uuidv4()}, 'groups.json');
+        const groupParentId = newGroupDetails.parent;
+        const newId = uuidv4();
+        return Promise.all([nTree.createNew({type:'group', id:newId, pId:groupParentId}, 'connectors.json'),
+                           nTree.createNew({name:newGroupDetails.name, id:newId}, 'groups.json')])
+            .then((results)=>{
+                return results[1];
+            });
     }
 
     async deleteGroup(groupId):Promise<void> {
@@ -60,36 +63,39 @@ class GroupsService{
         return result;
     }
 
-    async getGroupData(groupId):Promise<{data:any[]}>{
+    async getGroupData(groupId):Promise<{data:any[]}> {
         const connectorsList = await this.getConnectorsList();
         const groupConnector = this.getGroupConnector(groupId, connectorsList);
         const groups = await this.getAllGroups();
 
-        let groupParentDetails = groups.data.find((group)=>{
+        let groupParentDetails = groups.data.find((group) => {
             return group.id === groupConnector.pId;
         });
 
-        if(!groupParentDetails){
-            groupParentDetails = {name:'No parent', id:""};
+        if (!groupParentDetails) {
+            groupParentDetails = {name: 'No parent', id: ""};
         }
         const groupChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
 
-        const groupChildrenIds = groupChildrenConnectors.map((child)=>{
+        const groupChildrenIds = groupChildrenConnectors.map((child) => {
             return child.id;
         });
 
-        let groupChildren;
-        if(groupChildrenConnectors[0].type === 'user'){
-            const usersList = await users.getUsersList();
+        if (groupChildrenConnectors.length) {
+            let groupChildren;
+            if (groupChildrenConnectors[0].type === 'user') {
+                const usersList = await users.getUsersList();
 
-            groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
+                groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
+            }
+            else {
+                groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group')
+            }
+            return ({data: [{groupParent: groupParentDetails}, {groupChildren}]});
         }
-        else{
-            groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group')
-        }
-
-        return ({data:[{groupParent: groupParentDetails}, {groupChildren}]});
+        return ({data: [{groupParent: groupParentDetails}, {groupChildren:[]}]});
     }
+
 
     async getConnectorsList():Promise<{data:{type:string, id:string, pId:string}[]}>{
        return await nTree.getConnectorsList();

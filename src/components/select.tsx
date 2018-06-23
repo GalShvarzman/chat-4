@@ -17,7 +17,6 @@ class Select extends React.Component<ISelectProps, {}> {
 
     render(){
         const optionsList = this.props.groups.map((group, index)=>{
-            debugger;
             return <option value={group.id} key={index}>{group.name} {group.id}</option>
         });
         return (

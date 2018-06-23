@@ -34,7 +34,7 @@ export class StateStoreService implements IStateStoreService{
     }
 
     public get(key: string) {
-        return StateStore.getInstance()[key] || null;
+        return StateStore.getInstance()[key] || [];
     }
 
     // public addNewUser(newUser:{name:string, age?:number, password:string}){

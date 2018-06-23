@@ -67,7 +67,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     async componentDidMount(){
         const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}]} = await stateStoreService.getGroupData(this.props.location.state.group.id);
-        if(groupData.data[1].groupChildren[0].type === 'group'){
+        if(groupData.data[1].groupChildren.length && groupData.data[1].groupChildren[0].type === 'group'){
             this.setState({addNewUserBtnIsHidden : true});
         }
         this.setState(prevState=>{
@@ -78,7 +78,8 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     parent:groupData.data[0].groupParent.name + " " + groupData.data[0].groupParent.id
                 }
             }
-        })
+        });
+
     }
 
     render(){
@@ -97,7 +98,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                             </span>
                         </p>
                         <div className="children-wrapper">
-                            {!this.state.addNewUserBtnIsHidden && <button>Add user to group</button>}
+                            {!this.state.addNewUserBtnIsHidden && <Link to='/users/select'>Add user to group</Link>}
                             <h2 className="children-header">Children</h2>
                             <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={5}
                                         minRows={5} className="children-table" data={this.state.group.children}

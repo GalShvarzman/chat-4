@@ -12,6 +12,7 @@ import NewUser from "./components/new-user";
 import GroupAdmin from "./components/group-admin";
 import GroupEdit from "./components/group-edit";
 import NewGroup from "./components/new-group";
+import SelectUsers from "./components/select-users";
 
 export enum ERROR_MSG{
     none,
@@ -152,6 +153,8 @@ class App extends React.Component<{}, IAppState> {
 
     public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
 
+    public selectUsersRender = (props:any) => (<SelectUsers users={this.state.users}/>);
+
     public onCreateNewUser = async (user:{name:string, age:number, password:string})=> {
         return await stateStoreService.createNewUser(user);
     };
@@ -193,6 +196,7 @@ class App extends React.Component<{}, IAppState> {
                         <Route exact={true} path='/groups/:id' render={this.newGroupRender}/>
                         <Route exact={true} path='/groups/:id/edit' render={this.groupEditRender}/>
                         <Route exact={true} path='/users/new' render={this.newUserRender}/>
+                        <Route exact={true} path='/users/select' render={this.selectUsersRender}/>
                         <Route exact={true} path='/users/:id' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id/edit' render={this.userEditRender}/>
                     </Switch>

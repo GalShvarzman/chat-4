@@ -27,7 +27,7 @@ class GroupsService {
             const groupsWithGroupsChildrenIds = [];
             groupsConnectors.forEach((groupConnector) => {
                 const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList);
-                if (connectorChildren[0].type === 'group') {
+                if (connectorChildren.length && connectorChildren[0].type === 'group') {
                     groupsWithGroupsChildrenIds.push(groupConnector.id);
                 }
             });
@@ -38,10 +38,13 @@ class GroupsService {
     }
     createNewGroup(newGroupDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const groupParent = newGroupDetails.parent;
-            // לבדוק מי הילדים של אותה הקבוצה.... אם הם יוזרים להעביר אותם
-            // לייצר רשומה בקונקטורס
-            return yield tree_1.nTree.createNew({ name: newGroupDetails.name, id: uuidv4() }, 'groups.json');
+            const groupParentId = newGroupDetails.parent;
+            const newId = uuidv4();
+            return Promise.all([tree_1.nTree.createNew({ type: 'group', id: newId, pId: groupParentId }, 'connectors.json'),
+                tree_1.nTree.createNew({ name: newGroupDetails.name, id: newId }, 'groups.json')])
+                .then((results) => {
+                return results[1];
+            });
         });
     }
     deleteGroup(groupId) {
@@ -81,15 +84,18 @@ class GroupsService {
             const groupChildrenIds = groupChildrenConnectors.map((child) => {
                 return child.id;
             });
-            let groupChildren;
-            if (groupChildrenConnectors[0].type === 'user') {
-                const usersList = yield users_1.default.getUsersList();
-                groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
+            if (groupChildrenConnectors.length) {
+                let groupChildren;
+                if (groupChildrenConnectors[0].type === 'user') {
+                    const usersList = yield users_1.default.getUsersList();
+                    groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
+                }
+                else {
+                    groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group');
+                }
+                return ({ data: [{ groupParent: groupParentDetails }, { groupChildren }] });
             }
-            else {
-                groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group');
-            }
-            return ({ data: [{ groupParent: groupParentDetails }, { groupChildren }] });
+            return ({ data: [{ groupParent: groupParentDetails }, { groupChildren: [] }] });
         });
     }
     getConnectorsList() {
