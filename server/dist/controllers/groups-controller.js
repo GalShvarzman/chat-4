@@ -66,6 +66,14 @@ class GroupsController {
             }));
         });
     }
+    deleteUserFromGroup(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                yield services.groupService.deleteUserFromGroup(req.params.id, req.params.userid);
+                res.status(204).send("");
+            }));
+        });
+    }
 }
 function tryCatch(next, func) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -113,7 +113,6 @@ class DB {
     }
     deleteObj(id, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
-            // fixme אחרי שמוחקים את היוזר גם צריך למחוק אותו מכל הקבוצות שלהן הוא שייך
             try {
                 const result = yield this.readFile(fileName);
                 const objIndex = this.getObjIndexById(result, id);

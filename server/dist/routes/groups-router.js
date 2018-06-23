@@ -9,5 +9,6 @@ groupsRouter.post('/', controllers.groupsController.createNewGroup);
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
 groupsRouter.patch('/:id', controllers.groupsController.saveGroupDetails);
 groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);
+groupsRouter.delete('/:id/users/:userid', controllers.groupsController.deleteUserFromGroup);
 exports.default = groupsRouter;
 //# sourceMappingURL=groups-router.js.map

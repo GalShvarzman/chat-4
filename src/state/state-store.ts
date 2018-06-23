@@ -5,7 +5,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import IGroup from "../models/group";
-import {getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -215,6 +215,9 @@ export class StateStoreService implements IStateStoreService{
         }
     }
 
+    public async deleteUserFromGroup(userId:string, groupId:string){
+        await deleteUserFromGroup(userId, groupId);
+    }
 
 
 }

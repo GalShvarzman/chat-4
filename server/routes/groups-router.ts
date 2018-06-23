@@ -15,4 +15,7 @@ groupsRouter.patch('/:id', controllers.groupsController.saveGroupDetails);
 
 groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);
 
+groupsRouter.delete('/:id/users/:userid', controllers.groupsController.deleteUserFromGroup);
+
+
 export default groupsRouter;

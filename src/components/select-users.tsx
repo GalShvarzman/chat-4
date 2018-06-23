@@ -87,7 +87,8 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         return(
             <>
                 <Link to={{pathname:`/groups/${this.props.location.state.group.id}/edit`, state:{group:this.props.location.state.group}}}><button>Back</button></Link>
-                <h1 className="users-header">Select users</h1>
+                <h1>{this.props.location.state.group.name}</h1>
+                <h2>Select users</h2>
                 <form onSubmit={this.handleFormSubmit}>
                     <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={10}
                                 minRows={10} className="users-select-table" data={this.state.users}

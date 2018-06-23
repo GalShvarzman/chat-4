@@ -41,10 +41,6 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     accessor: 'name',
                 },
                 {
-                    Header: 'Age',
-                    accessor: 'age',
-                },
-                {
                     Header: 'Type',
                     accessor: 'type',
                 }],
@@ -87,12 +83,42 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     }
 
+    private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
+        return {
+            onClick: async(e:any, handleOriginal:any) => {
+                if(e.target.className === "fa fa-trash"){
+                    await stateStoreService.deleteUserFromGroup(rowInfo.original.id, this.state.group.id);
+                    const groupChildrenClone = [...this.state.group.children];
+                    const deletedGroupId = groupChildrenClone.findIndex((child)=>{
+                        return child.id === rowInfo.original.id;
+                    });
+                    groupChildrenClone.splice(deletedGroupId, 1);
+                    this.setState(prevState => {
+                        return{
+                            group:{
+                                ...this.state.group,
+                                children : groupChildrenClone
+                            }
+                        }
+                    })
+                }
+                if (handleOriginal) {
+                    handleOriginal();
+                }
+            }
+        };
+    };
+
     render(){
         return(
             <div>
                 <Link to='/groups'><button className="edit-group-back-btn">Back</button></Link>
                 <div className="edit-group-wrapper">
                     <h2 className="edit-group-header">Edit group details</h2>
+                    <p className="parent-wrapper">
+                        <span className="group-id">Id:</span>
+                        <span>{this.state.group.id}</span>
+                    </p>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
                     <button onClick={this.save} className="edit-group-save-btn" type="button">Save</button>
                     <p hidden={!this.state.message}>{this.state.message}</p>
@@ -103,9 +129,9 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                             </span>
                         </p>
                         <div className="children-wrapper">
-                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:'/users/select', state:{group:this.state.group}}}>Add users to group</Link>}
+                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group.id}/add-users`, state:{group:this.state.group}}}>Add users to group</Link>}
                             <h2 className="children-header">Children</h2>
-                            <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={5}
+                            <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={5}
                                         minRows={5} className="children-table" data={this.state.group.children}
                                         columns={this.state.columns}/>
                         </div>

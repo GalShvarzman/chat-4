@@ -108,8 +108,6 @@ class DB{
 
 
     async deleteObj(id:string, fileName):Promise<boolean> {
-        // fixme אחרי שמוחקים את היוזר גם צריך למחוק אותו מכל הקבוצות שלהן הוא שייך
-
         try {
             const result = await this.readFile(fileName);
             const objIndex = this.getObjIndexById(result, id);

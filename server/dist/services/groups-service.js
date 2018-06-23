@@ -41,7 +41,7 @@ class GroupsService {
             const groups = yield tree_1.nTree.getGroups();
             const groupIndex = yield tree_1.nTree.getGroupIndexById(groups, groupNewDetails.id);
             groups.data[groupIndex].name = groupNewDetails.name;
-            yield tree_1.nTree.updateGroupsFile(groups);
+            yield tree_1.nTree.updateFile(groups, 'groups.json');
             return ({ group: { name: groups.data[groupIndex].name, id: groups.data[groupIndex].id } });
         });
     }
@@ -134,6 +134,16 @@ class GroupsService {
     getDirectChildrenConnectors(id, connectorsList) {
         return connectorsList.data.filter((el) => {
             return el.pId === id;
+        });
+    }
+    deleteUserFromGroup(groupId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const connectorsList = yield this.getConnectorsList();
+            const connectorToDeleteIndex = connectorsList.data.findIndex((connector) => {
+                return connector.id === userId && connector.pId === groupId;
+            });
+            connectorsList.data.splice(connectorToDeleteIndex, 1);
+            tree_1.nTree.updateFile(connectorsList, 'connectors.json');
         });
     }
     getGroupOptionalChildren(groupId) {

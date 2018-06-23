@@ -69,8 +69,8 @@ export class NTree{
         return db.getObjIndexById(groups, groupId);
     }
 
-    public async updateGroupsFile(groups){
-        await db.updateFile(groups, groupsFile);
+    public async updateFile(newData, fileName){
+        await db.updateFile(newData, fileName);
     }
 }
 

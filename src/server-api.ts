@@ -11,7 +11,11 @@ export async function saveGroupDetails(group:{name:string, id:string}) {
 }
 
 export async function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
-    return await remove(`/users/${user.id}`);
+    await remove(`/users/${user.id}`);
+}
+
+export async function deleteUserFromGroup(userId:string, groupId:string){
+   await remove(`/groups/${groupId}/users/${userId}`)
 }
 
 export async function deleteGroup(group:{id:string, name:string}):Promise<void>{

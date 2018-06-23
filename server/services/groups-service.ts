@@ -31,7 +31,7 @@ class GroupsService{
         const groups = await nTree.getGroups();
         const groupIndex = await nTree.getGroupIndexById(groups, groupNewDetails.id);
         groups.data[groupIndex].name = groupNewDetails.name;
-        await nTree.updateGroupsFile(groups);
+        await nTree.updateFile(groups, 'groups.json');
         return({group:{name:groups.data[groupIndex].name, id:groups.data[groupIndex].id}});
     }
 
@@ -129,6 +129,15 @@ class GroupsService{
         return connectorsList.data.filter((el) => {
             return el.pId === id;
         });
+    }
+
+    async deleteUserFromGroup(groupId, userId){
+        const connectorsList = await this.getConnectorsList();
+        const connectorToDeleteIndex = connectorsList.data.findIndex((connector)=>{
+            return connector.id === userId && connector.pId === groupId;
+        });
+        connectorsList.data.splice(connectorToDeleteIndex, 1);
+        nTree.updateFile(connectorsList, 'connectors.json');
     }
 
     async getGroupOptionalChildren(groupId){

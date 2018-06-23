@@ -12,6 +12,7 @@ const users_1 = require("../models/users");
 const hash_1 = require("../utils/hash");
 const client_error_1 = require("../utils/client-error");
 const uuidv4 = require("uuid/v4");
+const tree_1 = require("../models/tree");
 class UsersService {
     getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,7 +39,13 @@ class UsersService {
     }
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_1.default.deleteUser(id);
+            // fixme למחוק את היוזר גם מהקונקטורס
+            yield users_1.default.deleteUser(id);
+            const connectorsList = yield tree_1.nTree.getConnectorsList();
+            connectorsList.data = connectorsList.data.filter((connector) => {
+                return connector.id !== id;
+            });
+            tree_1.nTree.updateFile(connectorsList, 'connectors.json');
         });
     }
     createNewUser(user) {

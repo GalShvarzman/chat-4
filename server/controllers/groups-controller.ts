@@ -52,6 +52,13 @@ class GroupsController{
             res.status(201).json(updatedGroup);
         })
     }
+
+    async deleteUserFromGroup(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async () => {
+            await services.groupService.deleteUserFromGroup(req.params.id, req.params.userid);
+            res.status(204).send("");
+        })
+    }
 }
 
 async function tryCatch(next, func){

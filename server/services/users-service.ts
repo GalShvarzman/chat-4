@@ -2,6 +2,7 @@ import users from '../models/users';
 import {createHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
 import * as uuidv4 from 'uuid/v4';
+import {nTree} from "../models/tree";
 
 
 class UsersService{
@@ -28,8 +29,13 @@ class UsersService{
     }
 
 
-    async deleteUser(id):Promise<boolean>{
-        return await users.deleteUser(id);
+    async deleteUser(id):Promise<void>{
+        await users.deleteUser(id);
+        const connectorsList = await nTree.getConnectorsList();
+        connectorsList.data = connectorsList.data.filter((connector)=>{
+            return connector.id !== id;
+        });
+        nTree.updateFile(connectorsList, 'connectors.json');
     }
 
     async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{

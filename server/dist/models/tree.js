@@ -75,9 +75,9 @@ class NTree {
     getGroupIndexById(groups, groupId) {
         return DB_1.db.getObjIndexById(groups, groupId);
     }
-    updateGroupsFile(groups) {
+    updateFile(newData, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield DB_1.db.updateFile(groups, groupsFile);
+            yield DB_1.db.updateFile(newData, fileName);
         });
     }
 }
