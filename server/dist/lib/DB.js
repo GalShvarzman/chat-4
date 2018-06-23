@@ -154,6 +154,20 @@ class DB {
             }
         });
     }
+    createMultipleNew(data, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.readFile(fileName);
+                data.forEach((obj) => {
+                    result.data.push(obj);
+                });
+                yield this.writeFile(result, fileName);
+            }
+            catch (e) {
+                throw new client_error_1.ClientError(500, "CreateNewFailed");
+            }
+        });
+    }
 }
 exports.db = new DB();
 //# sourceMappingURL=DB.js.map

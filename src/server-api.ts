@@ -34,6 +34,10 @@ export async function getGroupsWithGroupsChildren():Promise<{data :{name:string,
     return await get('/groups?groups_with_children=true')
 }
 
+export async function addUsersToGroup(data:{usersIds:string[], groupId:string}){
+    return await post(`/groups/${data.groupId}/users`, data)
+}
+
 function post(url:string, body:any){
     return fetch(url,{
         method:'POST',

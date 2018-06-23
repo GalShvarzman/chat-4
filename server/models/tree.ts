@@ -21,6 +21,10 @@ export class NTree{
         return await db.createNew(newDetails, fileName);
     }
 
+    public async addConnectors(data):Promise<void>{
+        await db.createMultipleNew(data, 'connectors.json');
+    }
+
     public search(nodeId:string|undefined){
         return this.root.search(nodeId)
     }

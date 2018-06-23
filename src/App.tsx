@@ -153,14 +153,18 @@ class App extends React.Component<{}, IAppState> {
 
     public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
 
-    public selectUsersRender = (props:any) => (<SelectUsers users={this.state.users}/>);
+    public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup} users={this.state.users}/>);
 
-    public onCreateNewUser = async (user:{name:string, age:number, password:string})=> {
+    public onCreateNewUser = async (user:{name:string, age:number, password:string}) => {
         return await stateStoreService.createNewUser(user);
     };
 
-    public onCreateNewGroup = async (group:{name:string, parent:string})=>{
+    public onCreateNewGroup = async (group:{name:string, parent:string}) => {
         return await stateStoreService.createNewGroup(group);
+    };
+
+    public handelAddUsersToGroup = async(data:{usersIds:string[], groupId:string}) => {
+        return await stateStoreService.addUsersToGroup(data);
     };
 
     public render() {

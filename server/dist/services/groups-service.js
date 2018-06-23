@@ -27,13 +27,27 @@ class GroupsService {
             const groupsWithGroupsChildrenIds = [];
             groupsConnectors.forEach((groupConnector) => {
                 const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList);
-                if (connectorChildren.length && connectorChildren[0].type === 'group') {
+                if (connectorChildren.length && connectorChildren[0].type === 'group' || connectorChildren.length == 0) {
                     groupsWithGroupsChildrenIds.push(groupConnector.id);
                 }
             });
             return {
-                data: this.getObjData(allGroups.data, groupsWithGroupsChildrenIds)
+                data: this.getObjData(allGroups.data, groupsWithGroupsChildrenIds, ['name', 'id'])
             };
+        });
+    }
+    addUsersToGroup(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const newConnectors = data.usersIds.map((id) => {
+                return {
+                    type: 'user',
+                    id,
+                    pId: data.groupId
+                };
+            });
+            yield tree_1.nTree.addConnectors(newConnectors);
+            const usersList = yield users_1.default.getUsersList();
+            return this.getObjData(usersList.data, data.usersIds, ['name', 'id', 'age'], 'user');
         });
     }
     createNewGroup(newGroupDetails) {
@@ -88,10 +102,10 @@ class GroupsService {
                 let groupChildren;
                 if (groupChildrenConnectors[0].type === 'user') {
                     const usersList = yield users_1.default.getUsersList();
-                    groupChildren = this.getObjData(usersList.data, groupChildrenIds, 'user');
+                    groupChildren = this.getObjData(usersList.data, groupChildrenIds, ['name', 'id', 'age'], 'user');
                 }
                 else {
-                    groupChildren = this.getObjData(groups.data, groupChildrenIds, 'group');
+                    groupChildren = this.getObjData(groups.data, groupChildrenIds, ['name', 'id'], 'group');
                 }
                 return ({ data: [{ groupParent: groupParentDetails }, { groupChildren }] });
             }
@@ -113,11 +127,16 @@ class GroupsService {
             return obj.pId === id;
         });
     }
-    getObjData(arr1, arr2, type) {
+    getObjData(arr, idsArr, keysToExtract, type) {
         const result = [];
-        for (let i = 0; i < arr1.length; i++) {
-            if (arr2.indexOf(arr1[i].id) > -1) {
-                result.push({ name: arr1[i].name, id: arr1[i].id, type });
+        for (let i = 0; i < arr.length; i++) {
+            const el = arr[i];
+            if (idsArr.indexOf(el.id) > -1) {
+                const obj = { type };
+                keysToExtract.forEach((key) => {
+                    obj[key] = el[key];
+                });
+                result.push(obj);
             }
         }
         return result;

@@ -45,6 +45,14 @@ class GroupsController {
             }));
         });
     }
+    addUsersToGroup(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                const addedGroups = yield services.groupService.addUsersToGroup(req.body);
+                res.status(200).json(addedGroups);
+            }));
+        });
+    }
 }
 function tryCatch(next, func) {
     return __awaiter(this, void 0, void 0, function* () {

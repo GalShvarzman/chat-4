@@ -33,6 +33,13 @@ class GroupsController{
             res.status(200).json(group)
         })
     }
+
+    async addUsersToGroup(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async () => {
+            const addedGroups = await services.groupService.addUsersToGroup(req.body);
+            res.status(200).json(addedGroups);
+        })
+    }
 }
 
 async function tryCatch(next, func){

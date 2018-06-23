@@ -40,6 +40,10 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     accessor: 'name',
                 },
                 {
+                    Header: 'Age',
+                    accessor: 'age',
+                },
+                {
                     Header: 'Type',
                     accessor: 'type',
                 }],
@@ -98,7 +102,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                             </span>
                         </p>
                         <div className="children-wrapper">
-                            {!this.state.addNewUserBtnIsHidden && <Link to='/users/select'>Add user to group</Link>}
+                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:'/users/select', state:{group:this.state.group}}}>Add users to group</Link>}
                             <h2 className="children-header">Children</h2>
                             <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={5}
                                         minRows={5} className="children-table" data={this.state.group.children}

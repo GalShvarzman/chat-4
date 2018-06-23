@@ -24,6 +24,11 @@ class NTree {
             return yield DB_1.db.createNew(newDetails, fileName);
         });
     }
+    addConnectors(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield DB_1.db.createMultipleNew(data, 'connectors.json');
+        });
+    }
     search(nodeId) {
         return this.root.search(nodeId);
     }

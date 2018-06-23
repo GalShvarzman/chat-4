@@ -152,6 +152,19 @@ class DB{
 
     }
 
+    async createMultipleNew(data, fileName):Promise<void>{
+        try{
+            const result = await this.readFile(fileName);
+            data.forEach((obj)=>{
+                result.data.push(obj);
+            });
+            await this.writeFile(result, fileName);
+        }
+        catch (e) {
+            throw new ClientError(500, "CreateNewFailed")
+        }
+    }
+
 }
 
 

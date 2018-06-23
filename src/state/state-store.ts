@@ -5,7 +5,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import IGroup from "../models/group";
-import {getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -175,6 +175,10 @@ export class StateStoreService implements IStateStoreService{
         this._set('groups', groupsClone);
         this.onStoreChanged(['groups']);
         return newGroup;
+    }
+
+    public async addUsersToGroup(data:{usersIds:string[], groupId:string}){
+        return await addUsersToGroup(data);
     }
 
     public subscribe(listener:any){

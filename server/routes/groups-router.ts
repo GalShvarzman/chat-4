@@ -5,6 +5,8 @@ const groupsRouter = express.Router();
 
 groupsRouter.get('/', controllers.groupsController.getGroups);
 
+groupsRouter.post('/:id/users', controllers.groupsController.addUsersToGroup);
+
 groupsRouter.post('/', controllers.groupsController.createNewGroup);
 
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
