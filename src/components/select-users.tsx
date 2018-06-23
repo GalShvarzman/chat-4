@@ -3,16 +3,17 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css'
 import CheckBox from './checkbox';
 import {Link} from "react-router-dom";
+import {stateStoreService} from "../state/state-store";
 
 interface ISelectUsersProps {
-    users:{name:string, age:string, id:string}[],
     handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, id:string}[]>,
     location:any
 }
 
 interface ISelectUsersState {
     columns:any[],
-    message?:string
+    message?:string,
+    users:{name:string, age:string, id:string}[],
 }
 
 class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
@@ -21,6 +22,7 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
     constructor(props:ISelectUsersProps){
         super(props);
         this.state = {
+            users:[],
             columns : [
                 {
                     Header: 'ID',
@@ -50,7 +52,10 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         }
     };
 
-
+    async componentDidMount(){
+        const optionalUsers = await stateStoreService.getOptionalUsers(this.props.location.state.group.id);
+        this.setState({users:optionalUsers});
+    }
     // private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
     //     return {
     //         onClick: (e:any, handleOriginal:any) => {
@@ -85,7 +90,7 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
                 <h1 className="users-header">Select users</h1>
                 <form onSubmit={this.handleFormSubmit}>
                     <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={10}
-                                minRows={10} className="users-select-table" data={this.props.users}
+                                minRows={10} className="users-select-table" data={this.state.users}
                                 columns={this.state.columns}/>
                     <button type='submit'>Save</button>
                     <p hidden={!this.state.message}>{this.state.message}</p>

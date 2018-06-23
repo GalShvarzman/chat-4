@@ -54,15 +54,23 @@ export class NTree{
     }
     public async getGroups(){
         // return this.root.getGroups();
-        return await db.getData(groupsFile);
+        return await db.getFullData(groupsFile);
     }
 
     public async getConnectorsList():Promise<{data:{type:string, id:string, pId:string}[]}>{
-        return await db.getData(connectorsFile);
+        return await db.getFullData(connectorsFile);
     }
 
-    public isNodeExistInGroup(name:string){
-        return this.root.isNodeExistInGroup(name);
+    // public isNodeExistInGroup(name:string){
+    //     return this.root.isNodeExistInGroup(name);
+    // }
+
+    public getGroupIndexById(groups, groupId){
+        return db.getObjIndexById(groups, groupId);
+    }
+
+    public async updateGroupsFile(groups){
+        await db.updateFile(groups, groupsFile);
     }
 }
 

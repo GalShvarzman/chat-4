@@ -61,16 +61,24 @@ class NTree {
     getGroups() {
         return __awaiter(this, void 0, void 0, function* () {
             // return this.root.getGroups();
-            return yield DB_1.db.getData(groupsFile);
+            return yield DB_1.db.getFullData(groupsFile);
         });
     }
     getConnectorsList() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield DB_1.db.getData(connectorsFile);
+            return yield DB_1.db.getFullData(connectorsFile);
         });
     }
-    isNodeExistInGroup(name) {
-        return this.root.isNodeExistInGroup(name);
+    // public isNodeExistInGroup(name:string){
+    //     return this.root.isNodeExistInGroup(name);
+    // }
+    getGroupIndexById(groups, groupId) {
+        return DB_1.db.getObjIndexById(groups, groupId);
+    }
+    updateGroupsFile(groups) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield DB_1.db.updateFile(groups, groupsFile);
+        });
     }
 }
 exports.NTree = NTree;

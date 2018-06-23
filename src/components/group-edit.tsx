@@ -7,7 +7,8 @@ import './group-edit.css';
 import {stateStoreService} from "../state/state-store";
 
 interface IGroupEditProps {
-    location:any,
+    location: any,
+    saveGroupNewName(group: { name: string, id: string }): { name: string, id: string }
 }
 
 interface IGroupEditState {
@@ -53,10 +54,10 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     }
 
-    // public save = async () => {
-    //     const result:{message:string} = await this.props.onEditUserDetails(this.state.user);
-    //     this.setState({message:result.message});
-    // };
+    public save = async () => {
+        await this.props.saveGroupNewName({id:this.state.group.id, name:this.state.group.name});
+        this.setState({message:"Group updated successfully"});
+    };
 
     public updateField = (fieldName: string, value: string) => {
         this.setState(prevState => {
@@ -93,7 +94,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                 <div className="edit-group-wrapper">
                     <h2 className="edit-group-header">Edit group details</h2>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
-                    <button className="edit-group-save-btn" type="button">Save</button>
+                    <button onClick={this.save} className="edit-group-save-btn" type="button">Save</button>
                     <p hidden={!this.state.message}>{this.state.message}</p>
                     <div>
                         <p className="parent-wrapper">

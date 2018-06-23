@@ -11,6 +11,8 @@ groupsRouter.post('/', controllers.groupsController.createNewGroup);
 
 groupsRouter.get('/:id', controllers.groupsController.getGroupData);
 
+groupsRouter.patch('/:id', controllers.groupsController.saveGroupDetails);
+
 groupsRouter.delete('/:id', controllers.groupsController.deleteGroup);
 
 export default groupsRouter;

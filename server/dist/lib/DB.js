@@ -33,26 +33,13 @@ class DB {
             });
         });
     }
-    getData(fileName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield this.readFile(fileName);
-                // const result = await this.readFile(fileName);
-                // const data = [...result.data];
-                // return {data};
-            }
-            catch (e) {
-                throw new client_error_1.ClientError(500, "getDataFailed");
-            }
-        });
-    }
     getFullData(fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return yield this.readFile(fileName);
             }
             catch (e) {
-                throw new Error("getDataFailed");
+                throw new client_error_1.ClientError(500, "getDataFailed");
             }
         });
     }
@@ -84,7 +71,7 @@ class DB {
         });
         return (index !== -1);
     }
-    updateObjDetails(data, fileName) {
+    updateFile(data, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return yield this.writeFile(data, fileName);

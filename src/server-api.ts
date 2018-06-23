@@ -6,6 +6,10 @@ export async function saveUserDetails(user:{name:string, age?:number, password?:
     return await patch(`/users/${user.id}`, user);
 }
 
+export async function saveGroupDetails(group:{name:string, id:string}) {
+    return await patch(`/groups/${group.id}`, group);
+}
+
 export async function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
     return await remove(`/users/${user.id}`);
 }
@@ -24,6 +28,10 @@ export async function createNewGroup(group:{name:string, parent:string}) {
 
 export async function getGroups():Promise<{data :{name:string, id:string}[]}>{
    return await get('/groups');
+}
+
+export async function getGroupOptionalUsers(groupId:string){
+    return await get(`/groups/${groupId}?optional_users=true`)
 }
 
 export async function getGroupData(groupId:string):Promise<any>{

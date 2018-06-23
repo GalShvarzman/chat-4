@@ -33,12 +33,12 @@ class Users {
     // }
     getUsersList() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield DB_1.db.getData(usersFile);
+            return yield DB_1.db.getFullData(usersFile);
         });
     }
-    updateUserDetails(newData) {
+    updateUsersFile(newData) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield DB_1.db.updateObjDetails(newData, usersFile);
+            return yield DB_1.db.updateFile(newData, usersFile);
         });
     }
     getUserIndexById(data, id) {

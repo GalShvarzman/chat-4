@@ -5,7 +5,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import IGroup from "../models/group";
-import {addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -117,6 +117,18 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance().groupsWithGroupsChildren;
     }
 
+    public async saveGroupDetails(group:{name:string, id:string}){
+        const updatedGroup = await saveGroupDetails(group);
+        const groups = this.get('groups');
+        const groupsClone = [...groups];
+        const groupIndex = groupsClone.findIndex((group)=>{
+           return group.id === updatedGroup.group.id;
+        });
+        groupsClone[groupIndex] = updatedGroup.group;
+        this._set('groups', groupsClone);
+        this.onStoreChanged(['groups']);
+    }
+
     public async saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<void>{
         const updatedUser = await saveUserDetails(user);
         const users = this.get('users');
@@ -177,6 +189,10 @@ export class StateStoreService implements IStateStoreService{
         return newGroup;
     }
 
+    public async getOptionalUsers(groupId:string){
+        return await getGroupOptionalUsers(groupId);
+    }
+
     public async addUsersToGroup(data:{usersIds:string[], groupId:string}){
         return await addUsersToGroup(data);
     }
@@ -198,6 +214,8 @@ export class StateStoreService implements IStateStoreService{
             listener(event);
         }
     }
+
+
 
 }
 

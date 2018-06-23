@@ -27,6 +27,14 @@ class GroupsService{
         }
     }
 
+    async saveGroupDetails(groupNewDetails){
+        const groups = await nTree.getGroups();
+        const groupIndex = await nTree.getGroupIndexById(groups, groupNewDetails.id);
+        groups.data[groupIndex].name = groupNewDetails.name;
+        await nTree.updateGroupsFile(groups);
+        return({group:{name:groups.data[groupIndex].name, id:groups.data[groupIndex].id}});
+    }
+
     async addUsersToGroup(data:{groupId:string, usersIds:string[]}){
         const newConnectors = data.usersIds.map((id)=>{
             return {
@@ -118,9 +126,29 @@ class GroupsService{
     }
 
     getDirectChildrenConnectors(id, connectorsList){
-        return connectorsList.data.filter((obj) => {
-            return obj.pId === id;
+        return connectorsList.data.filter((el) => {
+            return el.pId === id;
         });
+    }
+
+    async getGroupOptionalChildren(groupId){
+        const connectorsList = await this.getConnectorsList();
+        const groupChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
+        let usersListFullData = await users.getUsersList();
+        const usersList = usersListFullData.data.map((user)=>{
+            return {"name":user.name, "age":user.age, "id":user.id}
+        });
+        if(groupChildrenConnectors.length) {
+            const groupChildrenIds = groupChildrenConnectors.map((child) => {
+                return child.id
+            });
+            return usersList.filter((user)=>{
+                return groupChildrenIds.indexOf(user.id) == -1;
+            })
+        }
+        else{
+            return usersList;
+        }
     }
 
     getObjData<T>(arr:any[], idsArr:string[], keysToExtract:string[], type?:string):T[]{

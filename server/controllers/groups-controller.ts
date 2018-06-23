@@ -16,7 +16,12 @@ class GroupsController{
 
     async getGroupData(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async()=>{
-            res.status(200).json(await services.groupService.getGroupData(req.params.id));
+            if(req.query['optional_users'] == 'true'){
+                res.status(200).json(await services.groupService.getGroupOptionalChildren(req.params.id));
+            }
+            else{
+                res.status(200).json(await services.groupService.getGroupData(req.params.id));
+            }
         })
     }
 
@@ -38,6 +43,13 @@ class GroupsController{
         return tryCatch(next, async () => {
             const addedGroups = await services.groupService.addUsersToGroup(req.body);
             res.status(200).json(addedGroups);
+        })
+    }
+
+    async saveGroupDetails(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async () => {
+           const updatedGroup = await services.groupService.saveGroupDetails(req.body);
+            res.status(201).json(updatedGroup);
         })
     }
 }

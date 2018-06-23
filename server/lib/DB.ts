@@ -25,24 +25,12 @@ class DB{
         });
     }
 
-    async getData(fileName):Promise<{data:any[]}>{
+    async getFullData(fileName):Promise<{data:any[]}>{
         try{
             return await this.readFile(fileName);
-            // const result = await this.readFile(fileName);
-            // const data = [...result.data];
-            // return {data};
         }
         catch(e){
             throw new ClientError(500, "getDataFailed");
-        }
-    }
-
-    async getFullData(fileName){
-        try {
-            return await this.readFile(fileName);
-        }
-        catch(e){
-            throw new Error("getDataFailed");
         }
     }
 
@@ -78,7 +66,7 @@ class DB{
     }
 
 
-    async updateObjDetails(data, fileName):Promise<boolean> {
+    async updateFile(data, fileName):Promise<boolean> {
         try {
             return await this.writeFile(data, fileName);
         }

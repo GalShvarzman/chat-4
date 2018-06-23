@@ -6,7 +6,7 @@ export interface IUsers {
     deleteUser(username:string):Promise<boolean>,
     // getUser(userName:string):Promise<IUser>,
     getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
-    updateUserDetails(newData):Promise<boolean>,
+    updateUsersFile(newData):Promise<boolean>,
     createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>,
     getUserIndexById(data, id):number,
     getUsersFullData():Promise<any>
@@ -36,11 +36,11 @@ class Users implements IUsers{
     // }
 
     public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-        return await db.getData(usersFile);
+        return await db.getFullData(usersFile);
     }
 
-    public async updateUserDetails(newData):Promise<boolean>{
-        return await db.updateObjDetails(newData, usersFile);
+    public async updateUsersFile(newData):Promise<boolean>{
+        return await db.updateFile(newData, usersFile);
     }
 
     public getUserIndexById(data, id):number{

@@ -23,7 +23,7 @@ class UsersService{
         if (userDetails.password) {
             usersData.data[userIndex].password = await createHash(userDetails.password); // fixme
         }
-        await users.updateUserDetails(usersData);
+        await users.updateUsersFile(usersData);
         return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
     }
 

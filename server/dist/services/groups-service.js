@@ -36,6 +36,15 @@ class GroupsService {
             };
         });
     }
+    saveGroupDetails(groupNewDetails) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const groups = yield tree_1.nTree.getGroups();
+            const groupIndex = yield tree_1.nTree.getGroupIndexById(groups, groupNewDetails.id);
+            groups.data[groupIndex].name = groupNewDetails.name;
+            yield tree_1.nTree.updateGroupsFile(groups);
+            return ({ group: { name: groups.data[groupIndex].name, id: groups.data[groupIndex].id } });
+        });
+    }
     addUsersToGroup(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const newConnectors = data.usersIds.map((id) => {
@@ -123,8 +132,29 @@ class GroupsService {
         });
     }
     getDirectChildrenConnectors(id, connectorsList) {
-        return connectorsList.data.filter((obj) => {
-            return obj.pId === id;
+        return connectorsList.data.filter((el) => {
+            return el.pId === id;
+        });
+    }
+    getGroupOptionalChildren(groupId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const connectorsList = yield this.getConnectorsList();
+            const groupChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
+            let usersListFullData = yield users_1.default.getUsersList();
+            const usersList = usersListFullData.data.map((user) => {
+                return { "name": user.name, "age": user.age, "id": user.id };
+            });
+            if (groupChildrenConnectors.length) {
+                const groupChildrenIds = groupChildrenConnectors.map((child) => {
+                    return child.id;
+                });
+                return usersList.filter((user) => {
+                    return groupChildrenIds.indexOf(user.id) == -1;
+                });
+            }
+            else {
+                return usersList;
+            }
         });
     }
     getObjData(arr, idsArr, keysToExtract, type) {

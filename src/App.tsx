@@ -82,6 +82,10 @@ class App extends React.Component<{}, IAppState> {
         await stateStoreService.saveUserDetails(user);
     };
 
+    public saveGroupNewName = async (group:{name:string, id:string}) => {
+        await stateStoreService.saveGroupDetails(group);
+    };
+
     public onLoginSubmitHandler =(user:{name:string, password:string})=>{
         try{
             const userId = stateStoreService.auth(user);
@@ -151,7 +155,7 @@ class App extends React.Component<{}, IAppState> {
 
     public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup} groupsWithGroupsChildren={this.state.groupsWithGroupsChildren}/>);
 
-    public groupEditRender = (props:any) => (<GroupEdit {...props}/>);
+    public groupEditRender = (props:any) => (<GroupEdit saveGroupNewName={this.saveGroupNewName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup} users={this.state.users}/>);
 
