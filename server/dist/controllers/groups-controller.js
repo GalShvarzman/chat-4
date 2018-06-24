@@ -16,6 +16,9 @@ class GroupsController {
                 if (req.query['groups_with_children'] == 'true') {
                     res.status(200).json(yield services.groupService.getGroupsWithGroupsChildren());
                 }
+                else if (req.query['tree'] == 'true') {
+                    res.status(200).json(yield services.groupService.getTree());
+                }
                 else {
                     res.status(200).json(yield services.groupService.getAllGroups());
                 }

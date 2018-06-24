@@ -7,13 +7,16 @@ import {ERROR_MSG} from "../App";
 import {stateStoreService} from "../state/state-store";
 import {IMessage} from "../models/message";
 import {Message} from '../models/message';
+import {listItem} from './left-tree';
+
 interface IChatProps {
     data:{
         loggedInUser: {name:string, id:string} | null,
         errorMsg: ERROR_MSG,
         counter: number,
         redirect:boolean
-    }
+    },
+    tree:listItem[]
 }
 
 interface IChatState {
@@ -99,7 +102,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         return (
             <div className="chat">
                 <div className="chat-left">
-                    <LeftTree getSelected={this.getSelected}/>
+                    <LeftTree tree={this.props.tree} getSelected={this.getSelected}/>
                 </div>
                 <div className="chat-right">
                     <div className="massages">

@@ -13,6 +13,7 @@ import GroupAdmin from "./components/group-admin";
 import GroupEdit from "./components/group-edit";
 import NewGroup from "./components/new-group";
 import SelectUsers from "./components/select-users";
+import {listItem} from './components/left-tree';
 
 export enum ERROR_MSG{
     none,
@@ -24,7 +25,8 @@ export enum ERROR_MSG{
 const changeOptions = {
     'users' : stateStoreService.getUsers.bind(stateStoreService),
     'groups' : stateStoreService.getGroups.bind(stateStoreService),
-    'groupsWithGroupsChildren': stateStoreService.getGroupsWithGroupsChildren.bind(stateStoreService)
+    'groupsWithGroupsChildren': stateStoreService.getGroupsWithGroupsChildren.bind(stateStoreService),
+    'tree' : stateStoreService.getTree.bind(stateStoreService)
 };
 
 interface IAppState {
@@ -35,6 +37,7 @@ interface IAppState {
     users:{name:string, age:string, id:string}[],
     groups:{name:string, id:string}[],
     groupsWithGroupsChildren:{name:string, id:string}[],
+    tree:listItem[],
     [key: string] : any
 }
 
@@ -52,7 +55,8 @@ class App extends React.Component<{}, IAppState> {
             redirectToChat:false,
             users: [],
             groups:[],
-            groupsWithGroupsChildren:[]
+            groupsWithGroupsChildren:[],
+            tree:[]
         };
 
     }
@@ -66,7 +70,7 @@ class App extends React.Component<{}, IAppState> {
     };
 
     componentDidMount(){
-        this.setState({users: stateStoreService.get('users'), groups: stateStoreService.get('groups'), groupsWithGroupsChildren:stateStoreService.get('groupsWithGroupsChildren')})
+        this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups'), groupsWithGroupsChildren:stateStoreService.get('groupsWithGroupsChildren')})
     }
 
     private onSubscribe = async (event:{changed:string[]}) => {
@@ -129,7 +133,7 @@ class App extends React.Component<{}, IAppState> {
 
     public signUpRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat tree={this.state.tree} ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
     public logOut = () => {
         this.setState({loggedInUser:null, redirectToChat:false, errorMsg: ERROR_MSG.none});

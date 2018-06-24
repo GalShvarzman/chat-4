@@ -1,11 +1,9 @@
-// import {IUsersDb} from "../models/users";
-import {nTree} from '../models/tree';
 import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 import IGroup from "../models/group";
-import {deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {getTree, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -22,11 +20,12 @@ export class StateStoreService implements IStateStoreService{
     }
 
     private async init(){
-        return Promise.all([getGroups(),getUsers(), getGroupsWithGroupsChildren()]).then((results)=>{
+        return Promise.all([getGroups(),getUsers(), getGroupsWithGroupsChildren(), getTree()]).then((results)=>{
             this._set('users', results[1].data);
             this._set('groups', results[0].data);
             this._set('groupsWithGroupsChildren', results[2].data);
-            this.onStoreChanged(['users', 'groups', 'groupsWithGroupsChildren']);
+            this._set('tree', results[3]);
+            this.onStoreChanged(['users', 'groups', 'groupsWithGroupsChildren', 'tree']);
         })
     }
     private _set(key: string, val: any) {
@@ -102,6 +101,7 @@ export class StateStoreService implements IStateStoreService{
     public walkTree(){
         const tree = StateStore.getInstance().tree;
         const treeToPrint = tree.printFullTree();
+        debugger;
         return JSON.stringify(treeToPrint);
     }
 
@@ -115,6 +115,10 @@ export class StateStoreService implements IStateStoreService{
 
     public getGroupsWithGroupsChildren(){
         return StateStore.getInstance().groupsWithGroupsChildren;
+    }
+
+    public getTree(){
+        return StateStore.getInstance().tree;
     }
 
     public async saveGroupDetails(group:{name:string, id:string}){
@@ -172,9 +176,7 @@ export class StateStoreService implements IStateStoreService{
     public async createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
         const newUser = await createNewUser(user);
         const users = this.get('users');
-        const usersClone = [...users];
-        usersClone.push(newUser.user);
-        this._set('users', usersClone);
+        this._set('users', users.concat([newUser.user]));
         this.onStoreChanged(['users']);
         return newUser;
     }
@@ -182,9 +184,7 @@ export class StateStoreService implements IStateStoreService{
     public async createNewGroup(group:{name:string, parent:string}):Promise<{group:{name:string, id:string}}>{
         const newGroup = await createNewGroup(group);
         const groups = this.get('groups');
-        const groupsClone = [...groups];
-        groupsClone.push(newGroup);
-        this._set('groups', groupsClone);
+        this._set('groups', groups.concat([newGroup]));
         this.onStoreChanged(['groups']);
         return newGroup;
     }
@@ -233,7 +233,7 @@ interface IStateStore {
 
 class StateStore implements IStateStore {
     public users:{name:string, age:string, id:string}[];
-    public tree:NTree = nTree;
+    public tree:NTree;
     public groups:{name:string, id:string}[];
     public messagesDb:MessagesDb = messagesDb;
     public groupsWithGroupsChildren : {name:string, id:string}[];

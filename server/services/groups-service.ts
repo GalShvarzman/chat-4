@@ -1,6 +1,14 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
 import * as uuidv4 from 'uuid/v4';
+import IUser from "../models/user";
+
+interface ITreeGroupObj {
+    id?:string,
+    name?:string,
+    type?:string,
+    items?:any[]
+}
 
 class GroupsService{
 
@@ -9,7 +17,7 @@ class GroupsService{
     }
 
     async getGroupsWithGroupsChildren():Promise<{data:{name:string, id:string}[]}>{
-        const allGroups = await nTree.getGroups();
+        const allGroups = await this.getAllGroups();
         const connectorsList = await this.getConnectorsList();
         const groupsConnectors = connectorsList.data.filter((connector)=>{
             return connector.type === 'group';
@@ -28,7 +36,7 @@ class GroupsService{
     }
 
     async saveGroupDetails(groupNewDetails){
-        const groups = await nTree.getGroups();
+        const groups = await this.getAllGroups();
         const groupIndex = await nTree.getGroupIndexById(groups, groupNewDetails.id);
         groups.data[groupIndex].name = groupNewDetails.name;
         await nTree.updateFile(groups, 'groups.json');
@@ -175,6 +183,50 @@ class GroupsService{
         return result;
     }
 
+    async getTree(){
+        const connectorsList = await this.getConnectorsList();
+        const groupsList = await this.getAllGroups();
+        const usersList = await users.getUsersList();
+        const rootConnector = connectorsList.data.find((connector)=>{
+            return connector.pId === "";
+        });
+        const groupDetails = groupsList.data.find(group=>group.id === rootConnector.id);
+        const obj:ITreeGroupObj = {id:rootConnector.id, name:groupDetails.name, type:rootConnector.type, items:[]};
+
+        const groupChildrenConnectors = this.getDirectChildrenConnectors(rootConnector.id, connectorsList);
+        groupChildrenConnectors.forEach((connector)=>{
+             obj.items.push(...this.walkTree(connector, connectorsList, usersList, groupsList));
+        });
+
+        return obj;
+    }
+
+    walkTree(connector, connectorsList, usersList, groupsList){
+        const result = [];
+        const groupDetails = groupsList.data.find(group=>group.id === connector.id);
+        const obj:ITreeGroupObj = {id:connector.id, name:groupDetails.name, type:connector.type};
+
+        const groupChildrenConnectors = this.getDirectChildrenConnectors(connector.id, connectorsList);
+        if(groupChildrenConnectors.length){
+            const groupChildrenConnectorsIds = groupChildrenConnectors.map(connector=>connector.id);
+            let childrenData;
+            if(groupChildrenConnectors[0].type === 'user'){
+                childrenData = this.getObjData(usersList.data, groupChildrenConnectorsIds, ['id','name','age'], 'user');
+                obj.items = childrenData;
+
+            }
+            else{
+                childrenData = this.getObjData(groupsList.data, groupChildrenConnectorsIds, ['id','name'], 'group');
+                obj.items = childrenData;
+                groupChildrenConnectors.forEach((groupConnector)=>{
+                    result.push(...this.walkTree(groupConnector, connectorsList, usersList, groupsList));
+                });
+            }
+
+        }
+        result.push(obj);
+        return result;
+    }
 
     // internalSearchAllGroups(node) {
     //     const results:any[] = [];
@@ -195,3 +247,4 @@ class GroupsService{
 const groupsService = new GroupsService();
 
 export default groupsService;
+

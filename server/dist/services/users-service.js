@@ -39,7 +39,6 @@ class UsersService {
     }
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            // fixme למחוק את היוזר גם מהקונקטורס
             yield users_1.default.deleteUser(id);
             const connectorsList = yield tree_1.nTree.getConnectorsList();
             connectorsList.data = connectorsList.data.filter((connector) => {

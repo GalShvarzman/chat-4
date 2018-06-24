@@ -50,6 +50,10 @@ export async function addUsersToGroup(data:{usersIds:string[], groupId:string}){
     return await post(`/groups/${data.groupId}/users`, data)
 }
 
+export async function getTree(){
+    return await get('/groups?tree=true');
+}
+
 function post(url:string, body:any){
     return fetch(url,{
         method:'POST',

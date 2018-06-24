@@ -19,7 +19,7 @@ class GroupsService {
     }
     getGroupsWithGroupsChildren() {
         return __awaiter(this, void 0, void 0, function* () {
-            const allGroups = yield tree_1.nTree.getGroups();
+            const allGroups = yield this.getAllGroups();
             const connectorsList = yield this.getConnectorsList();
             const groupsConnectors = connectorsList.data.filter((connector) => {
                 return connector.type === 'group';
@@ -38,7 +38,7 @@ class GroupsService {
     }
     saveGroupDetails(groupNewDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const groups = yield tree_1.nTree.getGroups();
+            const groups = yield this.getAllGroups();
             const groupIndex = yield tree_1.nTree.getGroupIndexById(groups, groupNewDetails.id);
             groups.data[groupIndex].name = groupNewDetails.name;
             yield tree_1.nTree.updateFile(groups, 'groups.json');
@@ -179,6 +179,46 @@ class GroupsService {
                 result.push(obj);
             }
         }
+        return result;
+    }
+    getTree() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const connectorsList = yield this.getConnectorsList();
+            const groupsList = yield this.getAllGroups();
+            const usersList = yield users_1.default.getUsersList();
+            const rootConnector = connectorsList.data.find((connector) => {
+                return connector.pId === "";
+            });
+            const groupDetails = groupsList.data.find(group => group.id === rootConnector.id);
+            const obj = { id: rootConnector.id, name: groupDetails.name, type: rootConnector.type, items: [] };
+            const groupChildrenConnectors = this.getDirectChildrenConnectors(rootConnector.id, connectorsList);
+            groupChildrenConnectors.forEach((connector) => {
+                obj.items.push(...this.walkTree(connector, connectorsList, usersList, groupsList));
+            });
+            return obj;
+        });
+    }
+    walkTree(connector, connectorsList, usersList, groupsList) {
+        const result = [];
+        const groupDetails = groupsList.data.find(group => group.id === connector.id);
+        const obj = { id: connector.id, name: groupDetails.name, type: connector.type };
+        const groupChildrenConnectors = this.getDirectChildrenConnectors(connector.id, connectorsList);
+        if (groupChildrenConnectors.length) {
+            const groupChildrenConnectorsIds = groupChildrenConnectors.map(connector => connector.id);
+            let childrenData;
+            if (groupChildrenConnectors[0].type === 'user') {
+                childrenData = this.getObjData(usersList.data, groupChildrenConnectorsIds, ['id', 'name', 'age'], 'user');
+                obj.items = childrenData;
+            }
+            else {
+                childrenData = this.getObjData(groupsList.data, groupChildrenConnectorsIds, ['id', 'name'], 'group');
+                obj.items = childrenData;
+                groupChildrenConnectors.forEach((groupConnector) => {
+                    result.push(...this.walkTree(groupConnector, connectorsList, usersList, groupsList));
+                });
+            }
+        }
+        result.push(obj);
         return result;
     }
 }

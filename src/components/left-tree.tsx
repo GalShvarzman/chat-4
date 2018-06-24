@@ -1,18 +1,16 @@
 import * as React from 'react';
 import './left-tree.css'
-import {stateStoreService} from "../state/state-store";
 
-const items = JSON.parse(stateStoreService.walkTree());
-
-interface listItem{
-    items: object[],
+export interface listItem{
+    items?: object[],
     name:string,
     type:string,
     id:string
 }
 
 interface ILeftTreeProps {
-    getSelected(eventTarget:any):void
+    getSelected(eventTarget:any):void,
+    tree:any
 }
 
 interface ILeftTreeState {
@@ -27,9 +25,25 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         }
     }
 
-    public load =  ()=>{
-        return this.walkTree(items, 0);
+    public load = ()=>{
+        return this.walkTree(this.props.tree.items, 0);
     };
+
+    // static getDerivedStateFromProps(nextProps:any, prevState:any){
+    //     if(nextProps.tree.items){
+    //         return {
+    //             tree : nextProps.tree
+    //         }
+    //     }
+    //     return null;
+    // }
+
+    // componentDidUpdate(prevProps:any, prevState:any, snapshot:any) {
+    //     debugger;
+    //     if(prevProps.tree !== this.props.tree){
+    //         debugger;
+    //     }
+    // }
 
     public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
         const keyName = e.key;
@@ -170,6 +184,9 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public shouldComponentUpdate(nextProps:any, nextState:any) {
+        if(nextProps.tree.items){
+            return true;
+        }
         return false
     };
 
@@ -215,7 +232,8 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public render() {
-        const list = this.load();
+        const list = this.props.tree.items ? this.load() : [];
+        debugger;
         return (
             <div>
                 <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp} className="left tree">{list}</ul>
