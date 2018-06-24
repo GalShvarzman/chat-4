@@ -40,14 +40,15 @@ class Chat extends React.Component<IChatProps, IChatState> {
     public getSelected = (eventTarget:any) => {
         if(this.props.data.loggedInUser) {
             if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI') {
-                if(eventTarget.type === 'group'){
-                    if(stateStoreService.isUserExistInGroup(eventTarget.id, this.props.data.loggedInUser.id)){
-                        this.setStateOnSelected(eventTarget);
-                    }
-                }
-                else{
-                    this.setStateOnSelected(eventTarget);
-                }
+                // if(eventTarget.type === 'group'){
+                //     if(stateStoreService.isUserExistInGroup(eventTarget.id, this.props.data.loggedInUser.id)){
+                //         this.setStateOnSelected(eventTarget);
+                //     }
+                // }
+                // else{
+                //     this.setStateOnSelected(eventTarget);
+                // } // fixme להציג למשתמש את היסטוריית ההודעות רק כשהוא שייך לקבוצה....
+                this.setStateOnSelected(eventTarget);
             }
         }
         else{

@@ -11,7 +11,6 @@ interface ISignUpProps {
 
 interface ISignUpState {
     user: {name:string, age?:number, password:string}
-
 }
 
 class SignUp extends React.Component<ISignUpProps, ISignUpState> {

@@ -122,7 +122,12 @@ class App extends React.Component<{}, IAppState> {
     public onSignUpSubmitHandler = async (user:{name:string, age?:number, password:string}):Promise<void> => {
         try{
             const result = await stateStoreService.createNewUser(user);
-            this.setState({loggedInUser:{name:result.user.name, id:result.user.id},redirectToChat:true});
+            if(result.user){
+                this.setState({loggedInUser:{name:result.user.name, id:result.user.id},redirectToChat:true});
+            }
+            else{
+                this.setState({errorMsg: ERROR_MSG.credentials})
+            }
         }
         catch(e){
             this.setState({errorMsg: ERROR_MSG.credentials})

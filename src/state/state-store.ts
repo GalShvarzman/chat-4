@@ -2,7 +2,7 @@ import NTree from '../models/tree';
 import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
-import IGroup from "../models/group";
+// import IGroup from "../models/group";
 import {getTree, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
@@ -47,8 +47,10 @@ export class StateStoreService implements IStateStoreService{
     // }
 
     public isUserExistInGroup(groupId:string, userId:string){
-        const group = StateStore.getInstance().tree.search(groupId);
-        return (group as IGroup).isNodeExistInGroup(userId);
+        const group = StateStore.getInstance().tree;
+        group;
+        // fixme;
+        // return (group as IGroup).isNodeExistInGroup(userId);
     }
 
     public addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
