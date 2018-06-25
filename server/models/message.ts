@@ -13,9 +13,10 @@ export class Message implements IMessage{
     public sender?:{name:string, id:string};
     public id:string;
 
-    constructor(message:string, date:string){
+    constructor(message:string, date:string, sender){
         this.id = uuidv4();
         this.message = message;
         this.date = date;
+        this.sender = sender;
     }
 }

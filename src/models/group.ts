@@ -122,7 +122,6 @@ export default class Group implements IGroup{
     }
 
     public getDetails(child:IUser|IGroup){
-        debugger;
         if(child instanceof Group){
             const children:any[] = child.children.map((child)=>{
                 return this.getDetails(child);

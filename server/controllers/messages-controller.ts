@@ -8,6 +8,13 @@ class MessagesController{
             res.status(200).json(messages);
         });
     }
+
+    async saveMessage(req:Request, res:Response, next:NextFunction){
+        return tryCatch(next, async ()=>{
+            const message = await services.messagesService.saveMessage(req.body, req.params.id);
+            res.status(201).json(message);
+        });
+    }
 }
 
 async function tryCatch(next, func){

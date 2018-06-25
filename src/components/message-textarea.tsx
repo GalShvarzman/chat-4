@@ -29,7 +29,12 @@ class MessageTextarea extends React.Component<IMassageTextAreaProps, IMassageTex
     public render() {
         return (
             <div className='container'>
-                <div className='textarea-wrapper'><textarea className='message-textarea' value={this.props.message['message']} disabled={!this.props.data.loggedInUser || !this.props.selectedName} onKeyDown={this.props.keyDownListener} onChange={this.props.handleChange} placeholder="Type a message"/></div>
+                <div className='textarea-wrapper'>
+                    <textarea className='message-textarea' value={this.props.message['message']}
+                              disabled={!this.props.data.loggedInUser || !this.props.selectedName}
+                              onKeyDown={this.props.keyDownListener} onChange={this.props.handleChange}
+                              placeholder="Type a message"/>
+                </div>
                 <div className='send-btn-wrapper'>
                     <button disabled={!this.props.data.loggedInUser} className='send-btn' onClick={this.props.onClickSend}>
                         <img src={send}/>

@@ -3,7 +3,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 // import IGroup from "../models/group";
-import {getSelectedMessages, getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -53,14 +53,15 @@ export class StateStoreService implements IStateStoreService{
         // return (group as IGroup).isNodeExistInGroup(userId);
     }
 
-    public addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
+    public async addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
         if(loggedInUser && selectedId){
-            message.sender = loggedInUser;
             if(selectedType === 'group'){
-                StateStore.getInstance().messagesDb.addMessageToGroup(message, selectedId);
+                // StateStore.getInstance().messagesDb.addMessageToGroup(message, selectedId);
+                await addMessage(message, selectedId);
             }
             else{
-                StateStore.getInstance().messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
+                // StateStore.getInstance().messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
+                await addMessage(message, selectedId, loggedInUser.id);
             }
             // this.onStoreChanged();
         }

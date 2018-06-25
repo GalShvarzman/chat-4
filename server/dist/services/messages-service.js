@@ -15,6 +15,11 @@ class MessagesService {
             return yield messages_1.messagesDb.getConversationMessages(conversationId);
         });
     }
+    saveMessage(message, conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield messages_1.messagesDb.addMessageToConversation(message, conversationId);
+        });
+    }
 }
 const messagesService = new MessagesService();
 exports.default = messagesService;

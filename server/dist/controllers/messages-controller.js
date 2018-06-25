@@ -18,6 +18,14 @@ class MessagesController {
             }));
         });
     }
+    saveMessage(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                const message = yield services.messagesService.saveMessage(req.body, req.params.id);
+                res.status(201).json(message);
+            }));
+        });
+    }
 }
 function tryCatch(next, func) {
     return __awaiter(this, void 0, void 0, function* () {

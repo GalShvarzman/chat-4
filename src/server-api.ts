@@ -1,3 +1,5 @@
+import {IMessage} from "./models/message";
+
 export async function getUsers():Promise<any>{
     return await get('/users');
 }
@@ -66,10 +68,19 @@ export async function getSelectedMessages(selectedId:string, loggedInUserId?:str
     else{
         conversationId = selectedId;
     }
-    debugger
     return await get(`messages/${conversationId}`)
 }
 
+export async function addMessage(message:IMessage, selectedId:string, userId?:string){
+    let conversationId;
+    if(userId){
+        conversationId = [selectedId,userId].sort().join("_");
+    }
+    else{
+        conversationId = selectedId;
+    }
+    return await post(`messages/${conversationId}`, message);
+}
 
 function post(url:string, body:any){
     return fetch(url,{

@@ -17,6 +17,9 @@ import GroupEdit from "./components/group-edit";
 import NewGroup from "./components/new-group";
 import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
+import * as io from 'socket.io-client';
+
+const socket =io();
 
 export enum ERROR_MSG{
     none,
@@ -122,6 +125,7 @@ class App extends React.Component<{} , IAppState> {
                     loggedInUser: {name: result.name, id:result.id},
                     errorMsg: ERROR_MSG.allGood
                 }, ()=>{
+                    socket.emit('login', result.name);
                     // this.props.history.push('/chat');
                 })
             }

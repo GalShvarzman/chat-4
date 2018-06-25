@@ -5,5 +5,6 @@ const messagesRouter = express.Router();
 
 messagesRouter.get('/:id', controllers.messagesController.getMessages);
 
+messagesRouter.post('/:id', controllers.messagesController.saveMessage);
 
 export default messagesRouter;

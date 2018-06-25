@@ -13,22 +13,26 @@ class MessagesDb {
     constructor() {
         this.messages = {};
     }
-    addMessageToGroup(message, groupId) {
-        if (this.messages[groupId]) {
-            this.messages[groupId].push(message);
-        }
-        else {
-            this.messages[groupId] = [message];
-        }
-    }
-    addMessageUsersConversation(message, user1Id, user2Id) {
-        const conversationId = this.createUniqIdForUsersConversatuin(user1Id, user2Id);
-        if (this.messages[conversationId]) {
-            this.messages[conversationId].push(message);
-        }
-        else {
-            this.messages[conversationId] = [message];
-        }
+    // addMessageToGroup(message:IMessage, groupId:string){
+    //     if(this.messages[groupId]){
+    //         this.messages[groupId].push(message);
+    //     }
+    //     else{
+    //         this.messages[groupId] = [message];
+    //     }
+    // }
+    addMessageToConversation(message, conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allMessages = yield DB_1.db.readFile('messages.json');
+            if (allMessages.data[conversationId]) {
+                allMessages.data[conversationId].push(message);
+            }
+            else {
+                allMessages.data[conversationId] = [message];
+            }
+            DB_1.db.writeFile(allMessages, 'messages.json');
+            return message;
+        });
     }
     getConversationMessages(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -36,25 +40,8 @@ class MessagesDb {
             if (allMessages.data[conversationId]) {
                 return allMessages.data[conversationId];
             }
-            allMessages.data[conversationId] = [];
-            return allMessages.data[conversationId];
+            return [];
         });
-    }
-    getGroupMessages(groupId) {
-        if (this.messages[groupId]) {
-            return this.messages[groupId];
-        }
-        return [];
-    }
-    getUsersConversationMessages(user1Id, user2Id) {
-        const conversationId = this.createUniqIdForUsersConversatuin(user1Id, user2Id);
-        if (this.messages[conversationId]) {
-            return this.messages[conversationId];
-        }
-        return [];
-    }
-    createUniqIdForUsersConversatuin(user1Id, user2Id) {
-        return [user1Id, user2Id].sort().join("_");
     }
 }
 exports.MessagesDb = MessagesDb;
