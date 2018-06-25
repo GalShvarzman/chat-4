@@ -8,6 +8,8 @@ app.use(express.json());
 
 app.use('/users', routes.usersRouter);
 
+app.use('/messages', routes.messagesRouter);
+
 app.use('/groups', routes.groupsRouter);
 
 app.get('/', (req, res) => res.send('Hello World!'));

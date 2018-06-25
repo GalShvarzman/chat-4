@@ -37,7 +37,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         this.setState({selectedId:"", selectedType:"", selectedName:""})
     };
 
-    public getSelected = (eventTarget:any) => {
+    public getSelectedSessionMessagesHistory = (eventTarget:any) => {
         if(this.props.data.loggedInUser) {
             if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI') {
                 // if(eventTarget.type === 'group'){
@@ -66,9 +66,9 @@ class Chat extends React.Component<IChatProps, IChatState> {
         });
     };
 
-    private getSelectedMessageHistory = () => {
+    private getSelectedMessageHistory = async() => {
         if(this.state.selectedId && this.props.data.loggedInUser){
-            const messagesList:IMessage[] = stateStoreService.getSelectedMessagesHistory(this.state.selectedType, this.state.selectedId, this.props.data.loggedInUser.id);
+            const messagesList:any = await stateStoreService.getSelectedMessagesHistory(this.state.selectedType, this.state.selectedId, this.props.data.loggedInUser.id);
             this.setState({selectedMassages:messagesList, message:{message:""}});
         }
     };
@@ -103,7 +103,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         return (
             <div className="chat">
                 <div className="chat-left">
-                    <LeftTree tree={this.props.tree} getSelected={this.getSelected}/>
+                    <LeftTree tree={this.props.tree} getSelected={this.getSelectedSessionMessagesHistory}/>
                 </div>
                 <div className="chat-right">
                     <div className="massages">

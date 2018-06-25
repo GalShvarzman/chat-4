@@ -1,4 +1,5 @@
 import {IMessage} from "./message";
+import {db} from "../lib/DB";
 
 export class MessagesDb{
     private messages:{};
@@ -24,6 +25,15 @@ export class MessagesDb{
         else{
             this.messages[conversationId] = [message];
         }
+    }
+
+    async getConversationMessages(conversationId){
+       const allMessages = await db.readFile('messages.json');
+       if(allMessages.data[conversationId]){
+           return allMessages.data[conversationId]
+       }
+       allMessages.data[conversationId] = [];
+       return allMessages.data[conversationId];
     }
 
     getGroupMessages(groupId:string){

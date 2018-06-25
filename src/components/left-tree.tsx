@@ -144,15 +144,21 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
       display : "none"
     };
 
-    public walkTree = (items:object[], step:number)=>{
+    public walkTree = (items:object[], step:number) => {
         const result:any[] = [];
-        items.forEach((item:listItem)=>{
-            if(item.items){
-                const li = this.createLiWithChildren(item, step);
-                result.push(li);
+        items.forEach((item:listItem) => {
+            if(item.type === 'group'){
+                if(item.items){
+                    const li = this.createLiWithChildren(item, step);
+                    result.push(li);
+                }
+                else{
+                    const li = this.createGroupLi(item, step);
+                    result.push(li);
+                }
             }
             else{
-                const li = this.createLi(item, step);
+                const li = this.createUserLi(item, step);
                 result.push(li);
             }
         });
@@ -226,7 +232,12 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         return React.createElement("li", {key:item.id}, a, ul);
     };
 
-    public createLi = (item:any, step:number) => {
+    public createGroupLi = (item:any, step:number) => {
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item.id, type:item.type}, "☻"+item.name);
+        return React.createElement("li", {key:item.id}, a);
+    };
+
+    public createUserLi = (item:any, step:number) => {
         const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name", id:item.id, type:item.type}, "☺"+item.name);
         return React.createElement("li", {key:item.id}, a);
     };

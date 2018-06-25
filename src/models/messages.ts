@@ -16,7 +16,7 @@ export class MessagesDb{
     }
 
     addMessageUsersConversation(message:IMessage, user1Id:string, user2Id:string){
-        const conversationId = this.createUniqIdForUsersConversatuin(user1Id, user2Id);
+        const conversationId = this.createUniqIdForUsersConversatoin(user1Id, user2Id);
 
         if(this.messages[conversationId]){
             this.messages[conversationId].push(message);
@@ -34,14 +34,14 @@ export class MessagesDb{
     }
 
     getUsersConversationMessages(user1Id:string, user2Id:string){
-        const conversationId = this.createUniqIdForUsersConversatuin(user1Id, user2Id);
+        const conversationId = this.createUniqIdForUsersConversatoin(user1Id, user2Id);
         if(this.messages[conversationId]){
             return this.messages[conversationId];
         }
         return [];
     }
 
-    createUniqIdForUsersConversatuin(user1Id:string, user2Id:string){
+    createUniqIdForUsersConversatoin(user1Id:string, user2Id:string){
         return [user1Id, user2Id].sort().join("_");
     }
 }

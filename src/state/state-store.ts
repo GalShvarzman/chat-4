@@ -3,7 +3,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 // import IGroup from "../models/group";
-import {getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {getSelectedMessages, getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -66,12 +66,14 @@ export class StateStoreService implements IStateStoreService{
         }
     }
 
-    public getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
+    public async getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
        if(selectedId && selectedType && loggedInUserId){
-               if(selectedType === 'group'){
-                   return StateStore.getInstance().messagesDb.getGroupMessages(selectedId);
+                if(selectedType === 'group'){
+                   return await getSelectedMessages(selectedId);
                }
-               return StateStore.getInstance().messagesDb.getUsersConversationMessages(selectedId, loggedInUserId);
+               else{
+                   return await getSelectedMessages(selectedId, loggedInUserId);
+               }
        }
        return [];
     }
@@ -88,12 +90,13 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance().users.getUser(userName).id;
     }
 
-    public walkTree(){
-        const tree = StateStore.getInstance().tree;
-        const treeToPrint = tree.printFullTree();
-        debugger;
-        return JSON.stringify(treeToPrint);
-    }
+    // public walkTree(){
+    //     const tree = StateStore.getInstance().tree;
+    //     debugger;
+    //     const treeToPrint = tree.printFullTree();
+    //     debugger;
+    //     return JSON.stringify(treeToPrint);
+    // }
 
     public getUsers(){
         return StateStore.getInstance().users;

@@ -8,14 +8,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const messages_1 = require("../models/messages");
-class MessagesService {
-    getConversationMessages(conversationId) {
+const services = require("../services");
+class MessagesController {
+    getMessages(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield messages_1.messagesDb.getConversationMessages(conversationId);
+            return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
+                const messages = yield services.messagesService.getConversationMessages(req.params.id);
+                res.status(200).json(messages);
+            }));
         });
     }
 }
-const messagesService = new MessagesService();
-exports.default = messagesService;
-//# sourceMappingURL=messages-service.js.map
+function tryCatch(next, func) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield func();
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+}
+const messagesController = new MessagesController();
+exports.default = messagesController;
+//# sourceMappingURL=messages-controller.js.map
