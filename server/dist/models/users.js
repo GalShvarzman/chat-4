@@ -31,11 +31,9 @@ class Users {
     //         throw new Error("No user was Found");
     //     }
     // }
-    getUsersList() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield DB_1.db.getFullData(usersFile);
-        });
-    }
+    // public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
+    //     return await db.getFullData(usersFile);
+    // }
     updateUsersFile(newData) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield DB_1.db.updateFile(newData, usersFile);

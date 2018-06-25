@@ -17,12 +17,14 @@ class SignUp extends React.Component<ISignUpProps, ISignUpState> {
 
     private messages = {
         [ERROR_MSG.allGood]: 'You have successfully registered',
-        [ERROR_MSG.credentials]: 'Username already exists. Choose a different name'
+        [ERROR_MSG.credentials]: 'Username already exists. Choose a different name',
+        [ERROR_MSG.fail]:"sign up failed"
     };
 
     private colors = {
         [ERROR_MSG.allGood]: 'green',
-        [ERROR_MSG.credentials]: 'red'
+        [ERROR_MSG.credentials]: 'red',
+        [ERROR_MSG.fail]: 'red'
     };
 
     constructor(props:ISignUpProps){

@@ -9,7 +9,7 @@ class UsersController{
         });
     }
 
-    async getAllUsers(req:Request,res:Response, next:NextFunction){
+    async getUsers(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async()=>{
             res.status(200).json(await services.usersService.getAllUsers());
         })
@@ -22,13 +22,18 @@ class UsersController{
         })
     }
 
-    async createNewUser(req:Request, res:Response, next:NextFunction){
+    async createNewUserOrAuth(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async ()=>{
-            const user = await services.usersService.createNewUser(req.body);
-            res.status(200).json(user);
+            if(req.query.login === 'true'){
+                const userAfterAuth = await services.usersService.authUser(req.body);
+                res.status(200).json(userAfterAuth);
+            }
+            else{
+                const user = await services.usersService.createNewUser(req.body);
+                res.status(200).json(user);
+            }
         })
     }
-
 }
 
 async function tryCatch(next, func){

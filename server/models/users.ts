@@ -5,11 +5,11 @@ export interface IUsers {
     isUserExists(data:any,username:string):boolean,
     deleteUser(username:string):Promise<boolean>,
     // getUser(userName:string):Promise<IUser>,
-    getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
+    // getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
     updateUsersFile(newData):Promise<boolean>,
     createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>,
     getUserIndexById(data, id):number,
-    getUsersFullData():Promise<any>
+    getUsersFullData():Promise<{data:{name:string, age:number, id:string, password:string}[]}>
 }
 
 class Users implements IUsers{
@@ -35,9 +35,9 @@ class Users implements IUsers{
     //     }
     // }
 
-    public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-        return await db.getFullData(usersFile);
-    }
+    // public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
+    //     return await db.getFullData(usersFile);
+    // }
 
     public async updateUsersFile(newData):Promise<boolean>{
         return await db.updateFile(newData, usersFile);
@@ -51,7 +51,7 @@ class Users implements IUsers{
         return await db.createNew(user, usersFile);
     }
 
-    public async getUsersFullData():Promise<any>{
+    public async getUsersFullData():Promise<{data:{name:string, age:number, id:string, password:string}[]}>{
         return await db.getFullData(usersFile);
     }
 

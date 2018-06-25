@@ -17,7 +17,7 @@ class UsersController {
             }));
         });
     }
-    getAllUsers(req, res, next) {
+    getUsers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
                 res.status(200).json(yield services.usersService.getAllUsers());
@@ -32,11 +32,17 @@ class UsersController {
             }));
         });
     }
-    createNewUser(req, res, next) {
+    createNewUserOrAuth(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             return tryCatch(next, () => __awaiter(this, void 0, void 0, function* () {
-                const user = yield services.usersService.createNewUser(req.body);
-                res.status(200).json(user);
+                if (req.query.login === 'true') {
+                    const userAfterAuth = yield services.usersService.authUser(req.body);
+                    res.status(200).json(userAfterAuth);
+                }
+                else {
+                    const user = yield services.usersService.createNewUser(req.body);
+                    res.status(200).json(user);
+                }
             }));
         });
     }

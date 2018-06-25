@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const tree_1 = require("../models/tree");
 const users_1 = require("../models/users");
-const uuidv4 = require("uuid/v4");
+const group_1 = require("../models/group");
 class GroupsService {
     getAllGroups() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -55,16 +55,16 @@ class GroupsService {
                 };
             });
             yield tree_1.nTree.addConnectors(newConnectors);
-            const usersList = yield users_1.default.getUsersList();
+            const usersList = yield users_1.default.getUsersFullData();
             return this.getObjData(usersList.data, data.usersIds, ['name', 'id', 'age'], 'user');
         });
     }
     createNewGroup(newGroupDetails) {
         return __awaiter(this, void 0, void 0, function* () {
             const groupParentId = newGroupDetails.parent;
-            const newId = uuidv4();
-            return Promise.all([tree_1.nTree.createNew({ type: 'group', id: newId, pId: groupParentId }, 'connectors.json'),
-                tree_1.nTree.createNew({ name: newGroupDetails.name, id: newId }, 'groups.json')])
+            const newGroup = new group_1.default(newGroupDetails.name);
+            return Promise.all([tree_1.nTree.createNew({ type: 'group', id: newGroup.id, pId: groupParentId }, 'connectors.json'),
+                tree_1.nTree.createNew(newGroup, 'groups.json')])
                 .then((results) => {
                 return results[1];
             });
@@ -110,7 +110,7 @@ class GroupsService {
             if (groupChildrenConnectors.length) {
                 let groupChildren;
                 if (groupChildrenConnectors[0].type === 'user') {
-                    const usersList = yield users_1.default.getUsersList();
+                    const usersList = yield users_1.default.getUsersFullData();
                     groupChildren = this.getObjData(usersList.data, groupChildrenIds, ['name', 'id', 'age'], 'user');
                 }
                 else {
@@ -150,7 +150,7 @@ class GroupsService {
         return __awaiter(this, void 0, void 0, function* () {
             const connectorsList = yield this.getConnectorsList();
             const groupChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
-            let usersListFullData = yield users_1.default.getUsersList();
+            let usersListFullData = yield users_1.default.getUsersFullData();
             const usersList = usersListFullData.data.map((user) => {
                 return { "name": user.name, "age": user.age, "id": user.id };
             });
@@ -185,7 +185,7 @@ class GroupsService {
         return __awaiter(this, void 0, void 0, function* () {
             const connectorsList = yield this.getConnectorsList();
             const groupsList = yield this.getAllGroups();
-            const usersList = yield users_1.default.getUsersList();
+            const usersList = yield users_1.default.getUsersFullData();
             const rootConnector = connectorsList.data.find((connector) => {
                 return connector.pId === "";
             });

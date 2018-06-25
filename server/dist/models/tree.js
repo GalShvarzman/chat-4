@@ -8,17 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const group_1 = require("./group");
 const DB_1 = require("../lib/DB");
 const groupsFile = 'groups.json';
 const connectorsFile = 'connectors.json';
 class NTree {
     constructor() {
-        this.root = new group_1.default(this.root, "treeRoot", []);
+        // this.root = new Group(this.root, "treeRoot", []);
     }
-    add(node, parentNode) {
-        this.root.add(node, parentNode);
-    }
+    // public add(node:IGroup| IUser, parentNode?:IGroup){
+    //     this.root.add(node, parentNode);
+    // }
     createNew(newDetails, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield DB_1.db.createNew(newDetails, fileName);
@@ -29,9 +28,9 @@ class NTree {
             yield DB_1.db.createMultipleNew(data, 'connectors.json');
         });
     }
-    search(nodeId) {
-        return this.root.search(nodeId);
-    }
+    // public search(nodeId:string|undefined){
+    //     return this.root.search(nodeId)
+    // }
     removeGroup(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield DB_1.db.deleteObj(id, groupsFile);
@@ -55,9 +54,10 @@ class NTree {
             // return this.root.removeGroup(node);
         });
     }
-    printFullTree() {
-        return this.root.printFullTree();
-    }
+    //
+    // public printFullTree(){
+    //     return this.root.printFullTree();
+    // }
     getGroups() {
         return __awaiter(this, void 0, void 0, function* () {
             // return this.root.getGroups();

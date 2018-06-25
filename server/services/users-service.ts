@@ -1,21 +1,21 @@
 import users from '../models/users';
-import {createHash} from "../utils/hash";
+import {createHash, compareHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
-import * as uuidv4 from 'uuid/v4';
 import {nTree} from "../models/tree";
+import User from "../models/user";
 
 
 class UsersService{
 
     async getAllUsers():Promise<{data:{name:string, age:number, id:string}[]}>{
-        const result =  await users.getUsersList();
-        result.data = result.data.map((user)=>{
+        const usersList =  await users.getUsersFullData();
+        const result = usersList.data.map((user)=>{
             return {"name":user.name, "age":user.age, "id":user.id}
         });
-        return result;
+        return {data:result};
     }
 
-    async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<{user:{name:string, age:string, id:string}}> {
+    async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<{user:{name:string, age:number, id:string}}> {
         const usersData = await users.getUsersFullData();
         const userIndex = users.getUserIndexById(usersData, userDetails.id);
         if (userDetails.age) {
@@ -39,14 +39,35 @@ class UsersService{
     }
 
     async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{
-        const usersData = await users.getUsersList();
+        const usersData = await users.getUsersFullData();
         if(await users.isUserExists(usersData, user.name)){
             throw new ClientError(400, "usernameAlreadyExist") // fixme status??
         }
         else{
-            user.password = await createHash(user.password);
-            user.id = uuidv4();
-            return await users.createNewUser(user);
+            const newUser = new User(user.name, user.age);
+            newUser.password = await createHash(user.password);
+            return await users.createNewUser(newUser);
+        }
+    }
+
+    async authUser(userToAuth) {
+        const usersList = await users.getUsersFullData();
+        const userIndex = usersList.data.findIndex((user) => {
+            return user.name === userToAuth.name;
+        });
+        if (userIndex !== -1) {
+            const userDetails = usersList.data[userIndex];
+            try {
+                await compareHash(userToAuth.password, userDetails.password);
+                return ({
+                    id: userDetails.id,
+                    name: userDetails.name,
+                    age: userDetails.age
+                });
+            }
+            catch (e) {
+                throw new ClientError(404, "auth failed");
+            }
         }
     }
 

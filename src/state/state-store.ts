@@ -3,7 +3,7 @@ import {IMessage} from "../models/message";
 import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 // import IGroup from "../models/group";
-import {getTree, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -76,24 +76,12 @@ export class StateStoreService implements IStateStoreService{
        return [];
     }
 
-    public search(id:string|undefined){
-        return StateStore.getInstance().tree.search(id);
-    }
+    // public search(id:string|undefined){
+    //     return StateStore.getInstance().tree.search(id);
+    // }
 
-    public auth(user:{name:string, password:string}):string{
-        // fixme לאמת את היוזר בשרת....
-        try{
-            const currentUser = StateStore.getInstance().users.getUser(user.name);
-            if(currentUser.auth(user.password)){
-                return currentUser.id;
-            }
-            else{
-                throw new Error("Authentication failed");
-            }
-        }
-        catch(error){
-            throw new Error("Authentication failed");
-        }
+    public async auth(user:{name:string, password:string}):Promise<any>{
+        return await auth(user);
     }
 
     public getUserId(userName:string){

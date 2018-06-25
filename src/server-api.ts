@@ -54,6 +54,11 @@ export async function getTree(){
     return await get('/groups?tree=true');
 }
 
+export async function auth(user:any){
+    return await post(`/users?login=true`, user)
+}
+
+
 function post(url:string, body:any){
     return fetch(url,{
         method:'POST',

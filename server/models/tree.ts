@@ -10,12 +10,12 @@ const connectorsFile = 'connectors.json';
 export class NTree{
     public root:IGroup;
     constructor(){
-        this.root = new Group(this.root, "treeRoot", []);
+        // this.root = new Group(this.root, "treeRoot", []);
     }
 
-    public add(node:IGroup| IUser, parentNode?:IGroup){
-        this.root.add(node, parentNode);
-    }
+    // public add(node:IGroup| IUser, parentNode?:IGroup){
+    //     this.root.add(node, parentNode);
+    // }
 
     public async createNew(newDetails, fileName){
         return await db.createNew(newDetails, fileName);
@@ -25,9 +25,9 @@ export class NTree{
         await db.createMultipleNew(data, 'connectors.json');
     }
 
-    public search(nodeId:string|undefined){
-        return this.root.search(nodeId)
-    }
+    // public search(nodeId:string|undefined){
+    //     return this.root.search(nodeId)
+    // }
 
     async removeGroup(id:string){
         return await db.deleteObj(id, groupsFile);
@@ -48,10 +48,10 @@ export class NTree{
         // return this.root.removeGroup(node);
     }
 
-
-    public printFullTree(){
-        return this.root.printFullTree();
-    }
+    //
+    // public printFullTree(){
+    //     return this.root.printFullTree();
+    // }
     public async getGroups(){
         // return this.root.getGroups();
         return await db.getFullData(groupsFile);

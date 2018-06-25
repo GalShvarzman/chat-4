@@ -1,7 +1,7 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
-import * as uuidv4 from 'uuid/v4';
 import IUser from "../models/user";
+import Group from "../models/group";
 
 interface ITreeGroupObj {
     id?:string,
@@ -52,15 +52,15 @@ class GroupsService{
             }
         });
         await nTree.addConnectors(newConnectors);
-        const usersList = await users.getUsersList();
+        const usersList = await users.getUsersFullData();
         return this.getObjData<{name:string, id:string, age:string, type:string}>(usersList.data, data.usersIds, ['name', 'id', 'age'],'user');
     }
 
     async createNewGroup(newGroupDetails):Promise<{name:string, id:string}>{
         const groupParentId = newGroupDetails.parent;
-        const newId = uuidv4();
-        return Promise.all([nTree.createNew({type:'group', id:newId, pId:groupParentId}, 'connectors.json'),
-                           nTree.createNew({name:newGroupDetails.name, id:newId}, 'groups.json')])
+        const newGroup = new Group(newGroupDetails.name);
+        return Promise.all([nTree.createNew({type:'group', id:newGroup.id, pId:groupParentId}, 'connectors.json'),
+                           nTree.createNew(newGroup, 'groups.json')])
             .then((results)=>{
                 return results[1];
             });
@@ -110,7 +110,7 @@ class GroupsService{
         if (groupChildrenConnectors.length) {
             let groupChildren;
             if (groupChildrenConnectors[0].type === 'user') {
-                const usersList = await users.getUsersList();
+                const usersList = await users.getUsersFullData();
 
                 groupChildren = this.getObjData<{name:string, id:string, age:string, type:string}>(usersList.data, groupChildrenIds, ['name', 'id', 'age'],'user');
             }
@@ -151,7 +151,7 @@ class GroupsService{
     async getGroupOptionalChildren(groupId){
         const connectorsList = await this.getConnectorsList();
         const groupChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
-        let usersListFullData = await users.getUsersList();
+        let usersListFullData = await users.getUsersFullData();
         const usersList = usersListFullData.data.map((user)=>{
             return {"name":user.name, "age":user.age, "id":user.id}
         });
@@ -186,7 +186,7 @@ class GroupsService{
     async getTree(){
         const connectorsList = await this.getConnectorsList();
         const groupsList = await this.getAllGroups();
-        const usersList = await users.getUsersList();
+        const usersList = await users.getUsersFullData();
         const rootConnector = connectorsList.data.find((connector)=>{
             return connector.pId === "";
         });

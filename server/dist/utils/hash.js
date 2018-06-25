@@ -17,7 +17,12 @@ function compareHash(usersPlaintextPassword, hash) {
         bcrypt.compare(usersPlaintextPassword, hash, function (err, res) {
             if (err)
                 reject(err);
-            resolve(res);
+            if (res === true) {
+                resolve(res);
+            }
+            else {
+                reject(err);
+            }
         });
     });
 }

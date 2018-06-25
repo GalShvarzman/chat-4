@@ -7,9 +7,9 @@ usersRouter.patch('/:id', controllers.usersController.saveUserDetails);
 
 usersRouter.delete('/:id', controllers.usersController.deleteUser);
 
-usersRouter.get('/', controllers.usersController.getAllUsers);
+usersRouter.get('/', controllers.usersController.getUsers);
 
-usersRouter.post('/', controllers.usersController.createNewUser);
+usersRouter.post('/', controllers.usersController.createNewUserOrAuth);
 
 
 export default usersRouter;

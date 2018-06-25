@@ -11,16 +11,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const users_1 = require("../models/users");
 const hash_1 = require("../utils/hash");
 const client_error_1 = require("../utils/client-error");
-const uuidv4 = require("uuid/v4");
 const tree_1 = require("../models/tree");
+const user_1 = require("../models/user");
 class UsersService {
     getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield users_1.default.getUsersList();
-            result.data = result.data.map((user) => {
+            const usersList = yield users_1.default.getUsersFullData();
+            const result = usersList.data.map((user) => {
                 return { "name": user.name, "age": user.age, "id": user.id };
             });
-            return result;
+            return { data: result };
         });
     }
     saveUserDetails(userDetails) {
@@ -49,14 +49,36 @@ class UsersService {
     }
     createNewUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const usersData = yield users_1.default.getUsersList();
+            const usersData = yield users_1.default.getUsersFullData();
             if (yield users_1.default.isUserExists(usersData, user.name)) {
                 throw new client_error_1.ClientError(400, "usernameAlreadyExist"); // fixme status??
             }
             else {
-                user.password = yield hash_1.createHash(user.password);
-                user.id = uuidv4();
-                return yield users_1.default.createNewUser(user);
+                const newUser = new user_1.default(user.name, user.age);
+                newUser.password = yield hash_1.createHash(user.password);
+                return yield users_1.default.createNewUser(newUser);
+            }
+        });
+    }
+    authUser(userToAuth) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const usersList = yield users_1.default.getUsersFullData();
+            const userIndex = usersList.data.findIndex((user) => {
+                return user.name === userToAuth.name;
+            });
+            if (userIndex !== -1) {
+                const userDetails = usersList.data[userIndex];
+                try {
+                    yield hash_1.compareHash(userToAuth.password, userDetails.password);
+                    return ({
+                        id: userDetails.id,
+                        name: userDetails.name,
+                        age: userDetails.age
+                    });
+                }
+                catch (e) {
+                    throw new client_error_1.ClientError(404, "auth failed");
+                }
             }
         });
     }

@@ -1,4 +1,7 @@
 import * as React from 'react';
+// import { withRouter, RouteProps } from 'react-router';
+// import {withoutRouteProps} from "./withoutRouteProps";
+
 import {Switch, Route, Link, Redirect} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
@@ -19,7 +22,8 @@ export enum ERROR_MSG{
     none,
     allGood,
     credentials,
-    locked
+    locked,
+    fail
 }
 
 const changeOptions = {
@@ -40,8 +44,14 @@ interface IAppState {
     tree:listItem[],
     [key: string] : any
 }
+//
+// interface IAppProps {
+//     history:any,
+//     match:any,
+//     location:any,
+// }
 
-class App extends React.Component<{}, IAppState> {
+class App extends React.Component<{} , IAppState> {
     public chatMessagesChild:any;
     public menu:any;
 
@@ -90,33 +100,31 @@ class App extends React.Component<{}, IAppState> {
         await stateStoreService.saveGroupDetails(group);
     };
 
-    public onLoginSubmitHandler =(user:{name:string, password:string})=>{
-        try{
-            const userId = stateStoreService.auth(user);
-            this.setState({
-                loggedInUser: {name: user.name, id:userId},
-                errorMsg: ERROR_MSG.allGood,
-                redirectToChat: true
-            })
-
-        }
-        catch(error){
-            if(this.state.counter === 2){
+    public onLoginSubmitHandler = async (user:{name:string, password:string})=>{
+            const result = await stateStoreService.auth(user);
+            if(result.message){
+                if(this.state.counter === 2){
+                    this.setState({
+                        loggedInUser: null,
+                        errorMsg: ERROR_MSG.locked
+                    });
+                }
+                else {
+                    this.setState((prev) => ({
+                        loggedInUser: null,
+                        errorMsg: ERROR_MSG.credentials,
+                        counter: this.state.counter + 1
+                    }));
+                }
+            }
+            else{
                 this.setState({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.locked
-                });
+                    loggedInUser: {name: result.name, id:result.id},
+                    errorMsg: ERROR_MSG.allGood
+                }, ()=>{
+                    // this.props.history.push('/chat');
+                })
             }
-            else {
-                this.setState((prev) => ({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.credentials,
-                    counter: this.state.counter + 1
-                }));
-            }
-
-        }
-
     };
 
     public onSignUpSubmitHandler = async (user:{name:string, age?:number, password:string}):Promise<void> => {
@@ -130,11 +138,12 @@ class App extends React.Component<{}, IAppState> {
             }
         }
         catch(e){
-            this.setState({errorMsg: ERROR_MSG.credentials})
+            this.setState({errorMsg: ERROR_MSG.fail})
         }
     };
 
-    public loginRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any)=> (<Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    //(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
     public signUpRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
@@ -223,4 +232,5 @@ class App extends React.Component<{}, IAppState> {
     }
 }
 
+// export default withRouter(App);
 export default App;
