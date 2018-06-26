@@ -3,6 +3,7 @@ import {createHash, compareHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
 import {nTree} from "../models/tree";
 import User from "../models/user";
+import {messagesDb} from "../models/messages";
 
 
 class UsersService{
@@ -30,14 +31,27 @@ class UsersService{
 
 
     async deleteUser(id):Promise<void>{
-        // fixme - delete also chat messages history....
-
         await users.deleteUser(id);
         const connectorsList = await nTree.getConnectorsList();
         connectorsList.data = connectorsList.data.filter((connector)=>{
             return connector.id !== id;
         });
         nTree.updateFile(connectorsList, 'connectors.json');
+        const allMessages = await messagesDb.getAllMessages();
+        const allMessagesKeysArr = Object.keys(allMessages.data);
+        const matchConversationKeys = [];
+
+        allMessagesKeysArr.forEach((key)=>{
+            if (key.includes(id)){
+                matchConversationKeys.push(key);
+            }
+        });
+        if(matchConversationKeys.length){
+            matchConversationKeys.forEach((key)=>{
+                delete allMessages.data[key];
+            });
+            await messagesDb.updateMessagesFile(allMessages);
+        }
     }
 
     async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{

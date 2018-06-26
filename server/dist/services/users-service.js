@@ -13,6 +13,7 @@ const hash_1 = require("../utils/hash");
 const client_error_1 = require("../utils/client-error");
 const tree_1 = require("../models/tree");
 const user_1 = require("../models/user");
+const messages_1 = require("../models/messages");
 class UsersService {
     getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,13 +40,26 @@ class UsersService {
     }
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            // fixme - delete also chat messages history....
             yield users_1.default.deleteUser(id);
             const connectorsList = yield tree_1.nTree.getConnectorsList();
             connectorsList.data = connectorsList.data.filter((connector) => {
                 return connector.id !== id;
             });
             tree_1.nTree.updateFile(connectorsList, 'connectors.json');
+            const allMessages = yield messages_1.messagesDb.getAllMessages();
+            const allMessagesKeysArr = Object.keys(allMessages.data);
+            const matchConversationKeys = [];
+            allMessagesKeysArr.forEach((key) => {
+                if (key.includes(id)) {
+                    matchConversationKeys.push(key);
+                }
+            });
+            if (matchConversationKeys.length) {
+                matchConversationKeys.forEach((key) => {
+                    delete allMessages.data[key];
+                });
+                yield messages_1.messagesDb.updateMessagesFile(allMessages);
+            }
         });
     }
     createNewUser(user) {

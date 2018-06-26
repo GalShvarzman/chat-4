@@ -35,7 +35,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                 {
                     Header: 'ID',
                     accessor: 'id',
-                    Cell:(props:any)=> (<><button className="delete-child-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></>)
+                    Cell:(props:any)=> (<div className="delete-child-btn"><button className="delete-child-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></div>)
                 }, {
                     Header: 'Name',
                     accessor: 'name',
@@ -119,7 +119,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     <h2 className="edit-group-header">Edit group details</h2>
                     <p className="parent-wrapper">
                         <span className="group-id">Id:</span>
-                        <span>{this.state.group.id}</span>
+                        <span className="id">{this.state.group.id}</span>
                     </p>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
                     <button onClick={this.save} className="edit-group-save-btn" type="button">Save</button>
@@ -131,7 +131,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                             </span>
                         </p>
                         <div className="children-wrapper">
-                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group.id}/add-users`, state:{group:this.state.group}}}>Add users to group</Link>}
+                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group.id}/add-users`, state:{group:this.state.group}}}><button className="add-children-btn">Add users to group</button></Link>}
                             <h2 className="children-header">Children</h2>
                             <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={5}
                                         minRows={5} className="children-table" data={this.state.group.children}

@@ -1,3 +1,48 @@
-.select-users-header{
+.select-users-header, .select-users-group-name-header{
     color:#483D8B;
+    text-align: center;
+}
+
+.select-users-group-name-header{
+    margin-top:0;
+}
+
+.users-select-table{
+    width: 80%;
+    margin:auto;
+    text-align: center;
+}
+
+.check-box-wrapper{
+    text-align: left;
+}
+
+
+.select-users-back-btn{
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 1px solid darkslateblue;
+    border-radius: 5px;
+    padding:0.5em 1em;
+}
+
+.select-users-save-btn{
+    color: darkslateblue;
+    background-color: lightblue;
+    border: 2px solid darkslateblue;
+    border-radius: 5px;
+    font-size:1em;
+    padding:0.3em 0.8em;
+    vertical-align:middle;
+    text-align: center;
+    margin:auto;
+    margin-top:1em;
+    display: block;
+    outline: none;
+}
+
+.select-users-message{
+    text-align: center;
+    color:#483D8B;
+    font-size:1em;
 }

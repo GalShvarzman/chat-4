@@ -28,9 +28,9 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
                 {
                     Header: 'ID',
                     accessor: 'id',
-                    Cell:(props:any)=> (<><CheckBox label={props.value} handleCheckboxChange={this.toggleCheckbox}
+                    Cell:(props:any)=> (<div className="check-box-wrapper"><CheckBox label={props.value} handleCheckboxChange={this.toggleCheckbox}
                         key={props.value}/>
-                    </>)
+                    </div>)
                 }, {
                     Header: 'Name',
                     accessor: 'name',
@@ -68,15 +68,15 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
     render(){
         return(
             <>
-                <Link to={{pathname:`/groups/${this.props.location.state.group.id}/edit`, state:{group:this.props.location.state.group}}}><button>Back</button></Link>
-                <h1>{this.props.location.state.group.name}</h1>
+                <Link to={{pathname:`/groups/${this.props.location.state.group.id}/edit`, state:{group:this.props.location.state.group}}}><button className="select-users-back-btn">Back</button></Link>
+                <h1 className="select-users-group-name-header">{this.props.location.state.group.name}</h1>
                 <h2 className="select-users-header">Select users</h2>
                 <form onSubmit={this.handleFormSubmit}>
-                    <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={10}
-                                minRows={10} className="users-select-table" data={this.state.users}
+                    <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={8}
+                                minRows={8} className="users-select-table" data={this.state.users}
                                 columns={this.state.columns}/>
-                    <button type='submit'>Save</button>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
+                    <button className="select-users-save-btn" type='submit'>Save</button>
+                    <p className="select-users-message" hidden={!this.state.message}>{this.state.message}</p>
                 </form>
             </>
         )
