@@ -4,6 +4,7 @@ import 'react-table/react-table.css'
 import CheckBox from './checkbox';
 import {Link} from "react-router-dom";
 import {stateStoreService} from "../state/state-store";
+import './select-users.css';
 
 interface ISelectUsersProps {
     handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, id:string}[]>,
@@ -56,25 +57,6 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         const optionalUsers = await stateStoreService.getOptionalUsers(this.props.location.state.group.id);
         this.setState({users:optionalUsers});
     }
-    // private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
-    //     return {
-    //         onClick: (e:any, handleOriginal:any) => {
-    //             if(e.target.type = 'checkbox'){  // fixme
-    //                 // this.setState(prevState => {
-    //                 //     return{
-    //                 //         selectedUsers:[
-    //                 //             ...prevState.selectedUsers,
-    //                 //             rowInfo
-    //                 //         ]
-    //                 //     }
-    //                 // })
-    //             }
-    //             if (handleOriginal) {
-    //                 handleOriginal();
-    //             }
-    //         }
-    //     };
-    // };
 
     private handleFormSubmit = async (e:React.MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -88,7 +70,7 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
             <>
                 <Link to={{pathname:`/groups/${this.props.location.state.group.id}/edit`, state:{group:this.props.location.state.group}}}><button>Back</button></Link>
                 <h1>{this.props.location.state.group.name}</h1>
-                <h2>Select users</h2>
+                <h2 className="select-users-header">Select users</h2>
                 <form onSubmit={this.handleFormSubmit}>
                     <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={10}
                                 minRows={10} className="users-select-table" data={this.state.users}

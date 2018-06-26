@@ -28,6 +28,7 @@ interface IChatState {
     selectedType?:string,
     message:IMessage,
     selectedMassages?:IMessage[],
+    previousSelectedId?:string
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
@@ -60,24 +61,30 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     private setStateOnSelected = (eventTarget:any) => {
+        const previousSelectedId = this.state.selectedId;
         this.setState({
             selectedName: eventTarget.innerHTML.substr(1),
             selectedId: eventTarget.id,
-            selectedType:eventTarget.type
+            selectedType:eventTarget.type,
+            previousSelectedId
         }, () => {
             this.getSelectedMessageHistory();
         });
-    };
-    // fixme כשמשתמש לוחץ על קבוצה הוא צריך לעזוב את הסשן הקודם..
-    leaveGroup = () => {
-        socket.emit('leave-group', this.state.selectedId);
     };
 
     private getSelectedMessageHistory = async() => {
         if(this.state.selectedId && this.props.data.loggedInUser){
             const messagesList:any = await stateStoreService.getSelectedMessagesHistory(this.state.selectedType, this.state.selectedId, this.props.data.loggedInUser.id);
-            socket.emit('join-group', this.props.data.loggedInUser.name, this.state.selectedId);
             this.setState({selectedMassages:messagesList, message:{message:""}});
+
+            if(this.state.previousSelectedId){
+                socket.emit('leave-group', this.props.data.loggedInUser.name, this.state.previousSelectedId);
+            }
+            if(this.state.selectedType === 'user'){
+                const selectedId = [this.state.selectedId , this.props.data.loggedInUser.id].sort().join('_');
+                this.setState({selectedId});
+            }
+            socket.emit('join-group', this.props.data.loggedInUser.name, this.state.selectedId);
         }
     };
 
@@ -119,7 +126,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
     public addMessage = ()=>{
         this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.data.loggedInUser)}, async()=>{
-            socket.emit('msg', this.state.message, this.state.selectedId);
+            debugger;
+            socket.emit('msg', this.state.selectedId, this.state.message);
             await stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
             this.setState((prevState)=>{
                 return{

@@ -30,6 +30,9 @@ class GroupsService {
                 if (connectorChildren.length && connectorChildren[0].type === 'group' || connectorChildren.length == 0) {
                     groupsWithGroupsChildrenIds.push(groupConnector.id);
                 }
+                if (connectorChildren.length == 0) {
+                    groupsWithGroupsChildrenIds.push(groupConnector.id);
+                }
             });
             return {
                 data: this.getObjData(allGroups.data, groupsWithGroupsChildrenIds, ['name', 'id'])
@@ -79,16 +82,19 @@ class GroupsService {
             yield tree_1.nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
             const groupConnector = this.getGroupConnector(groupId, connectorsList);
             yield tree_1.nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
+            // fixme - delete also chat messages history....
         });
     }
     getAllChildrenConnectors(connectorsList, groupId) {
         const result = [];
         const groupDirectChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
-        result.push(...groupDirectChildrenConnectors);
-        if (groupDirectChildrenConnectors[0].type === 'group') {
-            groupDirectChildrenConnectors.forEach((child) => {
-                result.push(...this.getAllChildrenConnectors(connectorsList, child.id));
-            });
+        if (groupDirectChildrenConnectors.length) {
+            result.push(...groupDirectChildrenConnectors);
+            if (groupDirectChildrenConnectors[0].type === 'group') {
+                groupDirectChildrenConnectors.forEach((child) => {
+                    result.push(...this.getAllChildrenConnectors(connectorsList, child.id));
+                });
+            }
         }
         return result;
     }

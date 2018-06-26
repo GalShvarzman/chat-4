@@ -67,7 +67,9 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     };
 
     async componentDidMount(){
-        const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}]} = await stateStoreService.getGroupData(this.props.location.state.group.id);
+        const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}] } = await stateStoreService.getGroupData(this.props.location.state.group.id);
+        debugger;
+
         if(groupData.data[1].groupChildren.length && groupData.data[1].groupChildren[0].type === 'group'){
             this.setState({addNewUserBtnIsHidden : true});
         }

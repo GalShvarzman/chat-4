@@ -1,6 +1,5 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
-import IUser from "../models/user";
 import Group from "../models/group";
 
 interface ITreeGroupObj {
@@ -26,6 +25,9 @@ class GroupsService{
         groupsConnectors.forEach((groupConnector)=>{
            const connectorChildren = this.getDirectChildrenConnectors(groupConnector.id, connectorsList) ;
            if(connectorChildren.length && connectorChildren[0].type === 'group' || connectorChildren.length == 0){
+               groupsWithGroupsChildrenIds.push(groupConnector.id);
+           }
+           if(connectorChildren.length == 0){
                groupsWithGroupsChildrenIds.push(groupConnector.id);
            }
         });
@@ -74,17 +76,20 @@ class GroupsService{
         await nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
         const groupConnector = this.getGroupConnector(groupId, connectorsList);
         await nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
+        // fixme - delete also chat messages history....
     }
 
     getAllChildrenConnectors(connectorsList, groupId){
         const result = [];
         const groupDirectChildrenConnectors = this.getDirectChildrenConnectors(groupId, connectorsList);
-        result.push(...groupDirectChildrenConnectors);
+        if(groupDirectChildrenConnectors.length){
+            result.push(...groupDirectChildrenConnectors);
 
-        if(groupDirectChildrenConnectors[0].type ==='group'){
-            groupDirectChildrenConnectors.forEach((child)=>{
-                result.push(...this.getAllChildrenConnectors(connectorsList, child.id));
-            });
+            if(groupDirectChildrenConnectors[0].type ==='group'){
+                groupDirectChildrenConnectors.forEach((child)=>{
+                    result.push(...this.getAllChildrenConnectors(connectorsList, child.id));
+                });
+            }
         }
         return result;
     }
@@ -227,21 +232,6 @@ class GroupsService{
         result.push(obj);
         return result;
     }
-
-    // internalSearchAllGroups(node) {
-    //     const results:any[] = [];
-    //     if (node.children) {
-    //         node.children.forEach((child) => {
-    //             if (child.type === 'group') {
-    //                 results.push(child);
-    //             }
-    //             if(child.children){
-    //                 results.push(...this.internalSearchAllGroups(child));
-    //             }
-    //         });
-    //     }
-    //     return results;
-    // }
 }
 
 const groupsService = new GroupsService();

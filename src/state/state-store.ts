@@ -20,12 +20,12 @@ export class StateStoreService implements IStateStoreService{
     }
 
     private async init(){
-        return Promise.all([getGroups(),getUsers(), getGroupsWithGroupsChildren(), getTree()]).then((results)=>{
-            this._set('users', results[1].data);
-            this._set('groups', results[0].data);
-            this._set('groupsWithGroupsChildren', results[2].data);
-            this._set('tree', results[3]);
-            this.onStoreChanged(['users', 'groups', 'groupsWithGroupsChildren', 'tree']);
+        return Promise.all([getGroups(), getUsers(), getTree()])
+            .then((results)=>{
+                this._set('groups', results[0].data);
+                this._set('users', results[1].data);
+                this._set('tree', results[2]);
+                this.onStoreChanged(['users', 'groups', 'tree']);
         })
     }
     private _set(key: string, val: any) {
@@ -35,6 +35,8 @@ export class StateStoreService implements IStateStoreService{
     public get(key: string) {
         return StateStore.getInstance()[key] || [];
     }
+
+
 
     // public addNewUser(newUser:{name:string, age?:number, password:string}){
     //     if(StateStore.getInstance().users.isUserExists(newUser.name)){
@@ -46,28 +48,26 @@ export class StateStoreService implements IStateStoreService{
     //     }
     // }
 
-    public isUserExistInGroup(groupId:string, userId:string){
-        const group = StateStore.getInstance().tree;
-        group;
-        // fixme;
-        // return (group as IGroup).isNodeExistInGroup(userId);
-    }
+    // public isUserExistInGroup(groupId:string, userId:string){
+    //     const group = StateStore.getInstance().tree;
+    //     group;
+    //     // fixme;
+    //     // return (group as IGroup).isNodeExistInGroup(userId);
+    // }
 
     public async addMessage(selectedType:string|undefined, selectedId:string|undefined, message:IMessage, loggedInUser:{name:string, id:string}|null){
         if(loggedInUser && selectedId){
             if(selectedType === 'group'){
-                // StateStore.getInstance().messagesDb.addMessageToGroup(message, selectedId);
                 await addMessage(message, selectedId);
             }
             else{
-                // StateStore.getInstance().messagesDb.addMessageUsersConversation(message, selectedId, loggedInUser.id);
                 await addMessage(message, selectedId, loggedInUser.id);
             }
-            // this.onStoreChanged();
         }
     }
 
     public async getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
+        // fixme bring only if the user is in this group;
        if(selectedId && selectedType && loggedInUserId){
                 if(selectedType === 'group'){
                    return await getSelectedMessages(selectedId);
@@ -87,9 +87,9 @@ export class StateStoreService implements IStateStoreService{
         return await auth(user);
     }
 
-    public getUserId(userName:string){
-        return StateStore.getInstance().users.getUser(userName).id;
-    }
+    // public getUserId(userName:string){
+    //     return StateStore.getInstance().users.getUser(userName).id;
+    // }
 
     // public walkTree(){
     //     const tree = StateStore.getInstance().tree;
@@ -107,12 +107,13 @@ export class StateStoreService implements IStateStoreService{
         return StateStore.getInstance().groups;
     }
 
-    public getGroupsWithGroupsChildren(){
-        return StateStore.getInstance().groupsWithGroupsChildren;
-    }
-
     public getTree(){
         return StateStore.getInstance().tree;
+    }
+
+    async getOptionalGroupParents(){
+       const result = await getGroupsWithGroupsChildren();
+       return result.data;
     }
 
     public async saveGroupDetails(group:{name:string, id:string}){
@@ -124,7 +125,9 @@ export class StateStoreService implements IStateStoreService{
         });
         groupsClone[groupIndex] = updatedGroup.group;
         this._set('groups', groupsClone);
-        this.onStoreChanged(['groups']);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['groups', 'tree']);
     }
 
     public async saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<void>{
@@ -136,7 +139,9 @@ export class StateStoreService implements IStateStoreService{
         });
         usersClone[userIndex] = updatedUser.user;
         this._set('users', usersClone);
-        this.onStoreChanged(['users']);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['users', 'tree']);
     }
 
     public async deleteUser(userToDelete:{name:string, age:number, id:string}):Promise<void>{
@@ -148,7 +153,9 @@ export class StateStoreService implements IStateStoreService{
         });
         usersClone.splice(userIndex, 1);
         this._set('users', usersClone);
-        this.onStoreChanged(['users']);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['users', 'tree']);
     }
 
     public async deleteGroup(groupToDelete:{id:string, name:string}){
@@ -160,7 +167,9 @@ export class StateStoreService implements IStateStoreService{
         });
         groupsClone.splice(groupIndex, 1);
         this._set('groups', groupsClone);
-        this.onStoreChanged(['groups']);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['groups', 'tree']);
     }
 
     public async getGroupData(groupId:string){
@@ -179,7 +188,9 @@ export class StateStoreService implements IStateStoreService{
         const newGroup = await createNewGroup(group);
         const groups = this.get('groups');
         this._set('groups', groups.concat([newGroup]));
-        this.onStoreChanged(['groups']);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['groups', 'tree']);
         return newGroup;
     }
 
@@ -188,7 +199,10 @@ export class StateStoreService implements IStateStoreService{
     }
 
     public async addUsersToGroup(data:{usersIds:string[], groupId:string}){
-        return await addUsersToGroup(data);
+        await addUsersToGroup(data);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['tree']);
     }
 
     public subscribe(listener:any){
@@ -211,6 +225,9 @@ export class StateStoreService implements IStateStoreService{
 
     public async deleteUserFromGroup(userId:string, groupId:string){
         await deleteUserFromGroup(userId, groupId);
+        const tree = await getTree();
+        this._set('tree', tree);
+        this.onStoreChanged(['tree']);
     }
 
 
@@ -220,8 +237,7 @@ interface IStateStore {
     users : any,
     tree:NTree,
     messagesDb:MessagesDb,
-    groups:{name:string, id:string}[],
-    groupsWithGroupsChildren:{name:string, id:string}[]
+    groups:{name:string, id:string}[]
 }
 
 
@@ -230,7 +246,6 @@ class StateStore implements IStateStore {
     public tree:NTree;
     public groups:{name:string, id:string}[];
     public messagesDb:MessagesDb = messagesDb;
-    public groupsWithGroupsChildren : {name:string, id:string}[];
 
     static instance: IStateStore;
 

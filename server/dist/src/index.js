@@ -15,18 +15,19 @@ io.on('connection', (socket) => {
         console.log(`username ${username} was logged in!`);
         socket.broadcast.emit('connections', username);
     });
-    socket.on('join-group', (username, groupname) => {
-        console.log(`username: ${username} has joined ${groupname}`);
-        socket.join(groupname);
-        io.to(groupname).emit('msg', { id: 'dfdf2342adf3', message: 'hello ' + username, sender: { name: 'node', id: 123 } });
-        console.log(Object.keys(socket.rooms));
-        io.to(groupname).on('msg', (msg) => {
-            io.emit('msg', msg, { for: 'everyone' });
-        });
+    socket.on('join-group', (username, groupId) => {
+        console.log(`username: ${username} has joined ${groupId}`);
+        socket.join(groupId);
+        // io.to(groupname).emit('msg', {id:'dfdf2342adf3',message:'hello ' + username, sender:{name:'node', id:123}});
+        // console.log(Object.keys(socket.rooms));
     });
-    socket.on('leave-group', (groupName) => {
-        socket.leave(groupName);
-        console.log(`${socket.username} left ${groupName}`);
+    socket.on('msg', (id, msg) => {
+        socket.broadcast.to(id).emit('msg', msg);
+        //io.emit('msg', msg, { for: 'everyone' });
+    });
+    socket.on('leave-group', (username, groupId) => {
+        socket.leave(groupId);
+        console.log(`${username} left ${groupId}`);
     });
     socket.on('disconnect', function () {
         console.log('user disconnected');

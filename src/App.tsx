@@ -32,7 +32,6 @@ export enum ERROR_MSG{
 const changeOptions = {
     'users' : stateStoreService.getUsers.bind(stateStoreService),
     'groups' : stateStoreService.getGroups.bind(stateStoreService),
-    'groupsWithGroupsChildren': stateStoreService.getGroupsWithGroupsChildren.bind(stateStoreService),
     'tree' : stateStoreService.getTree.bind(stateStoreService)
 };
 
@@ -43,7 +42,6 @@ interface IAppState {
     redirectToChat:boolean,
     users:{name:string, age:string, id:string}[],
     groups:{name:string, id:string}[],
-    groupsWithGroupsChildren:{name:string, id:string}[],
     tree:listItem[],
     [key: string] : any
 }
@@ -68,7 +66,6 @@ class App extends React.Component<{} , IAppState> {
             redirectToChat:false,
             users: [],
             groups:[],
-            groupsWithGroupsChildren:[],
             tree:[]
         };
 
@@ -83,7 +80,7 @@ class App extends React.Component<{} , IAppState> {
     };
 
     componentDidMount(){
-        this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups'), groupsWithGroupsChildren:stateStoreService.get('groupsWithGroupsChildren')})
+        this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups')})
     }
 
     private onSubscribe = async (event:{changed:string[]}) => {
@@ -135,7 +132,9 @@ class App extends React.Component<{} , IAppState> {
         try{
             const result = await stateStoreService.createNewUser(user);
             if(result.user){
-                this.setState({loggedInUser:{name:result.user.name, id:result.user.id},redirectToChat:true});
+                this.setState({loggedInUser:{name:result.user.name, id:result.user.id},redirectToChat:true}, ()=>{
+                    socket.emit('login', result.user.name);
+                });
             }
             else{
                 this.setState({errorMsg: ERROR_MSG.credentials})
@@ -175,7 +174,7 @@ class App extends React.Component<{} , IAppState> {
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup} groupsWithGroupsChildren={this.state.groupsWithGroupsChildren}/>);
+    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
 
     public groupEditRender = (props:any) => (<GroupEdit saveGroupNewName={this.saveGroupNewName} {...props}/>);
 

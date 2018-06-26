@@ -20,7 +20,7 @@ export async function deleteUserFromGroup(userId:string, groupId:string){
    await remove(`/groups/${groupId}/users/${userId}`)
 }
 
-export async function deleteGroup(group:{id:string, name:string}):Promise<void>{
+export async function deleteGroup(group:{id:string, name:string}):Promise<any>{
     return await remove(`groups/${group.id}`);
 }
 
@@ -115,7 +115,7 @@ function remove(url:string){
     return fetch(url, {
         method:'DELETE'
     })
-        .then(()=>{
-            return;
+        .then((result)=>{
+            return result;
         })
 }
