@@ -30,6 +30,8 @@ class UsersService{
 
 
     async deleteUser(id):Promise<void>{
+        // fixme - delete also chat messages history....
+
         await users.deleteUser(id);
         const connectorsList = await nTree.getConnectorsList();
         connectorsList.data = connectorsList.data.filter((connector)=>{

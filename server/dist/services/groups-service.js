@@ -207,7 +207,7 @@ class GroupsService {
     walkTree(connector, connectorsList, usersList, groupsList) {
         const result = [];
         const groupDetails = groupsList.data.find(group => group.id === connector.id);
-        const obj = { id: connector.id, name: groupDetails.name, type: connector.type };
+        const obj = { id: connector.id, name: groupDetails.name, type: connector.type, items: [] };
         const groupChildrenConnectors = this.getDirectChildrenConnectors(connector.id, connectorsList);
         if (groupChildrenConnectors.length) {
             const groupChildrenConnectorsIds = groupChildrenConnectors.map(connector => connector.id);
@@ -217,10 +217,8 @@ class GroupsService {
                 obj.items = childrenData;
             }
             else {
-                childrenData = this.getObjData(groupsList.data, groupChildrenConnectorsIds, ['id', 'name'], 'group');
-                obj.items = childrenData;
                 groupChildrenConnectors.forEach((groupConnector) => {
-                    result.push(...this.walkTree(groupConnector, connectorsList, usersList, groupsList));
+                    obj.items.push(...this.walkTree(groupConnector, connectorsList, usersList, groupsList));
                 });
             }
         }
