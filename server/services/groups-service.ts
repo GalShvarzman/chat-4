@@ -1,6 +1,7 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
 import Group from "../models/group";
+import {messagesDb} from "../models/messages";
 
 interface ITreeGroupObj {
     id?:string,
@@ -76,7 +77,9 @@ class GroupsService{
         await nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
         const groupConnector = this.getGroupConnector(groupId, connectorsList);
         await nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
-        // fixme - delete also chat messages history....
+        const allMessages = await messagesDb.getAllMessages();
+        delete allMessages.data[groupId];
+        await messagesDb.updateMessagesFile(allMessages);
     }
 
     getAllChildrenConnectors(connectorsList, groupId){
@@ -233,4 +236,3 @@ class GroupsService{
 const groupsService = new GroupsService();
 
 export default groupsService;
-

@@ -245,9 +245,9 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public render() {
         const list = this.props.tree.items ? this.load() : [];
         return (
-            <div>
-                <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp} className="left tree">{list}</ul>
-            </div>
+                <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp}
+                    className="left tree">{list}</ul>
+
         );
     }
 }

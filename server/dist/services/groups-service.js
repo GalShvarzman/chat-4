@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tree_1 = require("../models/tree");
 const users_1 = require("../models/users");
 const group_1 = require("../models/group");
+const messages_1 = require("../models/messages");
 class GroupsService {
     getAllGroups() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -82,7 +83,9 @@ class GroupsService {
             yield tree_1.nTree.removeMultipleGroups([...childrenConnectorsTypeGroupIds, groupId]);
             const groupConnector = this.getGroupConnector(groupId, connectorsList);
             yield tree_1.nTree.removeMultipleConnectors([...allChildrenConnectors, groupConnector]);
-            // fixme - delete also chat messages history....
+            const allMessages = yield messages_1.messagesDb.getAllMessages();
+            delete allMessages.data[groupId];
+            yield messages_1.messagesDb.updateMessagesFile(allMessages);
         });
     }
     getAllChildrenConnectors(connectorsList, groupId) {

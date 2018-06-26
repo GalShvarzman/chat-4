@@ -9,38 +9,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const DB_1 = require("../lib/DB");
+const messagesFile = 'messages.json';
 class MessagesDb {
-    constructor() {
-        this.messages = {};
-    }
-    // addMessageToGroup(message:IMessage, groupId:string){
-    //     if(this.messages[groupId]){
-    //         this.messages[groupId].push(message);
-    //     }
-    //     else{
-    //         this.messages[groupId] = [message];
-    //     }
-    // }
     addMessageToConversation(message, conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allMessages = yield DB_1.db.readFile('messages.json');
+            const allMessages = yield DB_1.db.readFile(messagesFile);
             if (allMessages.data[conversationId]) {
                 allMessages.data[conversationId].push(message);
             }
             else {
                 allMessages.data[conversationId] = [message];
             }
-            DB_1.db.writeFile(allMessages, 'messages.json');
+            DB_1.db.writeFile(allMessages, messagesFile);
             return message;
         });
     }
     getConversationMessages(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allMessages = yield DB_1.db.readFile('messages.json');
+            const allMessages = yield DB_1.db.readFile(messagesFile);
             if (allMessages.data[conversationId]) {
                 return allMessages.data[conversationId];
             }
             return [];
+        });
+    }
+    getAllMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield DB_1.db.readFile(messagesFile);
+        });
+    }
+    updateMessagesFile(newData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield DB_1.db.updateFile(newData, messagesFile);
         });
     }
 }
