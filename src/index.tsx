@@ -6,9 +6,11 @@ import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter} from 'react-router-dom';
 // import history from './history';
 
+
+
 ReactDOM.render(
     <BrowserRouter>
-            <App/>
+            <App />
     </BrowserRouter>,
   document.getElementById('root') as HTMLElement
 );

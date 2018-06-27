@@ -85,6 +85,9 @@ class UsersService{
                 throw new ClientError(404, "auth failed");
             }
         }
+        else{
+            throw new ClientError(404, "auth failed");
+        }
     }
 
 }

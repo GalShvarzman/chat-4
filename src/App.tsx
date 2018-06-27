@@ -1,7 +1,5 @@
 import * as React from 'react';
-// import { withRouter, RouteProps } from 'react-router';
-// import {withoutRouteProps} from "./withoutRouteProps";
-
+import { withRouter, RouteComponentProps } from 'react-router';
 import {Switch, Route, Link, Redirect} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
@@ -45,18 +43,14 @@ interface IAppState {
     tree:listItem[],
     [key: string] : any
 }
-//
-// interface IAppProps {
-//     history:any,
-//     match:any,
-//     location:any,
-// }
 
-class App extends React.Component<{} , IAppState> {
+type AppProps = RouteComponentProps<{}> & {};
+
+class App extends React.Component<AppProps , IAppState> {
     public chatMessagesChild:any;
     public menu:any;
 
-    constructor(props:{}) {
+    constructor(props: AppProps) {
         super(props);
 
         this.state = {
@@ -123,10 +117,12 @@ class App extends React.Component<{} , IAppState> {
                     errorMsg: ERROR_MSG.allGood
                 }, ()=>{
                     socket.emit('login', result.name);
-                    // this.props.history.push('/chat');
+
+                    this.props.history.push('/chat');
                 })
             }
     };
+
 
     public onSignUpSubmitHandler = async (user:{name:string, age?:number, password:string}):Promise<void> => {
         try{
@@ -236,4 +232,4 @@ class App extends React.Component<{} , IAppState> {
 }
 
 // export default withRouter(App);
-export default App;
+export default withRouter(App);

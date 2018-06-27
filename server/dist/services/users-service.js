@@ -95,6 +95,9 @@ class UsersService {
                     throw new client_error_1.ClientError(404, "auth failed");
                 }
             }
+            else {
+                throw new client_error_1.ClientError(404, "auth failed");
+            }
         });
     }
 }
