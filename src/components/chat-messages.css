@@ -1,3 +1,7 @@
+*{
+    user-select: none;
+}
+
 .messages-on {
     text-align: center;
     color: #4e009c;

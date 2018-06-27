@@ -60,16 +60,8 @@ export async function auth(user:any){
     return await post(`/users?login=true`, user)
 }
 
-export async function getSelectedMessages(selectedId:string, loggedInUserId?:string){
-    let conversationId;
-    debugger;
-    if(loggedInUserId){
-        conversationId = [selectedId,loggedInUserId].sort().join("_");
-    }
-    else{
-        conversationId = selectedId;
-    }
-    return await get(`messages/${conversationId}`)
+export async function getSelectedMessages(selectedId:string){
+    return await get(`messages/${selectedId}`)
 }
 
 export async function addMessage(message:IMessage, selectedId:string, userId?:string){

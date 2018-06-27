@@ -11,8 +11,10 @@
 
 div.chat-left{
     width: 25%;
+    height: 100%;
     background-color:white;
     border-right: 2px solid darkslateblue;
+    overflow: auto;
 }
 
 div.chat-right{

@@ -66,17 +66,9 @@ export class StateStoreService implements IStateStoreService{
         }
     }
 
-    public async getSelectedMessagesHistory(selectedType:string|undefined, selectedId:string|undefined, loggedInUserId?:string|null){
+    public async getSelectedMessagesHistory(selectedId:string){
         // fixme bring only if the user is in this group;
-       if(selectedId && selectedType && loggedInUserId){
-                if(selectedType === 'group'){
-                   return await getSelectedMessages(selectedId);
-               }
-               else{
-                   return await getSelectedMessages(selectedId, loggedInUserId);
-               }
-       }
-       return [];
+        return await getSelectedMessages(selectedId);
     }
 
     // public search(id:string|undefined){

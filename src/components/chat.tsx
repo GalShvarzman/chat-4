@@ -28,7 +28,8 @@ interface IChatState {
     selectedType?:string,
     message:IMessage,
     selectedMassages?:IMessage[],
-    previousSelectedId?:string
+    previousSelectedId?:string,
+    previousSelectedType?:string
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
@@ -61,11 +62,20 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     private setStateOnSelected = (eventTarget:any) => {
-        const previousSelectedId = this.state.selectedId;
+        let previousSelectedId;
+        const previousSelectedType = this.state.selectedType;
+        if(previousSelectedType === "user"){
+            previousSelectedId = [this.state.selectedId, this.props.data.loggedInUser.id].sort().join("_");
+        }
+        else{
+            previousSelectedId = this.state.selectedId;
+        }
+        debugger;
         this.setState({
             selectedName: eventTarget.innerHTML.substr(1),
             selectedId: eventTarget.id,
             selectedType:eventTarget.type,
+            previousSelectedType,
             previousSelectedId
         }, () => {
             this.getSelectedMessageHistory();
@@ -74,19 +84,22 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
     private getSelectedMessageHistory = async() => {
         if(this.state.selectedId && this.props.data.loggedInUser){
-            const messagesList:any = await stateStoreService.getSelectedMessagesHistory(this.state.selectedType, this.state.selectedId, this.props.data.loggedInUser.id);
-            this.setState({selectedMassages:messagesList, message:{message:""}});
-
+            let selectedId;
+            const loggedInUserName = this.props.data.loggedInUser.name;
             if(this.state.previousSelectedId){
-                socket.emit('leave-group', this.props.data.loggedInUser.name, this.state.previousSelectedId);
+                debugger;
+                socket.emit('leave-group', loggedInUserName, this.state.previousSelectedId);
             }
             if(this.state.selectedType === 'user'){
-                const selectedId = [this.state.selectedId , this.props.data.loggedInUser.id].sort().join('_');
-                socket.emit('join-group', this.props.data.loggedInUser.name, selectedId);
+                selectedId = [this.state.selectedId , this.props.data.loggedInUser.id].sort().join('_');
+                socket.emit('join-group', loggedInUserName, selectedId);
             }
             else{
-                socket.emit('join-group', this.props.data.loggedInUser.name, this.state.selectedId);
+                selectedId = this.state.selectedId;
+                socket.emit('join-group', loggedInUserName, selectedId);
             }
+            const messagesList:any = await stateStoreService.getSelectedMessagesHistory(selectedId);
+            this.setState({selectedMassages:messagesList, message:{message:""}});
         }
     };
 
