@@ -1,7 +1,7 @@
 import * as socketio from 'socket.io';
 
 export default function socket(httpServer){
-    const io = socketio(httpServer);
+    const io = socketio.listen(httpServer);
     io.on('connection', (socket)=>{
         console.log('a user connected');
 

@@ -11,10 +11,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const path = require("path");
 const client_error_1 = require("../utils/client-error");
+const baseDir = path.join(__dirname.replace('dist' + path.sep, ''));
 class DB {
     readFile(fileName) {
         return new Promise((resolve, reject) => {
-            fs.readFile(path.join(__dirname, fileName), (err, res) => {
+            fs.readFile(path.join(baseDir, fileName), (err, res) => {
                 if (err)
                     reject(err);
                 else {
@@ -25,7 +26,7 @@ class DB {
     }
     writeFile(data, fileName) {
         return new Promise((resolve, reject) => {
-            fs.writeFile(path.join(__dirname, fileName), JSON.stringify(data), (err) => {
+            fs.writeFile(path.join(baseDir, fileName), JSON.stringify(data), (err) => {
                 if (err)
                     reject(err);
                 console.log('The file has been saved!');

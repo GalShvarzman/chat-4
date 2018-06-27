@@ -10,6 +10,7 @@
     "@types/react-table": "^6.7.11",
     "@types/socket.io-client": "^1.4.32",
     "bcrypt": "^2.0.1",
+    "concurrently": "^3.6.0",
     "express": "^4.16.3",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
@@ -21,7 +22,9 @@
     "uuid": "^3.2.1"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
+    "start-client": "react-scripts-ts start",
+    "start-server": "tsc -p \"server/tsconfig.json\" && node ./server/dist/src/index.js",
+    "start": "concurrently  \"npm run start-server\"  \"npm run start-client\" ",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

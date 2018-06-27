@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
-import {Switch, Route, Link, Redirect} from "react-router-dom";
+import {Switch, Route, Link} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
 import SignUp from "./components/sign-up";
@@ -17,7 +17,9 @@ import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 
-export const socket =io();
+export const socket =io('http://localhost:4000',{
+    transports: ['websocket']
+});
 
 export enum ERROR_MSG{
     none,
@@ -37,7 +39,6 @@ interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
-    redirectToChat:boolean,
     users:{name:string, age:string, id:string}[],
     groups:{name:string, id:string}[],
     tree:listItem[],
@@ -57,7 +58,6 @@ class App extends React.Component<AppProps , IAppState> {
             loggedInUser: null,
             errorMsg: ERROR_MSG.none,
             counter: 0,
-            redirectToChat:false,
             users: [],
             groups:[],
             tree:[]
@@ -129,8 +129,9 @@ class App extends React.Component<AppProps , IAppState> {
         try{
             const result = await stateStoreService.createNewUser(user);
             if(result.user){
-                this.setState({loggedInUser:{name:result.user.name, id:result.user.id},redirectToChat:true}, ()=>{
+                this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
                     socket.emit('login', result.user.name);
+                    this.props.history.push('/chat');
                 });
             }
             else{
@@ -142,10 +143,10 @@ class App extends React.Component<AppProps , IAppState> {
         }
     };
 
-    public loginRender = (props:any)=> (<Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
-    //(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}} /> : <Login {...props} data={this.state} loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any)=> (<Login {...props} data={this.state}
+                                               loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
-    public signUpRender = (props:any)=>(this.state.redirectToChat ? <Redirect to={{ pathname : '/chat'}}/> : <SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat tree={this.state.tree} ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 

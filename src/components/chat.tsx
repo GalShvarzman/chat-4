@@ -141,8 +141,13 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
     public addMessage = ()=>{
         this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.data.loggedInUser)}, async()=>{
-            const conversationId = [this.props.data.loggedInUser.id, this.state.selectedId].sort().join("_");
-            debugger;
+            let conversationId;
+            if(this.state.selectedType === "user"){
+                conversationId = [this.props.data.loggedInUser.id, this.state.selectedId].sort().join("_");
+            }
+            else{
+                conversationId = this.state.selectedId;
+            }
             socket.emit('msg', conversationId, this.state.message);
             await stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
             this.setState((prevState)=>{

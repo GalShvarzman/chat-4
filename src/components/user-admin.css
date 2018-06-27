@@ -37,3 +37,7 @@ a.user-age, a.user-name{
     margin-top:0.5em;
     margin-left:0.5em;
 }
+
+.user-id-trash{
+    text-align: left;
+}

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const socketio = require("socket.io");
 function socket(httpServer) {
-    const io = socketio(httpServer);
+    const io = socketio.listen(httpServer);
     io.on('connection', (socket) => {
         console.log('a user connected');
         socket.on('login', (username) => {

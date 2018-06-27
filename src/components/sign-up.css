@@ -3,7 +3,7 @@
     vertical-align: middle;
 }
 
-.sign-up-btn, .sign-up-X{
+.sign-up-btn, .sign-up-x{
     color: darkslateblue;
     background-color: lightblue;
     border: 2px solid darkslateblue;
@@ -41,7 +41,7 @@
     z-index: 1;
 }
 
-.sign-up-X{
+.sign-up-x{
     margin-left:5px;
     margin-top: 5px;
     text-decoration: none;

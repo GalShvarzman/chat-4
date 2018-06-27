@@ -22,8 +22,8 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
                 {
                     Header: 'ID',
                     accessor: 'id',
-                    Cell:(props:any)=> (<><button className="delete-user-btn">
-                                            <i className="fa fa-trash"/></button><span>{props.value}</span></>)
+                    Cell:(props:any)=> (<div className="user-id-trash"><button className="delete-user-btn">
+                                            <i className="fa fa-trash"/></button><span>{props.value}</span></div>)
                 }, {
                     Header: 'Name',
                     accessor: 'name',
