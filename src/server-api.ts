@@ -62,6 +62,7 @@ export async function auth(user:any){
 
 export async function getSelectedMessages(selectedId:string, loggedInUserId?:string){
     let conversationId;
+    debugger;
     if(loggedInUserId){
         conversationId = [selectedId,loggedInUserId].sort().join("_");
     }
@@ -75,6 +76,7 @@ export async function addMessage(message:IMessage, selectedId:string, userId?:st
     let conversationId;
     if(userId){
         conversationId = [selectedId,userId].sort().join("_");
+        debugger;
     }
     else{
         conversationId = selectedId;

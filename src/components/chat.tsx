@@ -8,9 +8,9 @@ import {stateStoreService} from "../state/state-store";
 import {IMessage} from "../models/message";
 import {Message} from '../models/message';
 import {listItem} from './left-tree';
-import * as io from 'socket.io-client';
 
-const socket =io();
+import {socket} from '../App';
+
 
 interface IChatProps {
     data:{
@@ -82,9 +82,11 @@ class Chat extends React.Component<IChatProps, IChatState> {
             }
             if(this.state.selectedType === 'user'){
                 const selectedId = [this.state.selectedId , this.props.data.loggedInUser.id].sort().join('_');
-                this.setState({selectedId});
+                socket.emit('join-group', this.props.data.loggedInUser.name, selectedId);
             }
-            socket.emit('join-group', this.props.data.loggedInUser.name, this.state.selectedId);
+            else{
+                socket.emit('join-group', this.props.data.loggedInUser.name, this.state.selectedId);
+            }
         }
     };
 
@@ -126,8 +128,9 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
     public addMessage = ()=>{
         this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.data.loggedInUser)}, async()=>{
+            const conversationId = [this.props.data.loggedInUser.id, this.state.selectedId].sort().join("_");
             debugger;
-            socket.emit('msg', this.state.selectedId, this.state.message);
+            socket.emit('msg', conversationId, this.state.message);
             await stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
             this.setState((prevState)=>{
                 return{

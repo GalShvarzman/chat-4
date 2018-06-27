@@ -17,7 +17,7 @@ import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 
-const socket =io();
+export const socket =io();
 
 export enum ERROR_MSG{
     none,
@@ -116,6 +116,7 @@ class App extends React.Component<AppProps , IAppState> {
                     loggedInUser: {name: result.name, id:result.id},
                     errorMsg: ERROR_MSG.allGood
                 }, ()=>{
+                    console.log("user" , result);
                     socket.emit('login', result.name);
 
                     this.props.history.push('/chat');
@@ -213,8 +214,6 @@ class App extends React.Component<AppProps , IAppState> {
                 </nav>
                 <div className="switch">
                     <Switch>
-                        <Route exact={true} path='/chat' render={this.chatRender}/>
-                        <Route exact={true} path='/' render={this.chatRender}/>
                         <Route exact={true} path='/users' render={this.usersRender}/>
                         <Route exact={true} path='/groups' render={this.groupsRender}/>
                         <Route exact={true} path='/groups/new' render={this.newGroupRender}/>
@@ -224,6 +223,8 @@ class App extends React.Component<AppProps , IAppState> {
                         <Route exact={true} path='/users/new' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id' render={this.newUserRender}/>
                         <Route exact={true} path='/users/:id/edit' render={this.userEditRender}/>
+                        <Route path='/chat' render={this.chatRender}/>
+                        <Route path='/' render={this.chatRender}/>
                     </Switch>
                 </div>
             </div>
