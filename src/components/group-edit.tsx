@@ -89,20 +89,31 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
         return {
             onClick: async(e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    await stateStoreService.deleteUserFromGroup(rowInfo.original.id, this.state.group.id);
-                    const groupChildrenClone = [...this.state.group.children];
-                    const deletedGroupId = groupChildrenClone.findIndex((child)=>{
-                        return child.id === rowInfo.original.id;
-                    });
-                    groupChildrenClone.splice(deletedGroupId, 1);
-                    this.setState(prevState => {
-                        return{
-                            group:{
-                                ...this.state.group,
-                                children : groupChildrenClone
-                            }
+                    try{
+                        if(rowInfo.original.type === 'user'){
+                            await stateStoreService.deleteUserFromGroup(rowInfo.original.id, this.state.group.id);
                         }
-                    })
+                        else{
+                            await stateStoreService.deleteGroup({id:rowInfo.original.id, name:rowInfo.original.name});
+                        }
+                        const groupChildrenClone = [...this.state.group.children];
+                        const deletedGroupId = groupChildrenClone.findIndex((child)=>{
+                            return child.id === rowInfo.original.id;
+                        });
+                        groupChildrenClone.splice(deletedGroupId, 1);
+                        this.setState(prevState => {
+                            return{
+                                group:{
+                                    ...this.state.group,
+                                    children : groupChildrenClone
+                                }
+                            }
+                        })
+                    }
+                    catch (e) {
+                        // fixme;
+                    }
+
                 }
                 if (handleOriginal) {
                     handleOriginal();

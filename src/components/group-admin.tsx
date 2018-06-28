@@ -22,8 +22,12 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
                     Header: 'ID',
                     accessor: 'id',
                     Cell:(props:any) => (<div className="group-id-trash">
-                        <button className="delete-group-btn"><i className="fa fa-trash"/></button>
-                        <span>{props.value}</span>
+                        {props.value === "0f5383e5-69b8-4611-9f95-fd3bbf851d4a" ?
+                            (<span>{props.value}</span>)
+                            :
+                            (<><button className="delete-group-btn"><i className="fa fa-trash"/></button>
+                                <span>{props.value}</span></>)
+                        }
                     </div>)
                 }, {
                     Header: 'Name',

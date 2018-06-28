@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {ClientError} from "../utils/client-error";
-import IGroup from "../models/group";
+
 const baseDir = path.join(__dirname.replace('dist'+path.sep,''));
 class DB{
     readFile(fileName):Promise<{data:any[]}>{

@@ -21,7 +21,8 @@ export async function deleteUserFromGroup(userId:string, groupId:string){
 }
 
 export async function deleteGroup(group:{id:string, name:string}):Promise<any>{
-    return await remove(`groups/${group.id}`);
+    debugger;
+    return await remove(`/groups/${group.id}`);
 }
 
 export async function createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
@@ -106,6 +107,7 @@ function get(url:string){
 }
 
 function remove(url:string){
+    debugger;
     return fetch(url, {
         method:'DELETE'
     })

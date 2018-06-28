@@ -106,9 +106,12 @@ class GroupsService {
             const connectorsList = yield this.getConnectorsList();
             const groupConnector = this.getGroupConnector(groupId, connectorsList);
             const groups = yield this.getAllGroups();
-            let groupParentDetails = groups.data.find((group) => {
-                return group.id === groupConnector.pId;
-            });
+            let groupParentDetails;
+            if (groupConnector) {
+                groupParentDetails = groups.data.find((group) => {
+                    return group.id === groupConnector.pId;
+                });
+            }
             if (!groupParentDetails) {
                 groupParentDetails = { name: 'No parent', id: "" };
             }

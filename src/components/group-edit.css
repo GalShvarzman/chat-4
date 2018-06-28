@@ -18,7 +18,8 @@
 .children-header{
     color:#483D8B;
     margin-top:1.5em;
-    margin-left:9em;
+    /*margin:auto;*/
+    margin-bottom: 1em;
 }
 
 .edit-group-save-btn, .add-children-btn{
