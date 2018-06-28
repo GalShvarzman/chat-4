@@ -3,6 +3,7 @@ import * as path from 'path';
 import {ClientError} from "../utils/client-error";
 
 const baseDir = path.join(__dirname.replace('dist'+path.sep,''));
+
 class DB{
     readFile(fileName):Promise<{data:any[]}>{
         return new Promise((resolve, reject)=>{
@@ -152,7 +153,5 @@ class DB{
     }
 
 }
-
-
 
 export const db = new DB();

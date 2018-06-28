@@ -8,7 +8,8 @@ import {stateStoreService} from "../state/state-store";
 
 interface IGroupEditProps {
     location: any,
-    saveGroupNewName(group: { name: string, id: string }): { name: string, id: string }
+    saveGroupNewName(group: { name: string, id: string }): { name: string, id: string },
+    deleteGroup(group:{id:string, name:string}):void
 }
 
 interface IGroupEditState {
@@ -68,8 +69,6 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     async componentDidMount(){
         const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}] } = await stateStoreService.getGroupData(this.props.location.state.group.id);
-        debugger;
-
         if(groupData.data[1].groupChildren.length && groupData.data[1].groupChildren[0].type === 'group'){
             this.setState({addNewUserBtnIsHidden : true});
         }
@@ -94,7 +93,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                             await stateStoreService.deleteUserFromGroup(rowInfo.original.id, this.state.group.id);
                         }
                         else{
-                            await stateStoreService.deleteGroup({id:rowInfo.original.id, name:rowInfo.original.name});
+                            await this.props.deleteGroup(rowInfo.original);
                         }
                         const groupChildrenClone = [...this.state.group.children];
                         const deletedGroupId = groupChildrenClone.findIndex((child)=>{

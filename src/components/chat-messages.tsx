@@ -9,21 +9,14 @@ interface IChatMessagesProps {
     loggedInUser: {name:string, id:string}|null
 }
 
-interface IChatMessagesState {
-
-}
-
-class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesState> {
+class ChatMessages extends React.Component<IChatMessagesProps, {}> {
     constructor(props:IChatMessagesProps){
-        super(props)
+        super(props);
     }
 
     public ulWrapper = {
         width: '100%'
     };
-
-
-
 
     public render() {
         let messagesHistory;

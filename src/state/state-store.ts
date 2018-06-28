@@ -1,9 +1,10 @@
-import NTree from '../models/tree';
 import {IMessage} from "../models/message";
-import {messagesDb} from "../models/messages";
-import {MessagesDb} from '../models/messages';
-// import IGroup from "../models/group";
-import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
+import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup,
+    getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails,
+    deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup,
+    getGroupsWithGroupsChildren} from '../server-api';
+import {IClientGroup, IClientUser, ITree} from "../interfaces";
+
 interface IStateStoreService {
     get(key: string): any | null,
     subscribe(listener:any): void,
@@ -36,32 +37,16 @@ export class StateStoreService implements IStateStoreService {
         return StateStore.getInstance()[key] || [];
     }
 
-
-    // public addNewUser(newUser:{name:string, age?:number, password:string}){
-    //     if(StateStore.getInstance().users.isUserExists(newUser.name)){
-    //         return false;
-    //     }
-    //     else{
-    //         StateStore.getInstance().users.addUser(new User(newUser.name, newUser.age!, newUser.password));
-    //         return true;
-    //     }
-    // }
-
-    // public isUserExistInGroup(groupId:string, userId:string){
-    //     const group = StateStore.getInstance().tree;
-    //     group;
-    //     // fixme;
-    //     // return (group as IGroup).isNodeExistInGroup(userId);
-    // }
-
     public async addMessage(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, id: string } | null) {
         if (loggedInUser && selectedId) {
+            let conversationId;
             if (selectedType === 'group') {
-                await addMessage(message, selectedId);
+                conversationId = selectedId;
             }
             else {
-                await addMessage(message, selectedId, loggedInUser.id);
+                conversationId = [selectedId,loggedInUser.id].sort().join("_");
             }
+            await addMessage(message, conversationId);
         }
     }
 
@@ -75,7 +60,7 @@ export class StateStoreService implements IStateStoreService {
             const userIndex = selectedGroup.items.findIndex((item: any) => {
                 return item.id === loggedInUserId
             });
-            return (userIndex !== -1)
+            return (userIndex !== -1);
         }
         else{
             return false;
@@ -89,7 +74,6 @@ export class StateStoreService implements IStateStoreService {
     private flatTreeGetAllGroups(items:any){
         const result:any[] = [];
         items.forEach((item:any)=>{
-            debugger;
             if(item.type === 'group'){
                 result.push(item);
                 if(item.items){
@@ -135,7 +119,7 @@ export class StateStoreService implements IStateStoreService {
         this.onStoreChanged(['groups', 'tree']);
     }
 
-    public async saveUserDetails(user: { name: string, age?: number, password?: string, id: string }): Promise<void> {
+    public async saveUserDetails(user: IClientUser): Promise<void> {
         const updatedUser = await saveUserDetails(user);
         const users = this.get('users');
         const usersClone = [...users];
@@ -149,7 +133,7 @@ export class StateStoreService implements IStateStoreService {
         this.onStoreChanged(['users', 'tree']);
     }
 
-    public async deleteUser(userToDelete: { name: string, age: number, id: string }): Promise<void> {
+    public async deleteUser(userToDelete: IClientUser): Promise<void> {
         await deleteUser(userToDelete);
         const users = this.get('users');
         const usersClone = [...users];
@@ -163,7 +147,7 @@ export class StateStoreService implements IStateStoreService {
         this.onStoreChanged(['users', 'tree']);
     }
 
-    public async deleteGroup(groupToDelete: { id: string, name: string }) {
+    public async deleteGroup(groupToDelete: IClientGroup) {
         await deleteGroup(groupToDelete);
         const groups = this.get('groups');
         const groupsClone = [...groups];
@@ -181,7 +165,7 @@ export class StateStoreService implements IStateStoreService {
         return await getGroupData(groupId);
     }
 
-    public async createNewUser(user: { name: string, age?: number, password: string }): Promise<{ user: { name: string, age: string, id: string } }> {
+    public async createNewUser(user: IClientUser): Promise<{ user: IClientUser }> {
         const newUser = await createNewUser(user);
         const users = this.get('users');
         this._set('users', users.concat([newUser.user]));
@@ -189,7 +173,7 @@ export class StateStoreService implements IStateStoreService {
         return newUser;
     }
 
-    public async createNewGroup(group: { name: string, parent: string }): Promise<{ group: { name: string, id: string } }> {
+    public async createNewGroup(group: { name: string, parent: string }): Promise<{ group: IClientGroup }> {
         const newGroup = await createNewGroup(group);
         const groups = this.get('groups');
         this._set('groups', groups.concat([newGroup]));
@@ -238,18 +222,16 @@ export class StateStoreService implements IStateStoreService {
 }
 
 interface IStateStore {
-    users : any,
-    tree:NTree,
-    messagesDb:MessagesDb,
-    groups:{name:string, id:string}[]
+    users : IClientUser[],
+    tree:ITree,
+    groups:IClientGroup[]
 }
 
 
 class StateStore implements IStateStore {
-    public users:{name:string, age:string, id:string}[];
-    public tree:NTree;
-    public groups:{name:string, id:string}[];
-    public messagesDb:MessagesDb = messagesDb;
+    public users:IClientUser[];
+    public tree:ITree;
+    public groups:IClientGroup[];
 
     static instance: IStateStore;
 

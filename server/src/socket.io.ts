@@ -23,7 +23,6 @@ export default function socket(httpServer){
         socket.on('leave-group', (username, groupId)=>{
             socket.leave(groupId);
             console.log(`username: ${username} left ${groupId}`);
-
         });
 
         socket.on('disconnect', function(){

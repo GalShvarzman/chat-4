@@ -2,6 +2,7 @@ import {IMessage} from "./message";
 import {db} from "../lib/DB";
 
 const messagesFile = 'messages.json';
+
 export class MessagesDb{
 
     async addMessageToConversation(message:IMessage, conversationId){

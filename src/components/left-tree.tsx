@@ -29,22 +29,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         return this.walkTree(this.props.tree.items, 0);
     };
 
-    // static getDerivedStateFromProps(nextProps:any, prevState:any){
-    //     if(nextProps.tree.items){
-    //         return {
-    //             tree : nextProps.tree
-    //         }
-    //     }
-    //     return null;
-    // }
-
-    // componentDidUpdate(prevProps:any, prevState:any, snapshot:any) {
-    //     debugger;
-    //     if(prevProps.tree !== this.props.tree){
-    //         debugger;
-    //     }
-    // }
-
     public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
         const keyName = e.key;
         if(e.target){
@@ -190,10 +174,7 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public shouldComponentUpdate(nextProps:any, nextState:any) {
-        if(nextProps.tree.items){
-            return true;
-        }
-        return false
+        return nextProps.tree.items !== this.props.tree.items;
     };
 
     public padding=(number:number)=>{

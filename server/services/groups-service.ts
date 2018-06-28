@@ -1,6 +1,7 @@
 import {nTree} from "../models/tree";
 import users from '../models/users';
 import Group from "../models/group";
+import IGroup from "../models/group";
 import {messagesDb} from "../models/messages";
 
 interface ITreeGroupObj {
@@ -10,13 +11,19 @@ interface ITreeGroupObj {
     items?:any[]
 }
 
+export interface IConnector {
+    id:string,
+    pId:string,
+    type:string
+}
+
 class GroupsService{
 
-    async getAllGroups():Promise<{data:{name:string, id:string}[]}>{
+    async getAllGroups():Promise<{data:IGroup[]}>{
         return await nTree.getGroups();
     }
 
-    async getGroupsWithGroupsChildren():Promise<{data:{name:string, id:string}[]}>{
+    async getGroupsWithGroupsChildren():Promise<{data:IGroup[]}>{
         const allGroups = await this.getAllGroups();
         const connectorsList = await this.getConnectorsList();
         const groupsConnectors = connectorsList.data.filter((connector)=>{
@@ -132,19 +139,19 @@ class GroupsService{
     }
 
 
-    async getConnectorsList():Promise<{data:{type:string, id:string, pId:string}[]}>{
+    async getConnectorsList():Promise<{data:IConnector[]}>{
        return await nTree.getConnectorsList();
     }
 
-    getGroupConnector(id, connectorsList):{type:string, id:string, pId:string}{
-        return connectorsList.data.find((obj:{type:string, id:string, pId:string})=>{
-            return obj.id === id;
+    getGroupConnector(id, connectorsList):IConnector{
+        return connectorsList.data.find((connector:IConnector)=>{
+            return connector.id === id;
         });
     }
 
     getDirectChildrenConnectors(id, connectorsList){
-        return connectorsList.data.filter((el) => {
-            return el.pId === id;
+        return connectorsList.data.filter((connector) => {
+            return connector.pId === id;
         });
     }
 

@@ -1,19 +1,20 @@
 import {IMessage} from "./models/message";
 import {request} from './utils/request';
+import {IClientGroup, IClientUser} from "./interfaces";
 
 export async function getUsers():Promise<any>{
     return await get('/users');
 }
 
-export async function saveUserDetails(user:{name:string, age?:number, password?:string, id:string}):Promise<any>{
+export async function saveUserDetails(user:IClientUser):Promise<{user:IClientUser}>{
     return await patch(`/users/${user.id}`, user);
 }
 
-export async function saveGroupDetails(group:{name:string, id:string}) {
+export async function saveGroupDetails(group:IClientGroup) {
     return await patch(`/groups/${group.id}`, group);
 }
 
-export async function deleteUser(user:{name:string, age:number, id:string}):Promise<void>{
+export async function deleteUser(user:IClientUser):Promise<void>{
     await remove(`/users/${user.id}`);
 }
 
@@ -25,7 +26,7 @@ export async function deleteGroup(group:{id:string, name:string}):Promise<any>{
     return await remove(`/groups/${group.id}`);
 }
 
-export async function createNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>{
+export async function createNewUser(user:IClientUser):Promise<{user:IClientUser}>{
     return await post('/users', user);
 }
 
@@ -33,7 +34,7 @@ export async function createNewGroup(group:{name:string, parent:string}) {
     return await post('/groups', group);
 }
 
-export async function getGroups():Promise<{data :{name:string, id:string}[]}>{
+export async function getGroups():Promise<{data :IClientGroup[]}>{
    return await get('/groups');
 }
 
@@ -45,7 +46,7 @@ export async function getGroupData(groupId:string):Promise<any>{
     return await get(`/groups/${groupId}`)
 }
 
-export async function getGroupsWithGroupsChildren():Promise<{data :{name:string, id:string}[]}>{
+export async function getGroupsWithGroupsChildren():Promise<{data :IClientGroup[]}>{
     return await get('/groups?groups_with_children=true')
 }
 
@@ -57,7 +58,7 @@ export async function getTree(){
     return await get('/groups?tree=true');
 }
 
-export async function auth(user:any){
+export async function auth(user:IClientUser){
     return await post(`/users?login=true`, user)
 }
 
@@ -65,14 +66,7 @@ export async function getSelectedMessages(selectedId:string){
     return await get(`messages/${selectedId}`)
 }
 
-export async function addMessage(message:IMessage, selectedId:string, userId?:string){
-    let conversationId;
-    if(userId){
-        conversationId = [selectedId,userId].sort().join("_");
-    }
-    else{
-        conversationId = selectedId;
-    }
+export async function addMessage(message:IMessage, conversationId:string){
     return await post(`messages/${conversationId}`, message);
 }
 
@@ -113,5 +107,3 @@ function remove(url:string){
             return result;
         })
 }
-
-

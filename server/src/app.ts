@@ -16,5 +16,4 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 app.use(controllers.errorHandlerController.errorHandler);
 
-
 export default app;

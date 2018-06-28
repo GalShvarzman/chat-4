@@ -11,5 +11,4 @@ usersRouter.get('/', controllers.usersController.getUsers);
 
 usersRouter.post('/', controllers.usersController.createNewUserOrAuth);
 
-
 export default usersRouter;

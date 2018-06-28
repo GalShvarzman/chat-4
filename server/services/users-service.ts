@@ -3,6 +3,7 @@ import {createHash, compareHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
 import {nTree} from "../models/tree";
 import User from "../models/user";
+import IUser from "../models/user";
 import {messagesDb} from "../models/messages";
 
 
@@ -16,7 +17,7 @@ class UsersService{
         return {data:result};
     }
 
-    async saveUserDetails(userDetails:{name:string, age?:number, id:string, password?:string}):Promise<{user:{name:string, age:number, id:string}}> {
+    async saveUserDetails(userDetails:IUser):Promise<{user:{name:string, age:number, id:string}}> {
         const usersData = await users.getUsersFullData();
         const userIndex = users.getUserIndexById(usersData, userDetails.id);
         if (userDetails.age) {
@@ -54,10 +55,10 @@ class UsersService{
         }
     }
 
-    async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{
+    async createNewUser(user):Promise<{user:IUser}>{
         const usersData = await users.getUsersFullData();
         if(await users.isUserExists(usersData, user.name)){
-            throw new ClientError(400, "usernameAlreadyExist") // fixme status??
+            throw new ClientError(422, "usernameAlreadyExist");
         }
         else{
             const newUser = new User(user.name, user.age);
@@ -82,14 +83,13 @@ class UsersService{
                 });
             }
             catch (e) {
-                throw new ClientError(404, "auth failed");
+                throw new ClientError(404, "authFailed");
             }
         }
         else{
-            throw new ClientError(404, "auth failed");
+            throw new ClientError(404, "authFailed");
         }
     }
-
 }
 
 const usersService = new UsersService();

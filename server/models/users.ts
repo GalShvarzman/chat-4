@@ -1,15 +1,14 @@
 import {db} from '../lib/DB';
+import IUser from "./user";
 const usersFile = 'users.json';
 
 export interface IUsers {
     isUserExists(data:any,username:string):boolean,
     deleteUser(username:string):Promise<boolean>,
-    // getUser(userName:string):Promise<IUser>,
-    // getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>,
     updateUsersFile(newData):Promise<boolean>,
-    createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>,
+    createNewUser(user):Promise<{user:IUser}>,
     getUserIndexById(data, id):number,
-    getUsersFullData():Promise<{data:{name:string, age:number, id:string, password:string}[]}>
+    getUsersFullData():Promise<{data:IUser[]}>
 }
 
 class Users implements IUsers{
@@ -22,23 +21,6 @@ class Users implements IUsers{
         return await db.deleteObj(id, usersFile);
     }
 
-    // public async getUser(userName:string){
-    //     const users:{data:any[]} = await this.getUsersList();
-    //     const user = users.data.find((user)=>{
-    //         return user.name === userName;
-    //     });
-    //     if(user){
-    //         return user;
-    //     }
-    //     else{
-    //         throw new Error("No user was Found");
-    //     }
-    // }
-
-    // public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-    //     return await db.getFullData(usersFile);
-    // }
-
     public async updateUsersFile(newData):Promise<boolean>{
         return await db.updateFile(newData, usersFile);
     }
@@ -47,11 +29,11 @@ class Users implements IUsers{
         return db.getObjIndexById(data, id);
     }
 
-    public async createNewUser(user):Promise<{user:{name:string, age:number, id:string}}>{
+    public async createNewUser(user):Promise<{user:IUser}>{
         return await db.createNew(user, usersFile);
     }
 
-    public async getUsersFullData():Promise<{data:{name:string, age:number, id:string, password:string}[]}>{
+    public async getUsersFullData():Promise<{data:IUser[]}>{
         return await db.getFullData(usersFile);
     }
 

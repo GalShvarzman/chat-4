@@ -1,5 +1,4 @@
 import * as bcrypt from 'bcrypt';
-import {ClientError} from "./client-error";
 const saltRounds = 10;
 
 export function createHash(usersPlaintextPassword):Promise<string>{

@@ -42,23 +42,6 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
         }
     }
 
-    // componentWillMount(){
-    //     this.props.refMenu.closeMenu();
-    // }
-
-    // public changeColor=(state:any, rowInfo:any, column:any) => {
-    //     return{
-    //         style: {
-    //             background: rowInfo.row.age > 20 ? "green" : "red"
-    //         }
-    //     }
-    // };
-
-    // private onDelete= (e:React.MouseEvent<HTMLButtonElement>) => {
-    //     debugger;
-    //     this.props.deleteObj(e)
-    // };
-
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
         return {
             onClick: (e:any, handleOriginal:any) => {

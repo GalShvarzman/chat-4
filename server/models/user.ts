@@ -18,43 +18,4 @@ export default class User implements IUser{
         this.age = parseInt(age);
         this.id = uuidv4();
     }
-
-    // public removeParent(parentNode:IGroup){
-    //     if(this.parents.length){
-    //         const i = this.parents.findIndex((parent)=>{
-    //             return parent  === parentNode
-    //         });
-    //         if(i !== -1){
-    //             this.parents.splice(i, 1);
-    //             return true
-    //         }
-    //         else{
-    //             return false;
-    //         }
-    //     }
-    //     return false;
-    // }
-
-    // public updateAge(newAge:number){
-    //     this.age = newAge;
-    //     return true;
-    // }
-    // public updatePassword(newPassword:string){
-    //     this.password = newPassword;
-    //     return true;
-    // }
-    //
-    // public getParentsToPrint(){
-    //     if(this.parents.length){
-    //         return this.parents.map((parent)=>{
-    //             return parent.name;
-    //         })
-    //     }
-    //     return false;
-    // }
-
-    // public auth(enteredPassword:string){
-    //     return enteredPassword === this.password
-    // }
 }
-

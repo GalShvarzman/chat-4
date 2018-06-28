@@ -16,6 +16,7 @@ import NewGroup from "./components/new-group";
 import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
+import {IClientGroup, IClientUser} from "./interfaces";
 
 export const socket =io('http://localhost:4000',{
     transports: ['websocket']
@@ -86,11 +87,11 @@ class App extends React.Component<AppProps , IAppState> {
         }
     };
 
-    public onEditUserDetails = async (user:{name:string, age?:number, password?:string, id:string}) => {
+    public onEditUserDetails = async (user:IClientUser) => {
         await stateStoreService.saveUserDetails(user);
     };
 
-    public saveGroupNewName = async (group:{name:string, id:string}) => {
+    public saveGroupNewName = async (group:IClientGroup) => {
         await stateStoreService.saveGroupDetails(group);
     };
 
@@ -125,7 +126,7 @@ class App extends React.Component<AppProps , IAppState> {
     };
 
 
-    public onSignUpSubmitHandler = async (user:{name:string, age?:number, password:string}):Promise<void> => {
+    public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
         try{
             const result = await stateStoreService.createNewUser(user);
             if(result.user){
@@ -167,14 +168,13 @@ class App extends React.Component<AppProps , IAppState> {
 
     public deleteGroup = async(group:{id:string, name:string}) => {
         await stateStoreService.deleteGroup(group);
-        this.setState({groups: stateStoreService.getGroups()});
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
     public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
 
-    public groupEditRender = (props:any) => (<GroupEdit saveGroupNewName={this.saveGroupNewName} {...props}/>);
+    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} saveGroupNewName={this.saveGroupNewName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
 
@@ -233,5 +233,4 @@ class App extends React.Component<AppProps , IAppState> {
     }
 }
 
-// export default withRouter(App);
 export default withRouter(App);

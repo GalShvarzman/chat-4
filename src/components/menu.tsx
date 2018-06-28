@@ -25,11 +25,9 @@ class Menu extends React.Component<{}, IMenuState> {
     };
 
     closeMenu = (event:any) => {
-        // if (!this.dropDownMenu.contains(event.target)) {
             this.setState({ showMenu: false }, () => {
                 document.removeEventListener('click', this.closeMenu);
             });
-        // }
     };
 
     render() {

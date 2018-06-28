@@ -1,14 +1,13 @@
 import * as React from 'react';
 import Field from "./field";
-import IUser from "../models/user";
 import './user-edit.css';
 import {Link} from "react-router-dom";
+import {IClientUser} from "../interfaces";
 
 interface IUserEditProps {
     location:any,
-    onEditUserDetails(user:IUser):void
+    onEditUserDetails(user:IClientUser):void
 }
-
 
 interface IUserEditState {
     user: {

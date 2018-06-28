@@ -8,9 +8,7 @@ import {stateStoreService} from "../state/state-store";
 import {IMessage} from "../models/message";
 import {Message} from '../models/message';
 import {listItem} from './left-tree';
-
 import {socket} from '../App';
-
 
 interface IChatProps {
     data:{
@@ -44,21 +42,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public getSelectedConversationMessagesHistory = (eventTarget:any) => {
-        if(this.props.data.loggedInUser) {
-            if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI') {
-                // if(eventTarget.type === 'group'){
-                //     if(stateStoreService.isUserExistInGroup(eventTarget.id, this.props.data.loggedInUser.id)){
-                //         this.setStateOnSelected(eventTarget);
-                //     }
-                // }
-                // else{
-                //     this.setStateOnSelected(eventTarget);
-                // } // fixme להציג למשתמש את היסטוריית ההודעות רק כשהוא שייך לקבוצה....
-                this.setStateOnSelected(eventTarget);
-            }
-        }
-        else{
-            alert("You need to login first...")
+        if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI' && this.props.data.loggedInUser) {
+            this.setStateOnSelected(eventTarget);
         }
     };
 
@@ -103,8 +88,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     this.getSelectedMessages(selectedId);
                 }
                 else{
-                    this.setState({selectedMassages : [{id:"71db2xxxx4c6-ee5d-4039-b380-f9fbce0ecd34", message:"The user does not belong to the group and therefore can not see the message history", date:"",sender:{name:"Admin","id":"3693d7ea-ce74-475e-b5ca-12575d5e2b9d999"}}], isAllowedToJoinTheGroup:false})
-
+                    this.setState({selectedMassages : [{id:"71db2xxxx4c6-ee5d-4039-b380-f9fbce0ecd34", message:"You do not belong to this group and therefore you can't see the message history", date:"",sender:{name:"Admin","id":"3693d7ea-ce74-475e-b5ca-12575d5e2b9d999"}}], isAllowedToJoinTheGroup:false});
                 }
             }
         }

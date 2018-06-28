@@ -9,7 +9,6 @@ class MessagesService{
     }
 }
 
-
 const messagesService = new MessagesService();
 
 export default messagesService;
