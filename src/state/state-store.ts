@@ -4,7 +4,6 @@ import {messagesDb} from "../models/messages";
 import {MessagesDb} from '../models/messages';
 // import IGroup from "../models/group";
 import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup, getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails, deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup, getGroupsWithGroupsChildren} from '../server-api';
-
 interface IStateStoreService {
     get(key: string): any | null,
     subscribe(listener:any): void,
@@ -66,30 +65,44 @@ export class StateStoreService implements IStateStoreService {
         }
     }
 
+    public isUserExistInGroup(selectedId:string, loggedInUserId:string){
+        const tree = this.get('tree');
+        const allGroups = this.flatTreeGetAllGroups(tree.items);
+        const selectedGroup = allGroups.find((group)=>{
+            return group.id === selectedId
+        });
+        if(selectedGroup.items) {
+            const userIndex = selectedGroup.items.findIndex((item: any) => {
+                return item.id === loggedInUserId
+            });
+            return (userIndex !== -1)
+        }
+        else{
+            return false;
+        }
+    }
+
     public async getSelectedMessagesHistory(selectedId: string) {
-        // fixme bring only if the user is in this group;
         return await getSelectedMessages(selectedId);
     }
 
-    // public search(id:string|undefined){
-    //     return StateStore.getInstance().tree.search(id);
-    // }
+    private flatTreeGetAllGroups(items:any){
+        const result:any[] = [];
+        items.forEach((item:any)=>{
+            debugger;
+            if(item.type === 'group'){
+                result.push(item);
+                if(item.items){
+                    result.push(...this.flatTreeGetAllGroups(item.items));
+                }
+            }
+        });
+        return result;
+    }
 
     public async auth(user: { name: string, password: string }): Promise<any> {
         return await auth(user);
     }
-
-    // public getUserId(userName:string){
-    //     return StateStore.getInstance().users.getUser(userName).id;
-    // }
-
-    // public walkTree(){
-    //     const tree = StateStore.getInstance().tree;
-    //     debugger;
-    //     const treeToPrint = tree.printFullTree();
-    //     debugger;
-    //     return JSON.stringify(treeToPrint);
-    // }
 
     public getUsers() {
         return StateStore.getInstance().users;
@@ -151,7 +164,6 @@ export class StateStoreService implements IStateStoreService {
     }
 
     public async deleteGroup(groupToDelete: { id: string, name: string }) {
-        debugger;
         await deleteGroup(groupToDelete);
         const groups = this.get('groups');
         const groupsClone = [...groups];

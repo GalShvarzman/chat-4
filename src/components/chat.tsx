@@ -29,13 +29,14 @@ interface IChatState {
     message:IMessage,
     selectedMassages?:IMessage[],
     previousSelectedId?:string,
-    previousSelectedType?:string
+    previousSelectedType?:string,
+    isAllowedToJoinTheGroup : boolean
 }
 
 class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps) {
         super(props);
-            this.state = {message:{message:''}};
+            this.state = {message:{message:''}, isAllowedToJoinTheGroup:false};
     }
 
     public logOut = () => {
@@ -86,21 +87,32 @@ class Chat extends React.Component<IChatProps, IChatState> {
         if(this.state.selectedId && this.props.data.loggedInUser){
             let selectedId;
             const loggedInUserName = this.props.data.loggedInUser.name;
+            const loggedInUserId = this.props.data.loggedInUser.id;
             if(this.state.previousSelectedId){
-                debugger;
                 socket.emit('leave-group', loggedInUserName, this.state.previousSelectedId);
             }
             if(this.state.selectedType === 'user'){
-                selectedId = [this.state.selectedId , this.props.data.loggedInUser.id].sort().join('_');
+                selectedId = [this.state.selectedId , loggedInUserId].sort().join('_');
                 socket.emit('join-group', loggedInUserName, selectedId);
+                this.getSelectedMessages(selectedId);
             }
             else{
                 selectedId = this.state.selectedId;
-                socket.emit('join-group', loggedInUserName, selectedId);
+                if(stateStoreService.isUserExistInGroup(selectedId, loggedInUserId)){
+                    socket.emit('join-group', loggedInUserName, selectedId);
+                    this.getSelectedMessages(selectedId);
+                }
+                else{
+                    this.setState({selectedMassages : [{id:"71db2xxxx4c6-ee5d-4039-b380-f9fbce0ecd34", message:"The user does not belong to the group and therefore can not see the message history", date:"",sender:{name:"Admin","id":"3693d7ea-ce74-475e-b5ca-12575d5e2b9d999"}}], isAllowedToJoinTheGroup:false})
+
+                }
             }
-            const messagesList:any = await stateStoreService.getSelectedMessagesHistory(selectedId);
-            this.setState({selectedMassages:messagesList, message:{message:""}});
         }
+    };
+
+    private getSelectedMessages = async(selectedId:string)=>{
+        const messagesList:any = await stateStoreService.getSelectedMessagesHistory(selectedId);
+        this.setState({selectedMassages:messagesList, message:{message:""}, isAllowedToJoinTheGroup:true});
     };
 
     public handleChange = (event: any):void => {
@@ -175,7 +187,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     <div className="massage-text-area">
                         <MessageTextarea onClickSend={this.onClickSend} message={this.state.message}
                                          selectedName={this.state.selectedName} data={this.props.data}
-                                         handleChange={this.handleChange} keyDownListener={this.keyDownListener}/>
+                                         handleChange={this.handleChange} keyDownListener={this.keyDownListener}
+                                         isAllowedToJoinTheGroup={this.state.isAllowedToJoinTheGroup}/>
                     </div>
                 </div>
             </div>

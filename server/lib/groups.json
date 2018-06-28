@@ -1,16 +1,1 @@
-{
-  "data": [
-    {
-      "name": "root",
-      "id": "0f5383e5-69b8-4611-9f95-fd3bbf851d4a"
-    },
-    {
-      "name": "Friends",
-      "id": "0078aabf-f428-4a43-b3a6-a1519fca6b4b"
-    },
-    {
-      "name": "Best Friends",
-      "id": "6c6a69ea-6b71-4410-b1ae-8169e4edf743"
-    }
-  ]
-}
+{"data":[{"name":"root","id":"0f5383e5-69b8-4611-9f95-fd3bbf851d4a"},{"name":"Friends","id":"0078aabf-f428-4a43-b3a6-a1519fca6b4b"},{"name":"Best Friends","id":"6c6a69ea-6b71-4410-b1ae-8169e4edf743"},{"name":"myGroup1","id":"159e0ae9-2211-4713-be6f-c15a975844b4"}]}

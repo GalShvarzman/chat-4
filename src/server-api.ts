@@ -1,4 +1,5 @@
 import {IMessage} from "./models/message";
+import {request} from './utils/request';
 
 export async function getUsers():Promise<any>{
     return await get('/users');
@@ -21,7 +22,6 @@ export async function deleteUserFromGroup(userId:string, groupId:string){
 }
 
 export async function deleteGroup(group:{id:string, name:string}):Promise<any>{
-    debugger;
     return await remove(`/groups/${group.id}`);
 }
 
@@ -69,7 +69,6 @@ export async function addMessage(message:IMessage, selectedId:string, userId?:st
     let conversationId;
     if(userId){
         conversationId = [selectedId,userId].sort().join("_");
-        debugger;
     }
     else{
         conversationId = selectedId;
@@ -78,7 +77,7 @@ export async function addMessage(message:IMessage, selectedId:string, userId?:st
 }
 
 function post(url:string, body:any){
-    return fetch(url,{
+    return request(url,{
         method:'POST',
         body:JSON.stringify(body),
         headers:{'content-type': 'application/json'}
@@ -89,7 +88,7 @@ function post(url:string, body:any){
 }
 
 function patch(url:string, body:any){
-    return fetch(url, {
+    return request(url, {
         method:'PATCH',
         body:JSON.stringify(body),
         headers:{'content-type': 'application/json'}
@@ -100,18 +99,19 @@ function patch(url:string, body:any){
 }
 
 function get(url:string){
-    return fetch(url)
+    return request(url)
         .then((res)=>{
             return (res.json());
         })
 }
 
 function remove(url:string){
-    debugger;
-    return fetch(url, {
+    return request(url, {
         method:'DELETE'
     })
         .then((result)=>{
             return result;
         })
 }
+
+
