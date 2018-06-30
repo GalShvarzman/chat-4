@@ -149,13 +149,8 @@ export class StateStoreService implements IStateStoreService {
 
     public async deleteGroup(groupToDelete: IClientGroup) {
         await deleteGroup(groupToDelete);
-        const groups = this.get('groups');
-        const groupsClone = [...groups];
-        const groupIndex = groupsClone.findIndex((group) => {
-            return group.id === groupToDelete.id;
-        });
-        groupsClone.splice(groupIndex, 1);
-        this._set('groups', groupsClone);
+        const groups = await getGroups();
+        this._set('groups', groups.data);
         const tree = await getTree();
         this._set('tree', tree);
         this.onStoreChanged(['groups', 'tree']);

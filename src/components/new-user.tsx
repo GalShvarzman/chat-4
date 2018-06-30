@@ -45,7 +45,7 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
             }
         }
         catch(e){
-            this.setState({message:"Something went wrong..."}); // fixme;
+            this.setState({message:"Create user failed"});
         }
     };
 

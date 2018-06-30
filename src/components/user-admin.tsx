@@ -7,11 +7,12 @@ import './user-admin.css';
 interface IUserAdminProps {
     users:any,
     refMenu:any,
-    deleteUser(user:{name: string, age: number, id: string}):void
+    deleteUser(user:{name: string, age: number, id: string}):Promise<void>
 }
 
 interface IUserAdminState {
-    columns:any[]
+    columns:any[],
+    message?:string
 }
 
 class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
@@ -44,9 +45,14 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
         return {
-            onClick: (e:any, handleOriginal:any) => {
+            onClick: async (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    this.props.deleteUser(rowInfo.original)
+                    try {
+                        await this.props.deleteUser(rowInfo.original);
+                    }
+                    catch (e) {
+                        this.setState({message:"Delete user failed"});
+                    }
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -63,6 +69,7 @@ class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
                             defaultPageSize={10} minRows={10} className="users-table" data={this.props.users}
                             columns={this.state.columns}/>
+                <p hidden={!this.state.message}>{this.state.message}</p>
             </>
         )
     }

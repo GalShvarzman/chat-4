@@ -24,7 +24,7 @@ class UsersService{
             usersData.data[userIndex].age = userDetails.age;
         }
         if (userDetails.password) {
-            usersData.data[userIndex].password = await createHash(userDetails.password); // fixme
+            usersData.data[userIndex].password = await createHash(userDetails.password);
         }
         await users.updateUsersFile(usersData);
         return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
@@ -61,8 +61,8 @@ class UsersService{
             throw new ClientError(422, "usernameAlreadyExist");
         }
         else{
-            const newUser = new User(user.name, user.age);
-            newUser.password = await createHash(user.password);
+            const password = await createHash(user.password);
+            const newUser = new User(user.name, user.age, password);
             return await users.createNewUser(newUser);
         }
     }

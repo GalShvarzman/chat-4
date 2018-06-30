@@ -38,7 +38,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     }
 
     public logOut = () => {
-        this.setState({selectedId:"", selectedType:"", selectedName:""})
+        this.setState({selectedId:"", selectedType:"", selectedName:""});
     };
 
     public getSelectedConversationMessagesHistory = (eventTarget:any) => {
@@ -56,7 +56,6 @@ class Chat extends React.Component<IChatProps, IChatState> {
         else{
             previousSelectedId = this.state.selectedId;
         }
-        debugger;
         this.setState({
             selectedName: eventTarget.innerHTML.substr(1),
             selectedId: eventTarget.id,
@@ -120,7 +119,6 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
     componentDidMount(){
         socket.on('msg', (msg:IMessage)=>{
-            debugger;
             this.setState((prevState)=>{
                 return {
                     selectedMassages: [

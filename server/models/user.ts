@@ -8,14 +8,15 @@ export default interface IUser {
 }
 
 export default class User implements IUser{
+    public id:string;
     public name:string;
     public age?:number;
     public password:string;
-    public id:string;
 
-    constructor(username:string, age:string){
+    constructor(username:string, age:string, password){
+        this.id = uuidv4();
         this.name = username;
         this.age = parseInt(age);
-        this.id = uuidv4();
+        this.password = password;
     }
 }

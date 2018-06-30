@@ -6,11 +6,12 @@ import './group-admin.css';
 
 interface IGroupAdminProps {
     groups:{name:string, id:string}[],
-    deleteGroup(group:{id:string, name:string}):void
+    deleteGroup(group:{id:string, name:string}):Promise<void>
 }
 
 interface IGroupAdminState {
-    columns:any[]
+    columns:any[],
+    message?:string
 }
 
 class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
@@ -43,9 +44,14 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
         return {
-            onClick: (e:any, handleOriginal:any) => {
+            onClick: async (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    this.props.deleteGroup(rowInfo.original);
+                    try {
+                        await this.props.deleteGroup(rowInfo.original);
+                    }
+                    catch (e) {
+                        this.setState({message:"Delete group failed"});
+                    }
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -62,6 +68,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
                             defaultPageSize={9} minRows={9} className="groups-table" data={this.props.groups}
                             columns={this.state.columns}/>
+                <p hidden={!this.state.message}>{this.state.message}</p>
             </>
         )
     }

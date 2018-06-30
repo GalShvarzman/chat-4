@@ -25,19 +25,21 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         this.state = {
             users:[],
             columns : [
-                {
-                    Header: 'ID',
-                    accessor: 'id',
-                    Cell:(props:any)=> (<div className="check-box-wrapper"><CheckBox label={props.value} handleCheckboxChange={this.toggleCheckbox}
-                        key={props.value}/>
-                    </div>)
-                }, {
-                    Header: 'Name',
-                    accessor: 'name',
-                }, {
-                    Header: 'Age',
-                    accessor: 'age'
-                }]
+                    {
+                        Header: 'ID',
+                        accessor: 'id',
+                        Cell:(props:any)=> (<div className="check-box-wrapper">
+                            <CheckBox label={props.value} handleCheckboxChange={this.toggleCheckbox}
+                            key={props.value}/>
+                        </div>)
+                    }, {
+                        Header: 'Name',
+                        accessor: 'name',
+                    }, {
+                        Header: 'Age',
+                        accessor: 'age'
+                    }
+                ]
         }
     }
 
@@ -54,15 +56,28 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
     };
 
     async componentDidMount(){
-        const optionalUsers = await stateStoreService.getOptionalUsers(this.props.location.state.group.id);
-        this.setState({users:optionalUsers});
+        try {
+            const optionalUsers = await stateStoreService.getOptionalUsers(this.props.location.state.group.id);
+            this.setState({users: optionalUsers});
+        }
+        catch (e) {
+            this.setState({message:"Failed to fetch users"});
+        }
     }
 
     private handleFormSubmit = async (e:React.MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const selectedUsersIterator = this.selectedUsers.values();
-        await this.props.handelAddUsersToGroup({usersIds:Array.from(selectedUsersIterator), groupId:this.props.location.state.group.id});
-        this.setState({message:'Users added successfully'})
+        try {
+            const selectedUsersIterator = this.selectedUsers.values();
+            await this.props.handelAddUsersToGroup({
+                usersIds: Array.from(selectedUsersIterator),
+                groupId: this.props.location.state.group.id
+            });
+            this.setState({message: 'Users added successfully'})
+        }
+        catch (e) {
+            this.setState({message: 'Adding users to the group failed'});
+        }
     };
 
     render(){

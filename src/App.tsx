@@ -88,71 +88,65 @@ class App extends React.Component<AppProps , IAppState> {
     };
 
     public onEditUserDetails = async (user:IClientUser) => {
-        await stateStoreService.saveUserDetails(user);
+        return await stateStoreService.saveUserDetails(user);
     };
 
     public saveGroupNewName = async (group:IClientGroup) => {
-        await stateStoreService.saveGroupDetails(group);
+        return await stateStoreService.saveGroupDetails(group);
     };
 
-    public onLoginSubmitHandler = async (user:{name:string, password:string})=>{
+    public onLoginSubmitHandler = async (user:{name:string, password:string})=> {
+        try {
             const result = await stateStoreService.auth(user);
-            if(result.message){
-                if(this.state.counter === 2){
-                    this.setState({
-                        loggedInUser: null,
-                        errorMsg: ERROR_MSG.locked
-                    });
-                }
-                else {
-                    this.setState((prev) => ({
-                        loggedInUser: null,
-                        errorMsg: ERROR_MSG.credentials,
-                        counter: this.state.counter + 1
-                    }));
-                }
-            }
-            else{
+            this.setState({
+                loggedInUser: {name: result.name, id: result.id},
+            }, () => {
+                socket.emit('login', result.name);
+                this.props.history.push('/chat');
+            })
+        }
+        catch (e) {
+            if (this.state.counter === 2) {
                 this.setState({
-                    loggedInUser: {name: result.name, id:result.id},
-                    errorMsg: ERROR_MSG.allGood
-                }, ()=>{
-                    console.log("user" , result);
-                    socket.emit('login', result.name);
-
-                    this.props.history.push('/chat');
-                })
+                    loggedInUser: null,
+                    errorMsg: ERROR_MSG.locked
+                });
             }
+            else {
+                this.setState((prevState) => ({
+                    loggedInUser: null,
+                    errorMsg: ERROR_MSG.credentials,
+                    counter: this.state.counter + 1
+                }));
+            }
+        }
     };
-
 
     public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
         try{
             const result = await stateStoreService.createNewUser(user);
-            if(result.user){
-                this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
-                    socket.emit('login', result.user.name);
-                    this.props.history.push('/chat');
-                });
-            }
-            else{
-                this.setState({errorMsg: ERROR_MSG.credentials})
-            }
+            this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
+                socket.emit('login', result.user.name);
+                this.setState({errorMsg: ERROR_MSG.none})
+                this.props.history.push('/chat');
+            });
         }
         catch(e){
-            this.setState({errorMsg: ERROR_MSG.fail})
+            this.setState({errorMsg: ERROR_MSG.credentials})
         }
     };
 
     public loginRender = (props:any)=> (<Login {...props} data={this.state}
                                                loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
 
-    public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg} onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg}
+                                                onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat tree={this.state.tree} ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat tree={this.state.tree}
+                                              ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
 
     public logOut = () => {
-        this.setState({loggedInUser:null, redirectToChat:false, errorMsg: ERROR_MSG.none});
+        this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
         this.chatMessagesChild.logOut();
     };
 
@@ -163,18 +157,19 @@ class App extends React.Component<AppProps , IAppState> {
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
     public  deleteUser = async(user:{name: string, age: number, id: string}):Promise<void> => {
-        await stateStoreService.deleteUser(user);
+        return await stateStoreService.deleteUser(user);
     };
 
     public deleteGroup = async(group:{id:string, name:string}) => {
-        await stateStoreService.deleteGroup(group);
+        return await stateStoreService.deleteGroup(group);
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
     public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
 
-    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} saveGroupNewName={this.saveGroupNewName} {...props}/>);
+    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup}
+                                                        saveGroupNewName={this.saveGroupNewName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
 

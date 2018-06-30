@@ -6,8 +6,7 @@ import {IClientUser} from "../interfaces";
 
 interface IUserEditProps {
     location:any,
-    onEditUserDetails(user:IClientUser):void
-}
+    onEditUserDetails(user:IClientUser):Promise<void>}
 
 interface IUserEditState {
     user: {
@@ -32,8 +31,13 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
     }
 
     public save = async () => {
-        await this.props.onEditUserDetails(this.state.user);
-        this.setState({message:"Users details updated successfully"});
+        try{
+            await this.props.onEditUserDetails(this.state.user);
+            this.setState({message:"Users details updated successfully"});
+        }
+        catch (e) {
+            this.setState({message:"Update user details failed"});
+        }
     };
 
     public updateField = (fieldName: string, value: string) => {
@@ -58,12 +62,10 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
                     <button className="edit-user-save-btn" type="button" onClick={this.save}>Save</button>
                     <p hidden={!this.state.message}>{this.state.message}</p>
-
                 </div>
             </div>
         )
     }
-
 }
 
 export default UserEdit;

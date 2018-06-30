@@ -66,7 +66,7 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
             this.setState({message: "Group created successfully", groupsWithGroupsChildren:this.state.groupsWithGroupsChildren.concat([group])});
         }
         catch(e){
-            this.setState({message:"Something went wrong..."}); // fixme;
+            this.setState({message:"Create group failed"});
         }
     };
 

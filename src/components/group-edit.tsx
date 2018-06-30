@@ -8,7 +8,7 @@ import {stateStoreService} from "../state/state-store";
 
 interface IGroupEditProps {
     location: any,
-    saveGroupNewName(group: { name: string, id: string }): { name: string, id: string },
+    saveGroupNewName(group: { name: string, id: string }): Promise<{ name: string, id: string }>,
     deleteGroup(group:{id:string, name:string}):void
 }
 
@@ -52,8 +52,13 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     }
 
     public save = async () => {
-        await this.props.saveGroupNewName({id:this.state.group.id, name:this.state.group.name});
-        this.setState({message:"Group updated successfully"});
+        try {
+            await this.props.saveGroupNewName({id: this.state.group.id, name: this.state.group.name});
+            this.setState({message: "Group updated successfully"});
+        }
+        catch (e) {
+            this.setState({message: "Update Group name failed"});
+        }
     };
 
     public updateField = (fieldName: string, value: string) => {
@@ -68,6 +73,10 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     };
 
     async componentDidMount(){
+       this.getGroupData();
+    }
+
+    async getGroupData(){
         const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}] } = await stateStoreService.getGroupData(this.props.location.state.group.id);
         if(groupData.data[1].groupChildren.length && groupData.data[1].groupChildren[0].type === 'group'){
             this.setState({addNewUserBtnIsHidden : true});
@@ -81,7 +90,6 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                 }
             }
         });
-
     }
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
@@ -110,9 +118,8 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                         })
                     }
                     catch (e) {
-                        // fixme;
+                        this.setState({message:"Delete failed"});
                     }
-
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -133,7 +140,6 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     </p>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
                     <button onClick={this.save} className="edit-group-save-btn" type="button">Save</button>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
                     <div>
                         <p className="parent-wrapper">
                             <span className="parent">Parent:</span><span className="parent-name">
@@ -143,10 +149,11 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                         <div className="children-wrapper">
                             {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group.id}/add-users`, state:{group:this.state.group}}}><button className="add-children-btn">Add users to group</button></Link>}
                             <h2 className="children-header">Children</h2>
-                            <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={5}
-                                        minRows={5} className="children-table" data={this.state.group.children}
+                            <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={4}
+                                        minRows={4} className="children-table" data={this.state.group.children}
                                         columns={this.state.columns}/>
                         </div>
+                        <p hidden={!this.state.message}>{this.state.message}</p>
                     </div>
                 </div>
             </div>

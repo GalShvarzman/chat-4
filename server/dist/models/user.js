@@ -2,10 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuidv4 = require("uuid/v4");
 class User {
-    constructor(username, age) {
+    constructor(username, age, password) {
+        this.id = uuidv4();
         this.name = username;
         this.age = parseInt(age);
-        this.id = uuidv4();
+        this.password = password;
     }
 }
 exports.default = User;

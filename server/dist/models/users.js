@@ -19,21 +19,6 @@ class Users {
             return yield DB_1.db.deleteObj(id, usersFile);
         });
     }
-    // public async getUser(userName:string){
-    //     const users:{data:any[]} = await this.getUsersList();
-    //     const user = users.data.find((user)=>{
-    //         return user.name === userName;
-    //     });
-    //     if(user){
-    //         return user;
-    //     }
-    //     else{
-    //         throw new Error("No user was Found");
-    //     }
-    // }
-    // public async getUsersList():Promise<{data:{name:string, age:number, id:string}[]}>{
-    //     return await db.getFullData(usersFile);
-    // }
     updateUsersFile(newData) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield DB_1.db.updateFile(newData, usersFile);

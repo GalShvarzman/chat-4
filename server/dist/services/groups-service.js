@@ -139,13 +139,13 @@ class GroupsService {
         });
     }
     getGroupConnector(id, connectorsList) {
-        return connectorsList.data.find((obj) => {
-            return obj.id === id;
+        return connectorsList.data.find((connector) => {
+            return connector.id === id;
         });
     }
     getDirectChildrenConnectors(id, connectorsList) {
-        return connectorsList.data.filter((el) => {
-            return el.pId === id;
+        return connectorsList.data.filter((connector) => {
+            return connector.pId === id;
         });
     }
     deleteUserFromGroup(groupId, userId) {

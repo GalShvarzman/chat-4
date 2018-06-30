@@ -32,7 +32,7 @@ class UsersService {
                 usersData.data[userIndex].age = userDetails.age;
             }
             if (userDetails.password) {
-                usersData.data[userIndex].password = yield hash_1.createHash(userDetails.password); // fixme
+                usersData.data[userIndex].password = yield hash_1.createHash(userDetails.password);
             }
             yield users_1.default.updateUsersFile(usersData);
             return ({ user: { name: usersData.data[userIndex].name, age: usersData.data[userIndex].age, id: usersData.data[userIndex].id } });
@@ -66,11 +66,11 @@ class UsersService {
         return __awaiter(this, void 0, void 0, function* () {
             const usersData = yield users_1.default.getUsersFullData();
             if (yield users_1.default.isUserExists(usersData, user.name)) {
-                throw new client_error_1.ClientError(400, "usernameAlreadyExist"); // fixme status??
+                throw new client_error_1.ClientError(422, "usernameAlreadyExist");
             }
             else {
-                const newUser = new user_1.default(user.name, user.age);
-                newUser.password = yield hash_1.createHash(user.password);
+                const password = yield hash_1.createHash(user.password);
+                const newUser = new user_1.default(user.name, user.age, password);
                 return yield users_1.default.createNewUser(newUser);
             }
         });
@@ -92,11 +92,11 @@ class UsersService {
                     });
                 }
                 catch (e) {
-                    throw new client_error_1.ClientError(404, "auth failed");
+                    throw new client_error_1.ClientError(404, "authFailed");
                 }
             }
             else {
-                throw new client_error_1.ClientError(404, "auth failed");
+                throw new client_error_1.ClientError(404, "authFailed");
             }
         });
     }
