@@ -4,7 +4,7 @@ import {Switch, Route, Link} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
 import SignUp from "./components/sign-up";
-import {stateStoreService} from "./state/state-store";
+import {stateStoreService} from "./state/store";
 import Chat from "./components/chat";
 import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
@@ -17,6 +17,7 @@ import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
+import { connect } from 'react-redux'
 
 export const socket =io('http://localhost:4000',{
     transports: ['websocket']
@@ -30,23 +31,26 @@ export enum ERROR_MSG{
     fail
 }
 
-const changeOptions = {
-    'users' : stateStoreService.getUsers.bind(stateStoreService),
-    'groups' : stateStoreService.getGroups.bind(stateStoreService),
-    'tree' : stateStoreService.getTree.bind(stateStoreService)
-};
+// const changeOptions = {
+//     'users' : stateStoreService.getUsers.bind(stateStoreService),
+//     'groups' : stateStoreService.getGroups.bind(stateStoreService),
+//     'tree' : stateStoreService.getTree.bind(stateStoreService)
+// };
 
 interface IAppState {
     loggedInUser: {name:string, id:string} | null,
     errorMsg: ERROR_MSG,
     counter: number,
-    users:{name:string, age:string, id:string}[],
-    groups:{name:string, id:string}[],
-    tree:listItem[],
-    [key: string] : any
+    // [key: string] : any
 }
 
-type AppProps = RouteComponentProps<{}> & {};
+interface IAppProps {
+    tree:listItem[],
+    users:IClientUser[],
+    groups:IClientGroup[]
+}
+
+type AppProps = RouteComponentProps<{}> & IAppProps;
 
 class App extends React.Component<AppProps , IAppState> {
     public chatMessagesChild:any;
@@ -58,34 +62,35 @@ class App extends React.Component<AppProps , IAppState> {
         this.state = {
             loggedInUser: null,
             errorMsg: ERROR_MSG.none,
-            counter: 0,
-            users: [],
-            groups:[],
-            tree:[]
+            counter: 0
         };
 
     }
 
-    componentWillMount(){
-        stateStoreService.subscribe(this.onSubscribe);
-    }
+    // shouldComponentUpdate(nextProps:IAppProps, nextState:IAppState) {
+    //     return nextProps.tree !== this.props.tree
+    // }
 
-    componentWillUnmount(){
-        stateStoreService.unsubscribe(this.onSubscribe);
-    };
-
-    componentDidMount(){
-        this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups')})
-    }
-
-    private onSubscribe = async (event:{changed:string[]}) => {
-        if(event.changed){
-            event.changed.forEach((change)=>{
-                const result  = changeOptions[change]();
-                this.setState({[change]:result});
-            })
-        }
-    };
+    // componentWillMount(){
+    //     stateStoreService.subscribe(this.onSubscribe);
+    // }
+    //
+    // componentWillUnmount(){
+    //     stateStoreService.unsubscribe(this.onSubscribe);
+    // };
+    //
+    // componentDidMount(){
+    //     this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups')})
+    // }
+    //
+    // private onSubscribe = async (event:{changed:string[]}) => {
+    //     if(event.changed){
+    //         event.changed.forEach((change)=>{
+    //             const result  = changeOptions[change]();
+    //             this.setState({[change]:result});
+    //         })
+    //     }
+    // };
 
     public onEditUserDetails = async (user:IClientUser) => {
         return await stateStoreService.saveUserDetails(user);
@@ -127,7 +132,7 @@ class App extends React.Component<AppProps , IAppState> {
             const result = await stateStoreService.createNewUser(user);
             this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
                 socket.emit('login', result.user.name);
-                this.setState({errorMsg: ERROR_MSG.none})
+                this.setState({errorMsg: ERROR_MSG.none});
                 this.props.history.push('/chat');
             });
         }
@@ -136,23 +141,23 @@ class App extends React.Component<AppProps , IAppState> {
         }
     };
 
-    public loginRender = (props:any)=> (<Login {...props} data={this.state}
-                                               loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any)=> (<Login {...props} loginStatus={this.state.errorMsg}
+                                               onSubmit={this.onLoginSubmitHandler}/>);
 
     public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg}
                                                 onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat tree={this.state.tree}
-                                              ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat ref={(instance:any) => {this.chatMessagesChild = instance}} {...props}
+                                              data={this.state}/>);
 
     public logOut = () => {
         this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
         this.chatMessagesChild.logOut();
     };
 
-    public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.state.users}/>);
+    public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
 
-    public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.state.groups}/>);
+    public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
@@ -228,4 +233,23 @@ class App extends React.Component<AppProps , IAppState> {
     }
 }
 
-export default withRouter(App);
+const mapStateToProps = (state:any, ownProps:any) => {
+    return {
+        tree: state.tree,
+        users:state.users,
+        groups:state.groups
+    }
+};
+
+const mapDispatchToProps = (dispatch:any, ownProps:any) => {
+    return {
+        // onAdd: (msg:string) => {
+        //     dispatch()
+        // }
+    }
+};
+
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App));

@@ -3,7 +3,7 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css'
 import CheckBox from './checkbox';
 import {Link} from "react-router-dom";
-import {stateStoreService} from "../state/state-store";
+import {stateStoreService} from "../state/store";
 import './select-users.css';
 
 interface ISelectUsersProps {

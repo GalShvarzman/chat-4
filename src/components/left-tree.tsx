@@ -174,7 +174,10 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     };
 
     public shouldComponentUpdate(nextProps:any, nextState:any) {
-        return nextProps.tree.items !== this.props.tree.items;
+        if(nextProps.tree !== undefined){
+            return nextProps.tree !== this.props.tree;
+        }
+        return false;
     };
 
     public padding=(number:number)=>{

@@ -4,6 +4,64 @@ import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup,
     deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup,
     getGroupsWithGroupsChildren} from '../server-api';
 import {IClientGroup, IClientUser, ITree} from "../interfaces";
+import { applyMiddleware, createStore } from 'redux';
+import thunk from 'redux-thunk';
+
+const initialState:{} = {
+    tree:[],
+    users:[],
+    groups:[],
+    selectedMessages:[]
+};
+
+function reducer (state:any, action:any){
+    if(action.type == "SET_TREE"){
+        return setTree(state, action.tree);
+    }
+    if(action.type == "SET_GROUPS"){
+        return setGroups(state, action.groups);
+    }
+    if(action.type == "SET_USERS"){
+        return setUsers(state, action.users);
+    }
+    if(action.type == "SET_SELECTED_MESSAGES"){
+        debugger;
+        return setSelectedMessages(state, action.messages);
+    }
+
+    return state;
+}
+
+function setTree(state:any, tree:{}[]){
+    return{
+        ...state,
+        tree
+    }
+}
+
+function setGroups(state:any, groups:{}[]){
+    return{
+        ...state,
+        groups
+    }
+}
+
+function setUsers(state:any, users:{}[]){
+    return{
+        ...state,
+        users
+    }
+}
+
+function setSelectedMessages(state:any, selectedMessages:any[]){
+    return{
+        ...state,
+        selectedMessages
+    }
+}
+
+export const store = createStore(reducer, initialState, applyMiddleware(thunk));
+
 
 interface IStateStoreService {
     get(key: string): any | null,
@@ -37,18 +95,7 @@ export class StateStoreService implements IStateStoreService {
         return StateStore.getInstance()[key] || [];
     }
 
-    public async addMessage(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, id: string } | null) {
-        if (loggedInUser && selectedId) {
-            let conversationId;
-            if (selectedType === 'group') {
-                conversationId = selectedId;
-            }
-            else {
-                conversationId = [selectedId,loggedInUser.id].sort().join("_");
-            }
-            await addMessage(message, conversationId);
-        }
-    }
+
 
     public isUserExistInGroup(selectedId:string, loggedInUserId:string){
         const tree = this.get('tree');
@@ -67,9 +114,8 @@ export class StateStoreService implements IStateStoreService {
         }
     }
 
-    public async getSelectedMessagesHistory(selectedId: string) {
-        return await getSelectedMessages(selectedId);
-    }
+
+
 
     private flatTreeGetAllGroups(items:any){
         const result:any[] = [];

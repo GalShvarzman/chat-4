@@ -4,11 +4,21 @@ import App from './App';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter} from 'react-router-dom';
+import {store} from './state/store';
+import {loadGroups, loadTree, loadUsers} from "./state/actions";
+import {Provider} from "react-redux";
+
+
+store.dispatch(loadTree());
+store.dispatch(loadUsers());
+store.dispatch(loadGroups());
 
 ReactDOM.render(
-    <BrowserRouter>
-            <App />
-    </BrowserRouter>,
+    <Provider store={store}>
+        <BrowserRouter>
+                <App />
+        </BrowserRouter>
+    </Provider>,
   document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();

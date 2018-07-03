@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import './new-user.css';
 import './new-group.css';
 import Select from "./select";
-import {stateStoreService} from "../state/state-store";
+import {stateStoreService} from "../state/store";
 
 interface INewGroupProps {
     history:any;

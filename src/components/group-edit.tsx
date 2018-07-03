@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-edit.css';
-import {stateStoreService} from "../state/state-store";
+import {stateStoreService} from "../state/store";
 
 interface IGroupEditProps {
     location: any,

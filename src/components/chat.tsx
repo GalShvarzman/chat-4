@@ -4,11 +4,13 @@ import ChatMessages from "./chat-messages";
 import MessageTextarea from "./message-textarea";
 import './chat.css';
 import {ERROR_MSG} from "../App";
-import {stateStoreService} from "../state/state-store";
+import {stateStoreService} from "../state/store";
 import {IMessage} from "../models/message";
 import {Message} from '../models/message';
 import {listItem} from './left-tree';
 import {socket} from '../App';
+import {addMessageToConversation, getSelectedMessagesHistory} from "../state/actions";
+import {connect} from "react-redux";
 
 interface IChatProps {
     data:{
@@ -17,7 +19,10 @@ interface IChatProps {
         counter: number,
         redirect:boolean
     },
-    tree:listItem[]
+    tree:listItem[],
+    onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, id:string}):void,
+    onSelectConversation(selectedId:string):Promise<void>,
+    selectedMessages:IMessage[]
 }
 
 interface IChatState {
@@ -25,7 +30,7 @@ interface IChatState {
     selectedId?:string,
     selectedType?:string,
     message:IMessage,
-    selectedMassages?:IMessage[],
+    selectedMessages:IMessage[],
     previousSelectedId?:string,
     previousSelectedType?:string,
     isAllowedToJoinTheGroup : boolean
@@ -34,7 +39,11 @@ interface IChatState {
 class Chat extends React.Component<IChatProps, IChatState> {
     constructor(props:IChatProps) {
         super(props);
-            this.state = {message:{message:''}, isAllowedToJoinTheGroup:false};
+            this.state = {
+                message:{message:''},
+                isAllowedToJoinTheGroup:false,
+                selectedMessages:this.props.selectedMessages
+            };
     }
 
     public logOut = () => {
@@ -67,6 +76,15 @@ class Chat extends React.Component<IChatProps, IChatState> {
         });
     };
 
+    static getDerivedStateFromProps(nextProps:IChatProps, prevState:IChatState) {
+        if (prevState.selectedMessages !== nextProps.selectedMessages) {
+            return {
+                selectedMessages: nextProps.selectedMessages,
+            };
+        }
+        return null;
+    }
+
     private getSelectedMessageHistory = async() => {
         if(this.state.selectedId && this.props.data.loggedInUser){
             let selectedId;
@@ -87,15 +105,15 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     this.getSelectedMessages(selectedId);
                 }
                 else{
-                    this.setState({selectedMassages : [{id:"71db2xxxx4c6-ee5d-4039-b380-f9fbce0ecd34", message:"You do not belong to this group and therefore you can't see the message history", date:"",sender:{name:"Admin","id":"3693d7ea-ce74-475e-b5ca-12575d5e2b9d999"}}], isAllowedToJoinTheGroup:false});
+                    this.setState({isAllowedToJoinTheGroup:false});
                 }
             }
         }
     };
 
     private getSelectedMessages = async(selectedId:string)=>{
-        const messagesList:any = await stateStoreService.getSelectedMessagesHistory(selectedId);
-        this.setState({selectedMassages:messagesList, message:{message:""}, isAllowedToJoinTheGroup:true});
+        await this.props.onSelectConversation(selectedId);
+        this.setState({message:{message:""}, isAllowedToJoinTheGroup:true});
     };
 
     public handleChange = (event: any):void => {
@@ -121,8 +139,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
         socket.on('msg', (msg:IMessage)=>{
             this.setState((prevState)=>{
                 return {
-                    selectedMassages: [
-                        ...prevState.selectedMassages, msg
+                    selectedMessages: [
+                        ...prevState.selectedMessages, msg
                     ]
                 }
             })
@@ -143,11 +161,11 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 conversationId = this.state.selectedId;
             }
             socket.emit('msg', conversationId, this.state.message);
-            await stateStoreService.addMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
+            await this.props.onAddMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
             this.setState((prevState)=>{
                 return{
-                    selectedMassages:[
-                        ...prevState.selectedMassages, this.state.message
+                    selectedMessages:[
+                        ...prevState.selectedMessages, this.state.message
                     ],
                     message:{message:""}
                 }
@@ -164,7 +182,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 <div className="chat-right">
                     <div className="massages">
                         <ChatMessages loggedInUser={this.props.data.loggedInUser} selectedName={this.state.selectedName}
-                                      messages={this.state.selectedMassages}/>
+                                      messages={this.state.selectedMessages}/>
                     </div>
                     <div className="massage-text-area">
                         <MessageTextarea onClickSend={this.onClickSend} message={this.state.message}
@@ -178,4 +196,25 @@ class Chat extends React.Component<IChatProps, IChatState> {
     }
 }
 
-export default Chat;
+
+const mapStateToProps = (state:any, ownProps:any) => {
+    return {
+        tree:state.tree,
+        selectedMessages:state.selectedMessages
+    }
+};
+
+const mapDispatchToProps = (dispatch:any, ownProps:any) => {
+    return {
+        onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:{name:string, id:string}) => {
+            dispatch(addMessageToConversation(selectedType, selectedId, msg, loggedInUser))
+        },
+        onSelectConversation:(selectedId:string)=>{
+            dispatch(getSelectedMessagesHistory(selectedId));
+        }
+    }
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps)(Chat);
