@@ -11,19 +11,22 @@ import {listItem} from './left-tree';
 import {socket} from '../App';
 import {addMessageToConversation, getSelectedMessagesHistory} from "../state/actions";
 import {connect} from "react-redux";
+import {IClientUser} from "../interfaces";
 
 interface IChatProps {
-    data:{
-        loggedInUser: {name:string, id:string} | null,
-        errorMsg: ERROR_MSG,
-        counter: number,
-        redirect:boolean
-    },
+    // data:{
+    //     loggedInUser: {name:string, id:string} | null,
+    //     errorMsg: ERROR_MSG,
+    //     counter: number,
+    //     redirect:boolean
+    // },
     tree:listItem[],
     onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, id:string}):void,
     onSelectConversation(selectedId:string):Promise<void>,
-    selectedMessages:IMessage[]
+    selectedMessages:IMessage[],
+    loggedInUser:{name:string, id:string}
 }
+
 
 interface IChatState {
     selectedName? : string,
@@ -36,7 +39,9 @@ interface IChatState {
     isAllowedToJoinTheGroup : boolean
 }
 
-class Chat extends React.Component<IChatProps, IChatState> {
+class Chat extends React.PureComponent<IChatProps, IChatState> {
+    public messagesRef:any;
+
     constructor(props:IChatProps) {
         super(props);
             this.state = {
@@ -44,6 +49,11 @@ class Chat extends React.Component<IChatProps, IChatState> {
                 isAllowedToJoinTheGroup:false,
                 selectedMessages:this.props.selectedMessages
             };
+        this.messagesRef = React.createRef();
+    }
+
+    componentDidUpdate(){
+        this.messagesRef.current.scrollTop = 9999999;
     }
 
     public logOut = () => {
@@ -51,7 +61,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public getSelectedConversationMessagesHistory = (eventTarget:any) => {
-        if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI' && this.props.data.loggedInUser) {
+        if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI' && this.props.loggedInUser) {
             this.setStateOnSelected(eventTarget);
         }
     };
@@ -60,7 +70,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         let previousSelectedId;
         const previousSelectedType = this.state.selectedType;
         if(previousSelectedType === "user"){
-            previousSelectedId = [this.state.selectedId, this.props.data.loggedInUser.id].sort().join("_");
+            previousSelectedId = [this.state.selectedId, this.props.loggedInUser.id].sort().join("_");
         }
         else{
             previousSelectedId = this.state.selectedId;
@@ -86,10 +96,10 @@ class Chat extends React.Component<IChatProps, IChatState> {
     }
 
     private getSelectedMessageHistory = async() => {
-        if(this.state.selectedId && this.props.data.loggedInUser){
+        if(this.state.selectedId && this.props.loggedInUser){
             let selectedId;
-            const loggedInUserName = this.props.data.loggedInUser.name;
-            const loggedInUserId = this.props.data.loggedInUser.id;
+            const loggedInUserName = this.props.loggedInUser.name;
+            const loggedInUserId = this.props.loggedInUser.id;
             if(this.state.previousSelectedId){
                 socket.emit('leave-group', loggedInUserName, this.state.previousSelectedId);
             }
@@ -111,6 +121,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         }
     };
 
+
     private getSelectedMessages = async(selectedId:string)=>{
         await this.props.onSelectConversation(selectedId);
         this.setState({message:{message:""}, isAllowedToJoinTheGroup:true});
@@ -121,7 +132,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public keyDownListener = (event:any) => {
-        if(this.props.data.loggedInUser && this.state.selectedName && this.state.message.message.trimLeft().length){
+        if(this.props.loggedInUser && this.state.selectedName && this.state.message.message.trimLeft().length){
             if(event.keyCode == 10 || event.keyCode == 13){
                 event.preventDefault();
                 this.addMessage();
@@ -130,7 +141,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public onClickSend = (event:React.MouseEvent<HTMLButtonElement>) => {
-        if(this.props.data.loggedInUser && this.state.selectedName){
+        if(this.props.loggedInUser && this.state.selectedName){
             this.addMessage();
         }
     };
@@ -152,16 +163,16 @@ class Chat extends React.Component<IChatProps, IChatState> {
     }
 
     public addMessage = ()=>{
-        this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.data.loggedInUser)}, async()=>{
+        this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.loggedInUser)}, async()=>{
             let conversationId;
             if(this.state.selectedType === "user"){
-                conversationId = [this.props.data.loggedInUser.id, this.state.selectedId].sort().join("_");
+                conversationId = [this.props.loggedInUser.id, this.state.selectedId].sort().join("_");
             }
             else{
                 conversationId = this.state.selectedId;
             }
             socket.emit('msg', conversationId, this.state.message);
-            await this.props.onAddMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.data.loggedInUser);
+            await this.props.onAddMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.loggedInUser);
             this.setState((prevState)=>{
                 return{
                     selectedMessages:[
@@ -180,13 +191,13 @@ class Chat extends React.Component<IChatProps, IChatState> {
                     <LeftTree tree={this.props.tree} getSelected={this.getSelectedConversationMessagesHistory}/>
                 </div>
                 <div className="chat-right">
-                    <div className="massages">
-                        <ChatMessages loggedInUser={this.props.data.loggedInUser} selectedName={this.state.selectedName}
+                    <div ref={this.messagesRef} className="massages">
+                        <ChatMessages loggedInUser={this.props.loggedInUser} selectedName={this.state.selectedName}
                                       messages={this.state.selectedMessages}/>
                     </div>
                     <div className="massage-text-area">
                         <MessageTextarea onClickSend={this.onClickSend} message={this.state.message}
-                                         selectedName={this.state.selectedName} data={this.props.data}
+                                         selectedName={this.state.selectedName} loggedInUser={this.props.loggedInUser}
                                          handleChange={this.handleChange} keyDownListener={this.keyDownListener}
                                          isAllowedToJoinTheGroup={this.state.isAllowedToJoinTheGroup}/>
                     </div>
@@ -200,7 +211,8 @@ class Chat extends React.Component<IChatProps, IChatState> {
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
         tree:state.tree,
-        selectedMessages:state.selectedMessages
+        selectedMessages:state.selectedMessages,
+        loggedInUser : state.loggedInUser
     }
 };
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router';
+import {withRouter, RouteComponentProps, Redirect} from 'react-router';
 import {Switch, Route, Link} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
@@ -18,6 +18,7 @@ import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import { connect } from 'react-redux'
+import {authUser, saveGroupNewName, saveUserNewDetails} from "./state/actions";
 
 export const socket =io('http://localhost:4000',{
     transports: ['websocket']
@@ -38,38 +39,30 @@ export enum ERROR_MSG{
 // };
 
 interface IAppState {
-    loggedInUser: {name:string, id:string} | null,
-    errorMsg: ERROR_MSG,
-    counter: number,
-    // [key: string] : any
+
 }
 
 interface IAppProps {
-    tree:listItem[],
-    users:IClientUser[],
-    groups:IClientGroup[]
+    tree: listItem[],
+    users: IClientUser[],
+    groups: IClientGroup[],
+    loggedInUser:IClientUser,
+    loginErrorMsg:string | null,
+    updateErrorMsg: string | null,
+    onEditUserDetails(user: IClientUser): IClientUser,
+    onEditGroupName(group:IClientGroup):void,
+    onAuthUser(user:{name:string,password:string}):IClientUser
 }
 
 type AppProps = RouteComponentProps<{}> & IAppProps;
 
-class App extends React.Component<AppProps , IAppState> {
+class App extends React.PureComponent<AppProps , IAppState> {
     public chatMessagesChild:any;
     public menu:any;
 
     constructor(props: AppProps) {
         super(props);
-
-        this.state = {
-            loggedInUser: null,
-            errorMsg: ERROR_MSG.none,
-            counter: 0
-        };
-
     }
-
-    // shouldComponentUpdate(nextProps:IAppProps, nextState:IAppState) {
-    //     return nextProps.tree !== this.props.tree
-    // }
 
     // componentWillMount(){
     //     stateStoreService.subscribe(this.onSubscribe);
@@ -93,38 +86,15 @@ class App extends React.Component<AppProps , IAppState> {
     // };
 
     public onEditUserDetails = async (user:IClientUser) => {
-        return await stateStoreService.saveUserDetails(user);
+        return await this.props.onEditUserDetails(user);
     };
 
-    public saveGroupNewName = async (group:IClientGroup) => {
-        return await stateStoreService.saveGroupDetails(group);
+    public onEditGroupName = async (group:IClientGroup) => {
+        this.props.onEditGroupName(group);
     };
 
     public onLoginSubmitHandler = async (user:{name:string, password:string})=> {
-        try {
-            const result = await stateStoreService.auth(user);
-            this.setState({
-                loggedInUser: {name: result.name, id: result.id},
-            }, () => {
-                socket.emit('login', result.name);
-                this.props.history.push('/chat');
-            })
-        }
-        catch (e) {
-            if (this.state.counter === 2) {
-                this.setState({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.locked
-                });
-            }
-            else {
-                this.setState((prevState) => ({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.credentials,
-                    counter: this.state.counter + 1
-                }));
-            }
-        }
+        this.props.onAuthUser(user);
     };
 
     public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
@@ -141,11 +111,10 @@ class App extends React.Component<AppProps , IAppState> {
         }
     };
 
-    public loginRender = (props:any)=> (<Login {...props} loginStatus={this.state.errorMsg}
-                                               onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any) => this.props.loggedInUser ? (<Redirect to={'/chat'}/>) :
+        (<Login {...props} onSubmit={this.onLoginSubmitHandler} loginErrorMsg={this.props.loginErrorMsg}/>);
 
-    public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg}
-                                                onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=>(<SignUp {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat ref={(instance:any) => {this.chatMessagesChild = instance}} {...props}
                                               data={this.state}/>);
@@ -173,8 +142,8 @@ class App extends React.Component<AppProps , IAppState> {
 
     public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
 
-    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup}
-                                                        saveGroupNewName={this.saveGroupNewName} {...props}/>);
+    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} updateErrorMsg={this.props.updateErrorMsg}
+                                                        saveGroupNewName={this.onEditGroupName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
 
@@ -205,10 +174,10 @@ class App extends React.Component<AppProps , IAppState> {
                     <div className="nav-right">
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
-                    <div hidden={!this.state.loggedInUser} className='nav-right'>
+                    <div hidden={!this.props.loggedInUser} className='nav-right'>
                         <div className="app-logged-in">You are logged in as:
                             <span className='logged-in-name'>
-                                {this.state.loggedInUser ? this.state.loggedInUser.name : ""}
+                                {this.props.loggedInUser ? this.props.loggedInUser.name : ""}
                             </span>
                         </div>
                     </div>
@@ -237,15 +206,24 @@ const mapStateToProps = (state:any, ownProps:any) => {
     return {
         tree: state.tree,
         users:state.users,
-        groups:state.groups
+        groups:state.groups,
+        loggedInUser:state.loggedInUser,
+        loginErrorMsg:state.loginErrorMsg,
+        updateErrorMsg: state.updateErrorMsg
     }
 };
 
 const mapDispatchToProps = (dispatch:any, ownProps:any) => {
     return {
-        // onAdd: (msg:string) => {
-        //     dispatch()
-        // }
+        onEditUserDetails: (user:IClientUser) => {
+            dispatch(saveUserNewDetails(user))
+        },
+        onEditGroupName: (group:IClientGroup) => {
+            dispatch(saveGroupNewName(group))
+        },
+        onAuthUser: (user:{name:string, password:string}) => {
+            dispatch(authUser(user))
+        }
     }
 };
 

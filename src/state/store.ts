@@ -7,11 +7,26 @@ import {IClientGroup, IClientUser, ITree} from "../interfaces";
 import { applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
 
+interface IState {
+    tree:any[],
+    users:IClientUser[],
+    groups:IClientGroup[],
+    selectedMessages:IMessage[],
+    loggedInUser:IClientUser,
+    loginErrorMsg:string,
+    updateErrorMsg:string,
+    updatedGroup:IClientGroup
+}
+
 const initialState:{} = {
     tree:[],
     users:[],
     groups:[],
-    selectedMessages:[]
+    selectedMessages:[],
+    loggedInUser:null,
+    loginErrorMsg:null,
+    updatedGroup:null,
+    updateErrorMsg:null
 };
 
 function reducer (state:any, action:any){
@@ -25,51 +40,116 @@ function reducer (state:any, action:any){
         return setUsers(state, action.users);
     }
     if(action.type == "SET_SELECTED_MESSAGES"){
-        debugger;
         return setSelectedMessages(state, action.messages);
     }
-
+    if(action.type == "UPDATE_USERS_AFTER_EDIT_USER_DETAILS"){
+        return updateUsersAfterEditUserDetails(state, action.user);
+    }
+    if(action.type == "UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME"){
+        return updateGroupsAfterEditGroupName(state, action.group, action.updateErrorMsg);
+    }
+    if(action.type == "USER_AFTER_AUTH"){
+        return userAfterAuth(state, action.loggedInUser, action.loginErrorMsg);
+    }
+    if(action.type == "USER_AUTH_FAILED"){
+        return afterAuthFailed(state, action.loginErrorMsg)
+    }
+    if(action.type == "UPDATE_FAILED"){
+        return updateDetailsFailed(state, action.updateErrorMsg)
+    }
     return state;
 }
 
-function setTree(state:any, tree:{}[]){
+function setTree(state:IState, tree:{}[]){
     return{
         ...state,
         tree
     }
 }
 
-function setGroups(state:any, groups:{}[]){
+function setGroups(state:IState, groups:{}[]){
     return{
         ...state,
         groups
     }
 }
 
-function setUsers(state:any, users:{}[]){
+function setUsers(state:IState, users:{}[]){
     return{
         ...state,
         users
     }
 }
 
-function setSelectedMessages(state:any, selectedMessages:any[]){
+function setSelectedMessages(state:IState, selectedMessages:any[]){
     return{
         ...state,
         selectedMessages
     }
 }
 
+function updateUsersAfterEditUserDetails(state:IState, updatedUser:any){
+    const users = state.users;
+    const usersClone = [...users];
+    const userIndex = usersClone.findIndex((user) => {
+        return user.id === updatedUser.user.id;
+    });
+    usersClone[userIndex] = updatedUser.user;
+    return{
+        ...state,
+        users : usersClone
+    }
+}
+
+function updateGroupsAfterEditGroupName(state:IState, updatedGroup:any, updateErrorMsg:string){
+    const groups = state.groups;
+    const groupsClone = [...groups];
+    const groupIndex = groupsClone.findIndex((group) => {
+        return group.id === updatedGroup.group.id;
+    });
+    groupsClone[groupIndex] = updatedGroup.group;
+    return{
+        ...state,
+        groups : groupsClone,
+        updatedGroup,
+        updateErrorMsg
+    }
+    // const tree = await getTree();
+    // this._set('tree', tree);
+}
+
+function userAfterAuth(state:IState, loggedInUser:IClientUser, loginErrorMsg:string){
+    return {
+        ...state,
+        loggedInUser,
+        loginErrorMsg
+    }
+}
+
+function afterAuthFailed(state:IState, loginErrorMsg:string){
+    return{
+        ...state,
+        loginErrorMsg
+    }
+}
+
+function updateDetailsFailed(state:IState, updateErrorMsg:string){
+    return{
+        ...state,
+        updateErrorMsg
+    }
+}
+
 export const store = createStore(reducer, initialState, applyMiddleware(thunk));
 
 
-interface IStateStoreService {
-    get(key: string): any | null,
-    subscribe(listener:any): void,
-    unsubscribe(listener:any):void
-}
+// interface IStateStoreService {
+//     get(key: string): any | null,
+//     subscribe(listener:any): void,
+//     unsubscribe(listener:any):void
+// }
 
-export class StateStoreService implements IStateStoreService {
+export class StateStoreService {
     listeners: Function[];
 
     constructor() {
@@ -99,6 +179,7 @@ export class StateStoreService implements IStateStoreService {
 
     public isUserExistInGroup(selectedId:string, loggedInUserId:string){
         const tree = this.get('tree');
+        debugger;
         const allGroups = this.flatTreeGetAllGroups(tree.items);
         const selectedGroup = allGroups.find((group)=>{
             return group.id === selectedId
@@ -130,9 +211,7 @@ export class StateStoreService implements IStateStoreService {
         return result;
     }
 
-    public async auth(user: { name: string, password: string }): Promise<any> {
-        return await auth(user);
-    }
+
 
     public getUsers() {
         return StateStore.getInstance().users;
@@ -151,33 +230,9 @@ export class StateStoreService implements IStateStoreService {
         return result.data;
     }
 
-    public async saveGroupDetails(group: { name: string, id: string }) {
-        const updatedGroup = await saveGroupDetails(group);
-        const groups = this.get('groups');
-        const groupsClone = [...groups];
-        const groupIndex = groupsClone.findIndex((group) => {
-            return group.id === updatedGroup.group.id;
-        });
-        groupsClone[groupIndex] = updatedGroup.group;
-        this._set('groups', groupsClone);
-        const tree = await getTree();
-        this._set('tree', tree);
-        this.onStoreChanged(['groups', 'tree']);
-    }
 
-    public async saveUserDetails(user: IClientUser): Promise<void> {
-        const updatedUser = await saveUserDetails(user);
-        const users = this.get('users');
-        const usersClone = [...users];
-        const userIndex = usersClone.findIndex((user) => {
-            return user.id === updatedUser.user.id;
-        });
-        usersClone[userIndex] = updatedUser.user;
-        this._set('users', usersClone);
-        const tree = await getTree();
-        this._set('tree', tree);
-        this.onStoreChanged(['users', 'tree']);
-    }
+
+
 
     public async deleteUser(userToDelete: IClientUser): Promise<void> {
         await deleteUser(userToDelete);

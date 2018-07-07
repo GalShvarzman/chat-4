@@ -8,8 +8,9 @@ import {stateStoreService} from "../state/store";
 
 interface IGroupEditProps {
     location: any,
-    saveGroupNewName(group: { name: string, id: string }): Promise<{ name: string, id: string }>,
-    deleteGroup(group:{id:string, name:string}):void
+    saveGroupNewName(group: { name: string, id: string }): void,
+    deleteGroup(group:{id:string, name:string}):void,
+    updateErrorMsg:string
 }
 
 interface IGroupEditState {
@@ -19,7 +20,6 @@ interface IGroupEditState {
         children?:any[],
         parent?:string
     },
-    message?:string,
     columns:any[],
     addNewUserBtnIsHidden:boolean
 }
@@ -51,21 +51,15 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     }
 
-    public save = async () => {
-        try {
-            await this.props.saveGroupNewName({id: this.state.group.id, name: this.state.group.name});
-            this.setState({message: "Group updated successfully"});
-        }
-        catch (e) {
-            this.setState({message: "Update Group name failed"});
-        }
+    public save = () => {
+        this.props.saveGroupNewName({id: this.state.group.id, name: this.state.group.name});
     };
 
     public updateField = (fieldName: string, value: string) => {
         this.setState(prevState => {
             return {
                 group: {
-                    ...this.state.group,
+                    ...prevState.group,
                     [fieldName]: value
                 }
             }
@@ -118,7 +112,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                         })
                     }
                     catch (e) {
-                        this.setState({message:"Delete failed"});
+                        //this.setState({message:"Delete failed"});
                     }
                 }
                 if (handleOriginal) {
@@ -153,7 +147,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                                         minRows={4} className="children-table" data={this.state.group.children}
                                         columns={this.state.columns}/>
                         </div>
-                        <p hidden={!this.state.message}>{this.state.message}</p>
+                        <p hidden={!this.props.updateErrorMsg}>{this.props.updateErrorMsg}</p>
                     </div>
                 </div>
             </div>
