@@ -7,7 +7,7 @@ import './user-admin.css';
 interface IUserAdminProps {
     users:any,
     refMenu:any,
-    deleteUser(user:{name: string, age: number, id: string}):Promise<void>
+    deleteUser(user:{name: string, age: number, _id: string}):Promise<void>
 }
 
 interface IUserAdminState {
@@ -15,28 +15,28 @@ interface IUserAdminState {
     message?:string
 }
 
-class UserAdmin extends React.Component<IUserAdminProps, IUserAdminState>{
+class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
     constructor(props:IUserAdminProps){
         super(props);
         this.state = {
             columns : [
                 {
                     Header: 'ID',
-                    accessor: 'id',
+                    accessor: '_id',
                     Cell:(props:any)=> (<div className="user-id-trash"><button className="delete-user-btn">
                                             <i className="fa fa-trash"/></button><span>{props.value}</span></div>)
                 }, {
                     Header: 'Name',
                     accessor: 'name',
                     Cell: (props: any) => (<Link className="user-name"
-                                                 to={{pathname: `/users/${props.original.id}/edit`,
+                                                 to={{pathname: `/users/${props.original._id}/edit`,
                                                      state:{user:props.original}}}>{props.value}
                                            </Link>)
                 }, {
                     Header: 'Age',
                     accessor: 'age',
                     Cell: (props: any) => (<Link className="user-age"
-                                                 to={{pathname: `/users/${props.original.id}/edit`,
+                                                 to={{pathname: `/users/${props.original._id}/edit`,
                                                      state:{user:props.original}}}>{props.value}
                                            </Link>)
                 }]

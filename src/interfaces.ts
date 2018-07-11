@@ -1,13 +1,15 @@
 export interface IClientUser {
+    id?:string,
     name:string,
     age?:string | number,
-    id?:string,
     password?:string
 }
 
 export interface IClientGroup {
+    id:string,
     name:string,
-    id:string
+    children?:IClientUser|IClientGroup[],
+    parentId?:string
 }
 
 export interface ITree {

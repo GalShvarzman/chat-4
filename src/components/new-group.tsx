@@ -8,30 +8,30 @@ import {stateStoreService} from "../state/store";
 
 interface INewGroupProps {
     history:any;
-    onCreateNewGroup(group:{name:string, parent:string}):{name:string, id:string}
+    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, id:string}
 }
 
 interface INewGroupState {
-    group: {name: string, parent:string},
+    group: {name: string, parentId:string},
     message?:string,
     groupsWithGroupsChildren:{name:string, id:string}[]
 }
 
-class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
+class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
     constructor(props:INewGroupProps){
         super(props);
         this.state = {
-            group: {name: '', parent: 'select'},
+            group: {name: '', parentId: 'select'},
             groupsWithGroupsChildren:[]
         };
     }
 
-    public handleSelect = (parent:any) => {
+    public handleSelect = (parentId:any) => {
         this.setState((prevState)=>{
             return{
                 group:{
                     name:prevState.group.name,
-                    parent: parent
+                    parentId
                 }
             }
         })
@@ -42,14 +42,14 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
         this.setState(prevState => {
             return {
                 group: {
-                    ...this.state.group,
+                    ...prevState.group,
                     [fieldName]: value
                 }
             }
         })
     };
 
-    private getOptions= async ()=>{
+    private getOptions = async ()=>{
         const groupsWithGroupsChildren = await stateStoreService.getOptionalGroupParents();
         this.setState({groupsWithGroupsChildren});
     };
@@ -78,11 +78,11 @@ class NewGroup extends React.Component<INewGroupProps,INewGroupState>{
                     <h2 className='new-group-header'>Create new group</h2>
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
                     <div className="new-group-select-parent">Parent</div>
-                    <Select parent={this.state.group.parent} handleSelect={this.handleSelect}
+                    <Select parent={this.state.group.parentId} handleSelect={this.handleSelect}
                             groups={this.state.groupsWithGroupsChildren}/>
                     <p hidden={!this.state.message}>{this.state.message}</p>
                     <button onClick={this.onCreateNewGroup} className="create-new-group-btn"
-                            disabled={!this.state.group.name || this.state.group.parent == "select"} type="button">Create</button>
+                            disabled={!this.state.group.name || this.state.group.parentId == "select"} type="button">Create</button>
                 </div>
             </>
         )

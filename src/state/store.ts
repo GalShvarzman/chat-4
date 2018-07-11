@@ -57,6 +57,9 @@ function reducer (state:any, action:any){
     if(action.type == "UPDATE_FAILED"){
         return updateDetailsFailed(state, action.updateErrorMsg)
     }
+    if(action.type == "SET_LOGGED_IN_USER"){
+        return updateLoggedInUser(state, null);
+    }
     return state;
 }
 
@@ -140,6 +143,13 @@ function updateDetailsFailed(state:IState, updateErrorMsg:string){
     }
 }
 
+function updateLoggedInUser(state:IState, loggedInUser:null){
+    return {
+        ...state,
+        loggedInUser
+    }
+}
+
 export const store = createStore(reducer, initialState, applyMiddleware(thunk));
 
 
@@ -154,18 +164,18 @@ export class StateStoreService {
 
     constructor() {
         this.listeners = [];
-        this.init()
+        //this.init()
     }
 
-    private async init() {
-        return Promise.all([getGroups(), getUsers(), getTree()])
-            .then((results) => {
-                this._set('groups', results[0].data);
-                this._set('users', results[1].data);
-                this._set('tree', results[2]);
-                this.onStoreChanged(['users', 'groups', 'tree']);
-            })
-    }
+    // private async init() {
+    //     return Promise.all([getGroups()])
+    //         .then((results) => {
+    //             this._set('groups', results[0]);
+    //             this._set('users', results[1].data);
+    //             // this._set('tree', results[2]);
+    //             this.onStoreChanged(['users', 'groups']);
+    //         })
+    // }
 
     private _set(key: string, val: any) {
         StateStore.getInstance()[key] = val;
@@ -226,8 +236,7 @@ export class StateStoreService {
     }
 
     async getOptionalGroupParents() {
-        const result = await getGroupsWithGroupsChildren();
-        return result.data;
+        return await getGroupsWithGroupsChildren();
     }
 
 
@@ -248,10 +257,10 @@ export class StateStoreService {
         this.onStoreChanged(['users', 'tree']);
     }
 
-    public async deleteGroup(groupToDelete: IClientGroup) {
+    public async deleteGroup(groupToDelete: any) {
         await deleteGroup(groupToDelete);
         const groups = await getGroups();
-        this._set('groups', groups.data);
+        this._set('groups', groups);
         const tree = await getTree();
         this._set('tree', tree);
         this.onStoreChanged(['groups', 'tree']);

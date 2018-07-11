@@ -23,7 +23,7 @@ class MessageListItem extends React.Component<IMessageListItemProps, {}> {
                 <div className={"message-text "+ className}>
                     <div className="user-name" hidden={this.props.message.sender!.id === this.props.loggedInUser!.id}>{this.props.message.sender ? this.props.message.sender.name : ""}</div>
                     {this.props.message.message}
-                    <div className="message-date">{this.props.message.date}</div>
+                    <div className="message-date">{this.props.message.date.toLocaleString().slice(0, -3)}</div>
                 </div>
             </li>
         );

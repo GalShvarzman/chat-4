@@ -9,7 +9,7 @@ import {loadGroups, loadTree, loadUsers} from "./state/actions";
 import {Provider} from "react-redux";
 
 
-store.dispatch(loadTree());
+//store.dispatch(loadTree());
 store.dispatch(loadUsers());
 store.dispatch(loadGroups());
 

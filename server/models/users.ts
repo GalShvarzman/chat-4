@@ -1,14 +1,14 @@
 import {db} from '../lib/DB';
-import IUser from "./user";
+import IUserDocument from "./user";
 const usersFile = 'users.json';
 
 export interface IUsers {
     isUserExists(data:any,username:string):boolean,
     deleteUser(username:string):Promise<boolean>,
     updateUsersFile(newData):Promise<boolean>,
-    createNewUser(user):Promise<{user:IUser}>,
+    createNewUser(user):Promise<{user:IUserDocument}>,
     getUserIndexById(data, id):number,
-    getUsersFullData():Promise<{data:IUser[]}>
+    getUsersFullData():Promise<{data:IUserDocument[]}>
 }
 
 class Users implements IUsers{
@@ -29,11 +29,11 @@ class Users implements IUsers{
         return db.getObjIndexById(data, id);
     }
 
-    public async createNewUser(user):Promise<{user:IUser}>{
+    public async createNewUser(user):Promise<{user:IUserDocument}>{
         return await db.createNew(user, usersFile);
     }
 
-    public async getUsersFullData():Promise<{data:IUser[]}>{
+    public async getUsersFullData():Promise<{data:IUserDocument[]}>{
         return await db.getFullData(usersFile);
     }
 

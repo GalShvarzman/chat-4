@@ -18,7 +18,7 @@ interface IGroupEditState {
         name:string,
         id:string,
         children?:any[],
-        parent?:string
+        parentId?:any
     },
     columns:any[],
     addNewUserBtnIsHidden:boolean
@@ -30,20 +30,20 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
         this.state = {
             group:{
                 name:props.location.state.group.name,
-                id:props.location.state.group.id
+                id:props.location.state.group._id
             },
             columns : [
                 {
                     Header: 'ID',
-                    accessor: 'id',
+                    accessor: 'childId._id',
                     Cell:(props:any)=> (<div className="delete-child-btn"><button className="delete-child-btn"><i className="fa fa-trash"/></button><span>{props.value}</span></div>)
                 }, {
                     Header: 'Name',
-                    accessor: 'name',
+                    accessor: 'childId.name',
                 },
                 {
-                    Header: 'Type',
-                    accessor: 'type',
+                    Header: 'Kind',
+                    accessor: 'kind',
                 }],
 
             addNewUserBtnIsHidden:false
@@ -71,16 +71,17 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     }
 
     async getGroupData(){
-        const groupData:{data:[{groupParent:{name:string, id:string}},{groupChildren:any[]}] } = await stateStoreService.getGroupData(this.props.location.state.group.id);
-        if(groupData.data[1].groupChildren.length && groupData.data[1].groupChildren[0].type === 'group'){
+        const groupData = await stateStoreService.getGroupData(this.state.group.id);
+
+        if(groupData.children.length && groupData.children[0].kind === 'Group'){
             this.setState({addNewUserBtnIsHidden : true});
         }
         this.setState(prevState=>{
             return{
                 group:{
                     ...prevState.group,
-                    children:groupData.data[1].groupChildren,
-                    parent:groupData.data[0].groupParent.name + " " + groupData.data[0].groupParent.id
+                    children:groupData.children,
+                    parentId:groupData.parentId
                 }
             }
         });
@@ -92,7 +93,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                 if(e.target.className === "fa fa-trash"){
                     try{
                         if(rowInfo.original.type === 'user'){
-                            await stateStoreService.deleteUserFromGroup(rowInfo.original.id, this.state.group.id);
+                            await stateStoreService.deleteUserFromGroup(rowInfo.original._id, this.state.group.id);
                         }
                         else{
                             await this.props.deleteGroup(rowInfo.original);
@@ -137,7 +138,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                     <div>
                         <p className="parent-wrapper">
                             <span className="parent">Parent:</span><span className="parent-name">
-                            {this.state.group.parent}
+                                {this.state.group.parentId ? (this.state.group.parentId.name + " " + this.state.group.parentId._id) : ("No Parent")}
                             </span>
                         </p>
                         <div className="children-wrapper">

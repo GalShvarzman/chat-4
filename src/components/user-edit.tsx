@@ -18,14 +18,14 @@ interface IUserEditState {
     message?:string
 }
 
-class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
+class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
     constructor(props:IUserEditProps){
         super(props);
         this.state = {
             user:{
                 name:props.location.state.user.name,
                 age:props.location.state.user.age,
-                id:props.location.state.user.id
+                id:props.location.state.user._id
             }
         }
     }
@@ -44,7 +44,7 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
         this.setState(prevState => {
             return {
                 user: {
-                    ...this.state.user,
+                    ...prevState.user,
                     [fieldName]: value
                 }
             }

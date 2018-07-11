@@ -1,92 +1,116 @@
-import users from '../models/users';
 import {createHash, compareHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
-import {nTree} from "../models/tree";
-import User from "../models/user";
-import IUser from "../models/user";
-import {messagesDb} from "../models/messages";
+import {IUser, User} from "../models/user";
+import IUserDocument from "../models/user";
+import {Group} from "../models/group";
 
 
 class UsersService{
 
-    async getAllUsers():Promise<{data:{name:string, age:number, id:string}[]}>{
-        const usersList =  await users.getUsersFullData();
-        const result = usersList.data.map((user)=>{
-            return {"name":user.name, "age":user.age, "id":user.id}
-        });
-        return {data:result};
+    async getAllUsers():Promise<IUser[]>{
+        return await User.find({}, {password:0, __v:0});
+        // const usersList =  await users.getUsersFullData();
+        // const result = usersList.data.map((user)=>{
+        //     return {"name":user.name, "age":user.age, "id":user.id}
+        // });
+        // return {result};
     }
 
-    async saveUserDetails(userDetails:IUser):Promise<{user:{name:string, age:number, id:string}}> {
-        const usersData = await users.getUsersFullData();
-        const userIndex = users.getUserIndexById(usersData, userDetails.id);
-        if (userDetails.age) {
-            usersData.data[userIndex].age = userDetails.age;
+    async saveUserDetails(userDetails:IUserDocument):Promise<{user:{name:string, age:number, id:string}}> {
+        const newAge = userDetails.age;
+        const newPassword = await createHash(userDetails.password);
+        const user = await User.findOne({_id:userDetails.id});
+        if (newAge) {
+            user["age"] = newAge;
         }
-        if (userDetails.password) {
-            usersData.data[userIndex].password = await createHash(userDetails.password);
+        if (newPassword) {
+            user["password"] = newPassword;
         }
-        await users.updateUsersFile(usersData);
-        return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
+        const updateUser = await user.save();
+
+        return ({user:{id:updateUser._id, name:updateUser["name"], age:updateUser["age"]}});
+
+
+        // const usersData = await users.getUsersFullData();
+        // const userIndex = users.getUserIndexById(usersData, userDetails.id);
+        // if (userDetails.age) {
+        //     usersData.data[userIndex].age = userDetails.age;
+        // }
+        // if (userDetails.password) {
+        //     usersData.data[userIndex].password =
+        // }
+        // await users.updateUsersFile(usersData);
+        // return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
     }
 
 
     async deleteUser(id):Promise<void>{
-        await users.deleteUser(id);
-        const connectorsList = await nTree.getConnectorsList();
-        connectorsList.data = connectorsList.data.filter((connector)=>{
-            return connector.id !== id;
-        });
-        nTree.updateFile(connectorsList, 'connectors.json');
-        const allMessages = await messagesDb.getAllMessages();
-        const allMessagesKeysArr = Object.keys(allMessages.data);
-        const matchConversationKeys = [];
-
-        allMessagesKeysArr.forEach((key)=>{
-            if (key.includes(id)){
-                matchConversationKeys.push(key);
+        // fixme delete also user message history;
+        await User.findByIdAndRemove(id);
+        const allGroups = await Group.find({}, {__v:0, parentId:0});
+        const promises = allGroups.map(async(group)=>{
+            if(group["children"].length > 0 && group["children"][0].kind === "User"){
+                const child = group["children"].find((child)=>{
+                    return child.childId.toString() === id;
+                });
+                if(child !== undefined){
+                    await Group.update({_id:group._id}, {$pull: {children: {childId: child.childId}}});
+                }
             }
+            return group;
         });
-        if(matchConversationKeys.length){
-            matchConversationKeys.forEach((key)=>{
-                delete allMessages.data[key];
-            });
-            await messagesDb.updateMessagesFile(allMessages);
-        }
+        await Promise.all(promises);
+
+        // await users.deleteUser(id);
+        // const connectorsList = await nTree.getConnectorsList();
+        // connectorsList.data = connectorsList.data.filter((connector)=>{
+        //     return connector.id !== id;
+        // });
+        // nTree.updateFile(connectorsList, 'connectors.json');
+        // const allMessages = await messagesDb.getAllMessages();
+        // const allMessagesKeysArr = Object.keys(allMessages.data);
+        // const matchConversationKeys = [];
+        //
+        // allMessagesKeysArr.forEach((key)=>{
+        //     if (key.includes(id)){
+        //         matchConversationKeys.push(key);
+        //     }
+        // });
+        // if(matchConversationKeys.length){
+        //     matchConversationKeys.forEach((key)=>{
+        //         delete allMessages.data[key];
+        //     });
+        //     await messagesDb.updateMessagesFile(allMessages);
+        // }
     }
 
-    async createNewUser(user):Promise<{user:IUser}>{
-        const usersData = await users.getUsersFullData();
-        if(await users.isUserExists(usersData, user.name)){
-            throw new ClientError(422, "usernameAlreadyExist");
-        }
-        else{
-            const password = await createHash(user.password);
-            const newUser = new User(user.name, user.age, password);
-            return await users.createNewUser(newUser);
-        }
+    async createNewUser(user){
+        user.password = await createHash(user.password);
+        const newUser = await new User(user);
+        await newUser.save();
+        return ({id: newUser._id, name: newUser["name"], age: newUser["age"]});
+
+        // const usersData = await users.getUsersFullData();
+        // if(await users.isUserExists(usersData, user.name)){
+        //     throw new ClientError(422, "usernameAlreadyExist");
+        // }
+        // else{
+        //     const newUser = new User(user.name, user.age, password);
+        //     return await users.createNewUser(newUser);
+        // }
     }
 
     async authUser(userToAuth) {
-        const usersList = await users.getUsersFullData();
-        const userIndex = usersList.data.findIndex((user) => {
-            return user.name === userToAuth.name;
-        });
-        if (userIndex !== -1) {
-            const userDetails = usersList.data[userIndex];
-            try {
-                await compareHash(userToAuth.password, userDetails.password);
-                return ({
-                    id: userDetails.id,
-                    name: userDetails.name,
-                    age: userDetails.age
-                });
-            }
-            catch (e) {
-                throw new ClientError(404, "authFailed");
-            }
+        try {
+            const userModel = await User.findOne({name:userToAuth.name}, {__v:0});
+            await compareHash(userToAuth.password, userModel.password);
+            return ({
+                id: userModel._id,
+                name: userModel.name,
+                age: userModel.age
+            });
         }
-        else{
+        catch (e) {
             throw new ClientError(404, "authFailed");
         }
     }

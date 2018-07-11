@@ -39,14 +39,14 @@ export function loadTree():any{
 export function loadUsers():any{
     return async (dispatch:Dispatch) => {
         const users = await getUsers();
-        dispatch(setUsers(users.data));
+        dispatch(setUsers(users));
     }
 }
 
 export function loadGroups():any{
     return async (dispatch:Dispatch) => {
         const groups = await getGroups();
-        dispatch(setGroups(groups.data));
+        dispatch(setGroups(groups));
     }
 }
 
@@ -58,7 +58,7 @@ export function saveUserNewDetails(user: IClientUser){
 }
 
 
-export function saveGroupNewName(group: { name: string, id: string }) {
+export function saveGroupNewName(group: { name: string, id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
@@ -80,6 +80,12 @@ export function authUser(user: { name: string, password: string }) {
         catch (e) {
             dispatch(afterAuthUserFailed("Username or password are wrong"));
         }
+    }
+}
+
+export function logOut(){
+    return {
+        type:'SET_LOGGED_IN_USER'
     }
 }
 

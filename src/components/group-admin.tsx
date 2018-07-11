@@ -6,7 +6,7 @@ import './group-admin.css';
 
 interface IGroupAdminProps {
     groups:{name:string, id:string}[],
-    deleteGroup(group:{id:string, name:string}):Promise<void>
+    deleteGroup(group:{_id:string, name:string}):Promise<void>
 }
 
 interface IGroupAdminState {
@@ -14,16 +14,16 @@ interface IGroupAdminState {
     message?:string
 }
 
-class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
+class GroupAdmin extends React.PureComponent<IGroupAdminProps,IGroupAdminState>{
     constructor(props:IGroupAdminProps){
         super(props);
         this.state = {
             columns : [
                 {
                     Header: 'ID',
-                    accessor: 'id',
+                    accessor: '_id',
                     Cell:(props:any) => (<div className="group-id-trash">
-                        {props.value === "0f5383e5-69b8-4611-9f95-fd3bbf851d4a" ?
+                        {props.value === "5b45f2306bf29f4108dcbed6" ?
                             (<span>{props.value}</span>)
                             :
                             (<><button className="delete-group-btn"><i className="fa fa-trash"/></button>
@@ -34,7 +34,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
                     Header: 'Name',
                     accessor: 'name',
                     Cell: (props: any) => (
-                        <Link className="group-name" to={{pathname: `/groups/${props.original.id}/edit`,
+                        <Link className="group-name" to={{pathname: `/groups/${props.original._id}/edit`,
                             state:{group:props.original}}}>
                             {props.value}
                             </Link>)

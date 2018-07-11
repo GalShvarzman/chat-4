@@ -14,12 +14,6 @@ import {connect} from "react-redux";
 import {IClientUser} from "../interfaces";
 
 interface IChatProps {
-    // data:{
-    //     loggedInUser: {name:string, id:string} | null,
-    //     errorMsg: ERROR_MSG,
-    //     counter: number,
-    //     redirect:boolean
-    // },
     tree:listItem[],
     onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, id:string}):void,
     onSelectConversation(selectedId:string):Promise<void>,
@@ -39,7 +33,7 @@ interface IChatState {
     isAllowedToJoinTheGroup : boolean
 }
 
-class Chat extends React.PureComponent<IChatProps, IChatState> {
+class Chat extends React.Component<IChatProps, IChatState> {
     public messagesRef:any;
 
     constructor(props:IChatProps) {
@@ -56,7 +50,8 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
         this.messagesRef.current.scrollTop = 9999999;
     }
 
-    public logOut = () => {
+    public onLogOut = () => {
+        debugger;
         this.setState({selectedId:"", selectedType:"", selectedName:""});
     };
 
@@ -163,7 +158,7 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     }
 
     public addMessage = ()=>{
-        this.setState({message : new Message(this.state.message.message, new Date().toLocaleString().slice(0, -3), this.props.loggedInUser)}, async()=>{
+        this.setState({message : new Message(this.state.message.message, new Date(), this.props.loggedInUser)}, async()=>{
             let conversationId;
             if(this.state.selectedType === "user"){
                 conversationId = [this.props.loggedInUser.id, this.state.selectedId].sort().join("_");
@@ -211,7 +206,9 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
         tree:state.tree,
-        selectedMessages:state.selectedMessages,
+        groups : state.groups,
+        users : state.users,
+        selectedMessages : state.selectedMessages,
         loggedInUser : state.loggedInUser
     }
 };

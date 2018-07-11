@@ -34,9 +34,9 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
 
     private onCreateNewUser = async () => {
         try{
-            const result = await this.props.onCreateNewUser(this.state.user);
-            if(result.user){
-                const id = result.user.id;
+            const newUser = await this.props.onCreateNewUser(this.state.user);
+            if(newUser){
+                const id = newUser["_id"];
                 this.props.history.push(id);
                 this.setState({message:"User created successfully"});
             }
@@ -45,7 +45,7 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
             }
         }
         catch(e){
-            this.setState({message:"Create user failed"});
+            this.setState({message:"Username already exist, choose a different name"});
         }
     };
 

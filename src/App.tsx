@@ -18,7 +18,8 @@ import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import { connect } from 'react-redux'
-import {authUser, saveGroupNewName, saveUserNewDetails} from "./state/actions";
+import {authUser, logOut, saveGroupNewName, saveUserNewDetails} from "./state/actions";
+import { createSelector } from 'reselect';
 
 export const socket =io('http://localhost:4000',{
     transports: ['websocket']
@@ -49,6 +50,7 @@ interface IAppProps {
     loggedInUser:IClientUser,
     loginErrorMsg:string | null,
     updateErrorMsg: string | null,
+    onLogOut():void,
     onEditUserDetails(user: IClientUser): IClientUser,
     onEditGroupName(group:IClientGroup):void,
     onAuthUser(user:{name:string,password:string}):IClientUser
@@ -62,6 +64,7 @@ class App extends React.PureComponent<AppProps , IAppState> {
 
     constructor(props: AppProps) {
         super(props);
+        this.chatMessagesChild = React.createRef();
     }
 
     // componentWillMount(){
@@ -116,12 +119,15 @@ class App extends React.PureComponent<AppProps , IAppState> {
 
     public signUpRender = (props:any)=>(<SignUp {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat ref={(instance:any) => {this.chatMessagesChild = instance}} {...props}
-                                              data={this.state}/>);
+    public chatRender = (props:any) => (<Chat ref={this.chatMessagesChild} {...props}/>);
 
     public logOut = () => {
-        this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
-        this.chatMessagesChild.logOut();
+        //this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
+        this.props.onLogOut();
+        this.chatMessagesChild.current
+        debugger;
+        //fixme;
+        //onLogOut();
     };
 
     public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
@@ -130,11 +136,11 @@ class App extends React.PureComponent<AppProps , IAppState> {
 
     public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
-    public  deleteUser = async(user:{name: string, age: number, id: string}):Promise<void> => {
+    public  deleteUser = async(user:{name: string, age: number, _id: string}):Promise<void> => {
         return await stateStoreService.deleteUser(user);
     };
 
-    public deleteGroup = async(group:{id:string, name:string}) => {
+    public deleteGroup = async(group:{_id:string, name:string}) => {
         return await stateStoreService.deleteGroup(group);
     };
 
@@ -202,11 +208,26 @@ class App extends React.PureComponent<AppProps , IAppState> {
     }
 }
 
+// const group ={
+//     users: [id]
+// };
+
+const getTree = (state:any) => state.tree;
+const getUsers = (state:any) => state.users;
+const getGroups = (state:any) => state.groups;
+const getUser = (users:any, userId:any) => users.find((user:IClientUser) => user.id === userId);
+// const withUsers = (groups:any, users:any) => groups.map((groups:any) =>
+//     groups.users.map((userId:string) => getUser(users, userId)));
+// const getGroupsWithUsers = createSelector(
+//     [getUsers, getGroups],
+//     (users, groups) => withUsers(groups, users));
+
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
-        tree: state.tree,
-        users:state.users,
-        groups:state.groups,
+        //tree: getTree(state),
+        users:getUsers(state),
+        //groupsWithUsers:getGroupsWithUsers(state),
+        groups:getGroups(state),
         loggedInUser:state.loggedInUser,
         loginErrorMsg:state.loginErrorMsg,
         updateErrorMsg: state.updateErrorMsg
@@ -223,6 +244,9 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         },
         onAuthUser: (user:{name:string, password:string}) => {
             dispatch(authUser(user))
+        },
+        onLogOut: () => {
+            dispatch(logOut())
         }
     }
 };

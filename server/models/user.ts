@@ -1,22 +1,35 @@
-import * as uuidv4 from 'uuid/v4';
+import * as mongoose from 'mongoose';
+import { Document, Model } from 'mongoose';
 
-export default interface IUser {
+export default interface IUserDocument extends Document {
     id:string,
     name:string,
     age?:number,
     password:string
 }
 
-export default class User implements IUser{
-    public id:string;
-    public name:string;
-    public age?:number;
-    public password:string;
-
-    constructor(username:string, age:string, password){
-        this.id = uuidv4();
-        this.name = username;
-        this.age = parseInt(age);
-        this.password = password;
-    }
+export interface IUser extends IUserDocument {
+    // methods;
 }
+
+export interface IUserModel extends Model<IUser> {
+    // statics;
+}
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type:String,
+        index: true,
+        unique: true
+    },
+    age:Number,
+    password:String
+});
+//
+// userSchema.statics = {
+//     async getAllUsers(){
+//         return await User.find({}, {password:0, __v:0});
+//     }
+// };
+
+export const User:IUserModel = mongoose.model<IUser, IUserModel>('User', userSchema);

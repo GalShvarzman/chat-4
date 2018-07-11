@@ -10,20 +10,20 @@ export async function saveUserDetails(user:IClientUser):Promise<{user:IClientUse
     return await patch(`/users/${user.id}`, user);
 }
 
-export async function saveGroupDetails(group:IClientGroup) {
+export async function saveGroupDetails(group:any) {
     return await patch(`/groups/${group.id}`, group);
 }
 
 export async function deleteUser(user:IClientUser):Promise<void>{
-    await remove(`/users/${user.id}`);
+    await remove(`/users/${user["_id"]}`);
 }
 
 export async function deleteUserFromGroup(userId:string, groupId:string){
    await remove(`/groups/${groupId}/users/${userId}`)
 }
 
-export async function deleteGroup(group:{id:string, name:string}):Promise<any>{
-    return await remove(`/groups/${group.id}`);
+export async function deleteGroup(group:{_id:string, name:string}):Promise<void>{
+    await remove(`/groups/${group._id}`);
 }
 
 export async function createNewUser(user:IClientUser):Promise<{user:IClientUser}>{
@@ -34,7 +34,7 @@ export async function createNewGroup(group:{name:string, parent:string}) {
     return await post('/groups', group);
 }
 
-export async function getGroups():Promise<{data :IClientGroup[]}>{
+export async function getGroups():Promise<IClientGroup[]>{
    return await get('/groups');
 }
 
@@ -46,7 +46,7 @@ export async function getGroupData(groupId:string):Promise<any>{
     return await get(`/groups/${groupId}`)
 }
 
-export async function getGroupsWithGroupsChildren():Promise<{data :IClientGroup[]}>{
+export async function getGroupsWithGroupsChildren():Promise<IClientGroup[]>{
     return await get('/groups?groups_with_children=true')
 }
 
