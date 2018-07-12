@@ -8,13 +8,13 @@ import {stateStoreService} from "../state/store";
 
 interface INewGroupProps {
     history:any;
-    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, id:string}
+    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, _id:string}
 }
 
 interface INewGroupState {
     group: {name: string, parentId:string},
     message?:string,
-    groupsWithGroupsChildren:{name:string, id:string}[]
+    groupsWithGroupsChildren:{name:string, _id:string}[]
 }
 
 class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
@@ -61,7 +61,7 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
     private onCreateNewGroup = async () => {
         try {
             const group = await this.props.onCreateNewGroup(this.state.group);
-            const id = group.id;
+            const id = group._id;
             this.props.history.push(id);
             this.setState({message: "Group created successfully", groupsWithGroupsChildren:this.state.groupsWithGroupsChildren.concat([group])});
         }

@@ -7,7 +7,7 @@ export async function getUsers():Promise<any>{
 }
 
 export async function saveUserDetails(user:IClientUser):Promise<{user:IClientUser}>{
-    return await patch(`/users/${user.id}`, user);
+    return await patch(`/users/${user._id}`, user);
 }
 
 export async function saveGroupDetails(group:any) {
@@ -51,6 +51,7 @@ export async function getGroupsWithGroupsChildren():Promise<IClientGroup[]>{
 }
 
 export async function addUsersToGroup(data:{usersIds:string[], groupId:string}){
+    debugger;
     return await post(`/groups/${data.groupId}/users`, data)
 }
 

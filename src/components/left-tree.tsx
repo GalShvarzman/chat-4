@@ -2,31 +2,32 @@ import * as React from 'react';
 import './left-tree.css'
 
 export interface listItem{
-    items?: object[],
+    children?: object[],
     name:string,
-    type:string,
-    id:string
+    kind:string,
+    _id:string
 }
 
 interface ILeftTreeProps {
     getSelected(eventTarget:any):void,
-    tree:any
+    tree:listItem[]
 }
 
 interface ILeftTreeState {
     selectedName : {}
 }
 
-class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
+class LeftTree extends React.PureComponent<ILeftTreeProps, ILeftTreeState> {
     constructor(props:ILeftTreeProps){
         super(props);
+
         this.state = {
             selectedName : {}
         }
     }
 
     public load = ()=>{
-        return this.walkTree(this.props.tree.items, 0);
+        return this.walkTree(this.props.tree, 0);
     };
 
     public onKeyUp = (e:React.KeyboardEvent<HTMLElement>)=>{
@@ -131,8 +132,8 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
     public walkTree = (items:object[], step:number) => {
         const result:any[] = [];
         items.forEach((item:listItem) => {
-            if(item.type === 'group'){
-                if(item.items){
+            if(item.kind === 'Group'){
+                if(item.children){
                     const li = this.createLiWithChildren(item, step);
                     result.push(li);
                 }
@@ -173,13 +174,6 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
         this.props.getSelected(e.target);
     };
 
-    public shouldComponentUpdate(nextProps:any, nextState:any) {
-        if(nextProps.tree !== undefined){
-            return nextProps.tree !== this.props.tree;
-        }
-        return false;
-    };
-
     public padding=(number:number)=>{
         let start = 0;
         let space = 20;
@@ -208,26 +202,26 @@ class LeftTree extends React.Component<ILeftTreeProps, ILeftTreeState> {
 
     public createLiWithChildren = (item:listItem, step:number) => {
         const ul = React.createElement("ul", {style:this.ulStyle},
-            this.walkTree(item.items, step+1).map((childItem) => {
+            this.walkTree(item.children, step+1).map((childItem) => {
                 return childItem
             })
         );
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item.id, type:item.type}, "☻"+item.name);
-        return React.createElement("li", {key:item.id}, a, ul);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item._id, type:item.kind}, "☻"+item.name);
+        return React.createElement("li", {key:item._id}, a, ul);
     };
 
     public createGroupLi = (item:any, step:number) => {
-        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item.id, type:item.type}, "☻"+item.name);
-        return React.createElement("li", {key:item.id}, a);
+        const a = React.createElement("a", {tabIndex:1, style:this.groupStyle(step), className:"item-name", id:item._id, type:item.kind}, "☻"+item.name);
+        return React.createElement("li", {key:item._id}, a);
     };
 
     public createUserLi = (item:any, step:number) => {
-        const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name", id:item.id, type:item.type}, "☺"+item.name);
-        return React.createElement("li", {key:item.id}, a);
+        const a = React.createElement("a", {tabIndex:1, style:this.userStyle(step), className:"item-name", id:item._id, type:item.kind}, "☺"+item.name);
+        return React.createElement("li", {key:item._id}, a);
     };
 
     public render() {
-        const list = this.props.tree.items ? this.load() : [];
+        const list = this.props.tree.length ? this.load() : [];
         return (
                 <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp}
                     className="left tree">{list}</ul>

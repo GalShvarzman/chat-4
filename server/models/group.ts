@@ -34,7 +34,8 @@ const groupSchema = new mongoose.Schema({
             type : ObjectId,
             refPath : 'children.kind'
         }
-    }]
+    }],
+    kind:String
 });
 
 groupSchema.methods = {

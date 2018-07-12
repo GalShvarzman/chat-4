@@ -19,9 +19,9 @@ import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import { connect } from 'react-redux'
 import {authUser, logOut, saveGroupNewName, saveUserNewDetails} from "./state/actions";
-import { createSelector } from 'reselect';
+import {getGroups, getUsers, treeSelectors} from "./selectors/selectors";
 
-export const socket =io('http://localhost:4000',{
+export const socket = io('http://localhost:4000',{
     transports: ['websocket']
 });
 
@@ -44,7 +44,6 @@ interface IAppState {
 }
 
 interface IAppProps {
-    tree: listItem[],
     users: IClientUser[],
     groups: IClientGroup[],
     loggedInUser:IClientUser,
@@ -103,7 +102,7 @@ class App extends React.PureComponent<AppProps , IAppState> {
     public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
         try{
             const result = await stateStoreService.createNewUser(user);
-            this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
+            this.setState({loggedInUser:{name:result.user.name, id:result.user._id}}, ()=>{
                 socket.emit('login', result.user.name);
                 this.setState({errorMsg: ERROR_MSG.none});
                 this.props.history.push('/chat');
@@ -124,7 +123,7 @@ class App extends React.PureComponent<AppProps , IAppState> {
     public logOut = () => {
         //this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
         this.props.onLogOut();
-        this.chatMessagesChild.current
+        this.chatMessagesChild.current;
         debugger;
         //fixme;
         //onLogOut();
@@ -208,25 +207,10 @@ class App extends React.PureComponent<AppProps , IAppState> {
     }
 }
 
-// const group ={
-//     users: [id]
-// };
-
-const getTree = (state:any) => state.tree;
-const getUsers = (state:any) => state.users;
-const getGroups = (state:any) => state.groups;
-const getUser = (users:any, userId:any) => users.find((user:IClientUser) => user.id === userId);
-// const withUsers = (groups:any, users:any) => groups.map((groups:any) =>
-//     groups.users.map((userId:string) => getUser(users, userId)));
-// const getGroupsWithUsers = createSelector(
-//     [getUsers, getGroups],
-//     (users, groups) => withUsers(groups, users));
-
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
-        //tree: getTree(state),
         users:getUsers(state),
-        //groupsWithUsers:getGroupsWithUsers(state),
+        //groupsWithUsers:treeSelectors(state),
         groups:getGroups(state),
         loggedInUser:state.loggedInUser,
         loginErrorMsg:state.loginErrorMsg,

@@ -2,7 +2,7 @@ import {nTree} from "../models/tree";
 import users from '../models/users';
 import {Group} from "../models/group";
 import {IGroup} from "../models/group";
-import {messagesDb} from "../models/messages";
+//import {messagesDb} from "../models/messages";
 import {User} from "../models/user";
 
 interface ITreeGroupObj {
@@ -65,7 +65,7 @@ class GroupsService{
             return {kind:'User', childId:id}
         });
         return await Group.findByIdAndUpdate(data.groupId, {$addToSet:{children:users}},{new:true});
-        // fixme check if works;
+
         // const newConnectors = data.usersIds.map((id)=>{
         //     return {
         //         type:'user',
@@ -80,7 +80,7 @@ class GroupsService{
 
     async createNewGroup(newGroupDetails){
         const groupParentId = newGroupDetails.parentId;
-        const newGroup = await new Group({name: newGroupDetails.name, parentId: groupParentId});
+        const newGroup = await new Group({name: newGroupDetails.name, parentId: groupParentId, kind:"Group"});
         await newGroup.save();
         if (groupParentId) {
             await Group.findByIdAndUpdate(groupParentId, {
@@ -137,7 +137,7 @@ class GroupsService{
     // }
 
     async getGroupData(groupId) {
-        return await Group.findById(groupId, {__v:0}).populate([{path:"children.childId", select:{__v:0, children:0, parentId:0}}, {path:"parentId", select:{__v:0, children:0, parentId:0}}]).lean();
+        return await Group.findById(groupId, {__v:0}).populate([{path:"children.childId", select:{__v:0, children:0, parentId:0, password:0}}, {path:"parentId", select:{__v:0, children:0, parentId:0}}]).lean();
 
         // const connectorsList = await this.getConnectorsList();
         // const groupConnector = this.getGroupConnector(groupId, connectorsList);
@@ -190,6 +190,9 @@ class GroupsService{
     // }
 
     async deleteUserFromGroup(groupId, userId){
+        //fixme not working;
+        const selectedUser = await User.findOne({_id:userId});
+        await Group.findByIdAndUpdate(groupId, {$pull: {children: {childId: selectedUser._id}}});
         // const connectorsList = await this.getConnectorsList();
         // const connectorToDeleteIndex = connectorsList.data.findIndex((connector)=>{
         //     return connector.id === userId && connector.pId === groupId;

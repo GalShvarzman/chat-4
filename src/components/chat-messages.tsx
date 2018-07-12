@@ -6,10 +6,10 @@ import {IMessage} from "../models/message";
 interface IChatMessagesProps {
     messages:IMessage[]|undefined,
     selectedName:string|undefined,
-    loggedInUser: {name:string, id:string}|null
+    loggedInUser: {name:string, _id:string}|null
 }
 
-class ChatMessages extends React.Component<IChatMessagesProps, {}> {
+class ChatMessages extends React.PureComponent<IChatMessagesProps, {}> {
     constructor(props:IChatMessagesProps){
         super(props);
     }
@@ -23,7 +23,7 @@ class ChatMessages extends React.Component<IChatMessagesProps, {}> {
         if(this.props.messages && this.props.loggedInUser){
              messagesHistory = this.props.messages.map((message, idx)=>{
                  if(this.props.loggedInUser){
-                     if(message.sender!.id === this.props.loggedInUser.id){
+                     if(message.sender["_id"] === this.props.loggedInUser._id){
                          return(<div key={idx} className='me-left'><MessageListItem loggedInUser={this.props.loggedInUser} className='me'  message={message}/></div>)
                      }
                      else{

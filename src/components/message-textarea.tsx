@@ -4,7 +4,7 @@ import {IMessage} from "../models/message";
 import './message-textarea.css';
 import send from '../images/send.png';
 interface IMassageTextAreaProps {
-    loggedInUser: {name:string, id:string} | null,
+    loggedInUser: {name:string, _id:string} | null,
     selectedName:string|undefined,
     message:IMessage,
     handleChange(event: any):void,

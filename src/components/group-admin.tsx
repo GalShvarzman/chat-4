@@ -5,7 +5,7 @@ import 'react-table/react-table.css';
 import './group-admin.css';
 
 interface IGroupAdminProps {
-    groups:{name:string, id:string}[],
+    groups:{name:string, _id:string}[],
     deleteGroup(group:{_id:string, name:string}):Promise<void>
 }
 

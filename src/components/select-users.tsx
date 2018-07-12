@@ -7,14 +7,14 @@ import {stateStoreService} from "../state/store";
 import './select-users.css';
 
 interface ISelectUsersProps {
-    handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, id:string}[]>,
+    handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, _id:string}[]>,
     location:any
 }
 
 interface ISelectUsersState {
     columns:any[],
     message?:string,
-    users:{name:string, age:string, id:string}[],
+    users:{name:string, age:string, _id:string}[],
 }
 
 class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
@@ -22,12 +22,13 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
 
     constructor(props:ISelectUsersProps){
         super(props);
+        debugger;
         this.state = {
             users:[],
             columns : [
                     {
                         Header: 'ID',
-                        accessor: 'id',
+                        accessor: '_id',
                         Cell:(props:any)=> (<div className="check-box-wrapper">
                             <CheckBox label={props.value} handleCheckboxChange={this.toggleCheckbox}
                             key={props.value}/>

@@ -27,10 +27,11 @@ interface IGroupEditState {
 class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     constructor(props:IGroupEditProps){
         super(props);
+        debugger;
         this.state = {
             group:{
                 name:props.location.state.group.name,
-                id:props.location.state.group._id
+                id:props.location.state.group._id || props.location.state.group.id
             },
             columns : [
                 {
@@ -71,8 +72,9 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     }
 
     async getGroupData(){
+        debugger;
         const groupData = await stateStoreService.getGroupData(this.state.group.id);
-
+        debugger;
         if(groupData.children.length && groupData.children[0].kind === 'Group'){
             this.setState({addNewUserBtnIsHidden : true});
         }
@@ -92,7 +94,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
             onClick: async(e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
                     try{
-                        if(rowInfo.original.type === 'user'){
+                        if(rowInfo.original.kind === 'User'){
                             await stateStoreService.deleteUserFromGroup(rowInfo.original._id, this.state.group.id);
                         }
                         else{
@@ -100,7 +102,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                         }
                         const groupChildrenClone = [...this.state.group.children];
                         const deletedGroupId = groupChildrenClone.findIndex((child)=>{
-                            return child.id === rowInfo.original.id;
+                            return child._id === rowInfo.original._id;
                         });
                         groupChildrenClone.splice(deletedGroupId, 1);
                         this.setState(prevState => {

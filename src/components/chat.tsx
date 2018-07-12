@@ -11,14 +11,16 @@ import {listItem} from './left-tree';
 import {socket} from '../App';
 import {addMessageToConversation, getSelectedMessagesHistory} from "../state/actions";
 import {connect} from "react-redux";
-import {IClientUser} from "../interfaces";
+import {getGroups, treeSelectors} from "../selectors/selectors";
+import {IClientGroup} from "../interfaces";
 
 interface IChatProps {
     tree:listItem[],
-    onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, id:string}):void,
+    groups:IClientGroup[],
+    onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, _id:string}):void,
     onSelectConversation(selectedId:string):Promise<void>,
     selectedMessages:IMessage[],
-    loggedInUser:{name:string, id:string}
+    loggedInUser:{name:string, _id:string}
 }
 
 
@@ -56,16 +58,18 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public getSelectedConversationMessagesHistory = (eventTarget:any) => {
+        debugger;
         if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI' && this.props.loggedInUser) {
             this.setStateOnSelected(eventTarget);
         }
     };
 
     private setStateOnSelected = (eventTarget:any) => {
+        debugger;
         let previousSelectedId;
         const previousSelectedType = this.state.selectedType;
         if(previousSelectedType === "user"){
-            previousSelectedId = [this.state.selectedId, this.props.loggedInUser.id].sort().join("_");
+            previousSelectedId = [this.state.selectedId, this.props.loggedInUser._id].sort().join("_");
         }
         else{
             previousSelectedId = this.state.selectedId;
@@ -94,7 +98,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         if(this.state.selectedId && this.props.loggedInUser){
             let selectedId;
             const loggedInUserName = this.props.loggedInUser.name;
-            const loggedInUserId = this.props.loggedInUser.id;
+            const loggedInUserId = this.props.loggedInUser._id;
             if(this.state.previousSelectedId){
                 socket.emit('leave-group', loggedInUserName, this.state.previousSelectedId);
             }
@@ -105,7 +109,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
             }
             else{
                 selectedId = this.state.selectedId;
-                if(stateStoreService.isUserExistInGroup(selectedId, loggedInUserId)){
+                if(this.isUserExistInGroup(selectedId, loggedInUserId)){
                     socket.emit('join-group', loggedInUserName, selectedId);
                     this.getSelectedMessages(selectedId);
                 }
@@ -115,6 +119,21 @@ class Chat extends React.Component<IChatProps, IChatState> {
             }
         }
     };
+
+    public isUserExistInGroup(selectedId:string, loggedInUserId:string){
+        const selectedGroup = this.props.groups.find((group)=>{
+            return group._id === selectedId;
+        });
+        if(selectedGroup.children) {
+            const userIndex = selectedGroup.children.findIndex((item: any) => {
+                return item._id === loggedInUserId;
+            });
+            return (userIndex !== -1);
+        }
+        else{
+            return false;
+        }
+    }
 
 
     private getSelectedMessages = async(selectedId:string)=>{
@@ -136,6 +155,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public onClickSend = (event:React.MouseEvent<HTMLButtonElement>) => {
+        debugger;
         if(this.props.loggedInUser && this.state.selectedName){
             this.addMessage();
         }
@@ -160,8 +180,9 @@ class Chat extends React.Component<IChatProps, IChatState> {
     public addMessage = ()=>{
         this.setState({message : new Message(this.state.message.message, new Date(), this.props.loggedInUser)}, async()=>{
             let conversationId;
-            if(this.state.selectedType === "user"){
-                conversationId = [this.props.loggedInUser.id, this.state.selectedId].sort().join("_");
+            debugger;
+            if(this.state.selectedType === "User"){
+                conversationId = [this.props.loggedInUser._id, this.state.selectedId].sort().join("_");
             }
             else{
                 conversationId = this.state.selectedId;
@@ -205,17 +226,16 @@ class Chat extends React.Component<IChatProps, IChatState> {
 
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
-        tree:state.tree,
-        groups : state.groups,
-        users : state.users,
+        tree: treeSelectors(state),
         selectedMessages : state.selectedMessages,
-        loggedInUser : state.loggedInUser
+        loggedInUser : state.loggedInUser,
+        groups: getGroups(state)
     }
 };
 
 const mapDispatchToProps = (dispatch:any, ownProps:any) => {
     return {
-        onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:{name:string, id:string}) => {
+        onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:{name:string, _id:string}) => {
             dispatch(addMessageToConversation(selectedType, selectedId, msg, loggedInUser))
         },
         onSelectConversation:(selectedId:string)=>{

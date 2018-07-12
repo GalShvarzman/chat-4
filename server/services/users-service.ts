@@ -86,6 +86,7 @@ class UsersService{
 
     async createNewUser(user){
         user.password = await createHash(user.password);
+        user.kind = "User";
         const newUser = await new User(user);
         await newUser.save();
         return ({id: newUser._id, name: newUser["name"], age: newUser["age"]});
@@ -105,7 +106,7 @@ class UsersService{
             const userModel = await User.findOne({name:userToAuth.name}, {__v:0});
             await compareHash(userToAuth.password, userModel.password);
             return ({
-                id: userModel._id,
+                _id: userModel._id,
                 name: userModel.name,
                 age: userModel.age
             });

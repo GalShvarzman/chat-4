@@ -1,14 +1,14 @@
 export interface IClientUser {
-    id?:string,
+    _id?:string,
     name:string,
     age?:string | number,
     password?:string
 }
 
 export interface IClientGroup {
-    id:string,
+    _id:string,
     name:string,
-    children?:IClientUser|IClientGroup[],
+    children?:any
     parentId?:string
 }
 

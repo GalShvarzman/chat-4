@@ -4,7 +4,7 @@ import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup,
     deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup,
     getGroupsWithGroupsChildren} from '../server-api';
 import {IClientGroup, IClientUser, ITree} from "../interfaces";
-import { applyMiddleware, createStore } from 'redux';
+import { applyMiddleware, createStore, compose  } from 'redux';
 import thunk from 'redux-thunk';
 
 interface IState {
@@ -95,7 +95,7 @@ function updateUsersAfterEditUserDetails(state:IState, updatedUser:any){
     const users = state.users;
     const usersClone = [...users];
     const userIndex = usersClone.findIndex((user) => {
-        return user.id === updatedUser.user.id;
+        return user._id === updatedUser.user._id;
     });
     usersClone[userIndex] = updatedUser.user;
     return{
@@ -108,7 +108,7 @@ function updateGroupsAfterEditGroupName(state:IState, updatedGroup:any, updateEr
     const groups = state.groups;
     const groupsClone = [...groups];
     const groupIndex = groupsClone.findIndex((group) => {
-        return group.id === updatedGroup.group.id;
+        return group._id === updatedGroup.group._id;
     });
     groupsClone[groupIndex] = updatedGroup.group;
     return{
@@ -122,6 +122,7 @@ function updateGroupsAfterEditGroupName(state:IState, updatedGroup:any, updateEr
 }
 
 function userAfterAuth(state:IState, loggedInUser:IClientUser, loginErrorMsg:string){
+    debugger;
     return {
         ...state,
         loggedInUser,
@@ -150,7 +151,9 @@ function updateLoggedInUser(state:IState, loggedInUser:null){
     }
 }
 
-export const store = createStore(reducer, initialState, applyMiddleware(thunk));
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+export const store = createStore(reducer, initialState, composeEnhancers(applyMiddleware(thunk)));
 
 
 // interface IStateStoreService {
@@ -184,28 +187,6 @@ export class StateStoreService {
     public get(key: string) {
         return StateStore.getInstance()[key] || [];
     }
-
-
-
-    public isUserExistInGroup(selectedId:string, loggedInUserId:string){
-        const tree = this.get('tree');
-        debugger;
-        const allGroups = this.flatTreeGetAllGroups(tree.items);
-        const selectedGroup = allGroups.find((group)=>{
-            return group.id === selectedId
-        });
-        if(selectedGroup.items) {
-            const userIndex = selectedGroup.items.findIndex((item: any) => {
-                return item.id === loggedInUserId
-            });
-            return (userIndex !== -1);
-        }
-        else{
-            return false;
-        }
-    }
-
-
 
 
     private flatTreeGetAllGroups(items:any){
@@ -248,7 +229,7 @@ export class StateStoreService {
         const users = this.get('users');
         const usersClone = [...users];
         const userIndex = usersClone.findIndex((user) => {
-            return user.id === userToDelete.id;
+            return user.id === userToDelete._id;
         });
         usersClone.splice(userIndex, 1);
         this._set('users', usersClone);

@@ -2,7 +2,7 @@ import * as React from 'react';
 import './select.css';
 
 interface ISelectProps {
-    groups:{name:string, id:string}[],
+    groups:{name:string, _id:string}[],
     handleSelect(select:any):void,
     parent:string;
 }

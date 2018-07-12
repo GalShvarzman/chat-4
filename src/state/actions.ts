@@ -7,25 +7,28 @@ import {IClientGroup, IClientUser} from "../interfaces";
 import {IMessage} from "../models/message";
 import {socket} from "../App";
 
-export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, id: string } | null) {
+export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, _id: string } | null) {
+    debugger;
     return async (dispatch:Dispatch)=>{
         if (loggedInUser && selectedId) {
             let conversationId;
-            if (selectedType === 'group') {
+            if (selectedType === 'Group') {
                 conversationId = selectedId;
             }
             else {
-                conversationId = [selectedId,loggedInUser.id].sort().join("_");
+                conversationId = [selectedId,loggedInUser._id].sort().join("_");
             }
             await addMessage(message, conversationId);
+            dispatch({type:""});
         }
     }
 }
 
 export function getSelectedMessagesHistory(selectedId: string) {
     return async (dispatch:Dispatch)=>{
-        const messages = await getSelectedMessages(selectedId);
-        dispatch(setSelectedMessages(messages));
+        const result = await getSelectedMessages(selectedId);
+        debugger;
+        dispatch(setSelectedMessages(result.messages));
     }
 }
 
@@ -58,7 +61,7 @@ export function saveUserNewDetails(user: IClientUser){
 }
 
 
-export function saveGroupNewName(group: { name: string, id: string }){
+export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);

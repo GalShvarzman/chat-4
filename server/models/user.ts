@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     age:Number,
-    password:String
+    password:String,
+    kind:String
 });
 //
 // userSchema.statics = {
