@@ -19,7 +19,7 @@ class MessageListItem extends React.Component<IMessageListItemProps, {}> {
             meClass = this.props.className
         }
         return (
-            <li key={this.props.message["_id"]}  className="message-li">
+            <li key={this.props.message._id}  className="message-li">
                 <div className={"message-text "+ meClass}>
                     <div className="user-name" hidden={this.props.message.sender!._id === this.props.loggedInUser!._id}>{this.props.message.sender ? this.props.message.sender.name : ""}</div>
                     {this.props.message.message}

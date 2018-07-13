@@ -86,9 +86,11 @@ export function authUser(user: { name: string, password: string }) {
     }
 }
 
-export function logOut(){
+export function logOut(loggedInUser:null, loginErrorMsg:null){
     return {
-        type:'SET_LOGGED_IN_USER'
+        type:'USER_LOGGED_OUT',
+        loggedInUser,
+        loginErrorMsg
     }
 }
 

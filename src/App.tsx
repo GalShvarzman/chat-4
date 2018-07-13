@@ -17,9 +17,10 @@ import SelectUsers from "./components/select-users";
 import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
-import { connect } from 'react-redux'
+import {connect} from 'react-redux';
 import {authUser, logOut, saveGroupNewName, saveUserNewDetails} from "./state/actions";
-import {getGroups, getUsers, treeSelectors} from "./selectors/selectors";
+import {getGroups, getUsers} from "./selectors/selectors";
+import {RefObject} from "react";
 
 export const socket = io('http://localhost:4000',{
     transports: ['websocket']
@@ -39,10 +40,6 @@ export enum ERROR_MSG{
 //     'tree' : stateStoreService.getTree.bind(stateStoreService)
 // };
 
-interface IAppState {
-
-}
-
 interface IAppProps {
     users: IClientUser[],
     groups: IClientGroup[],
@@ -57,13 +54,13 @@ interface IAppProps {
 
 type AppProps = RouteComponentProps<{}> & IAppProps;
 
-class App extends React.PureComponent<AppProps , IAppState> {
-    public chatMessagesChild:any;
+class App extends React.PureComponent<AppProps , {}> {
+    public chat:RefObject<any>;
     public menu:any;
 
     constructor(props: AppProps) {
         super(props);
-        this.chatMessagesChild = React.createRef();
+        this.chat = React.createRef();
     }
 
     // componentWillMount(){
@@ -118,15 +115,11 @@ class App extends React.PureComponent<AppProps , IAppState> {
 
     public signUpRender = (props:any)=>(<SignUp {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat ref={this.chatMessagesChild} {...props}/>);
+    public chatRender = (props:any) => (<Chat ref={this.chat} {...props}/>);
 
     public logOut = () => {
-        //this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
         this.props.onLogOut();
-        this.chatMessagesChild.current;
-        debugger;
-        //fixme;
-        //onLogOut();
+        this.chat.current.onUserLogOut();
     };
 
     public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
@@ -230,7 +223,7 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
             dispatch(authUser(user))
         },
         onLogOut: () => {
-            dispatch(logOut())
+            dispatch(logOut(null, null));
         }
     }
 };

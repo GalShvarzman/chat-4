@@ -3,8 +3,6 @@ import LeftTree from "./left-tree";
 import ChatMessages from "./chat-messages";
 import MessageTextarea from "./message-textarea";
 import './chat.css';
-import {ERROR_MSG} from "../App";
-import {stateStoreService} from "../state/store";
 import {IMessage} from "../models/message";
 import {Message} from '../models/message';
 import {listItem} from './left-tree';
@@ -22,7 +20,6 @@ interface IChatProps {
     selectedMessages:IMessage[],
     loggedInUser:{name:string, _id:string}
 }
-
 
 interface IChatState {
     selectedName? : string,
@@ -52,7 +49,7 @@ class Chat extends React.Component<IChatProps, IChatState> {
         this.messagesRef.current.scrollTop = 9999999;
     }
 
-    public onLogOut = () => {
+    public onUserLogOut = () => {
         debugger;
         this.setState({selectedId:"", selectedType:"", selectedName:""});
     };

@@ -4,7 +4,7 @@ export interface IMessage{
     message:string,
     date?:Date,
     sender?:{name:string, _id:string},
-    id?:string
+    _id?:string
 }
 
 export class Message implements IMessage{

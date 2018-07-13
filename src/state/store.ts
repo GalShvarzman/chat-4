@@ -6,14 +6,15 @@ import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup,
 import {IClientGroup, IClientUser, ITree} from "../interfaces";
 import { applyMiddleware, createStore, compose  } from 'redux';
 import thunk from 'redux-thunk';
+import {reducer} from "./reducer";
 
-interface IState {
+export interface IState {
     tree:any[],
     users:IClientUser[],
     groups:IClientGroup[],
     selectedMessages:IMessage[],
     loggedInUser:IClientUser,
-    loginErrorMsg:string,
+    loginErrorMsg:string | null,
     updateErrorMsg:string,
     updatedGroup:IClientGroup
 }
@@ -29,156 +30,17 @@ const initialState:{} = {
     updateErrorMsg:null
 };
 
-function reducer (state:any, action:any){
-    if(action.type == "SET_TREE"){
-        return setTree(state, action.tree);
-    }
-    if(action.type == "SET_GROUPS"){
-        return setGroups(state, action.groups);
-    }
-    if(action.type == "SET_USERS"){
-        return setUsers(state, action.users);
-    }
-    if(action.type == "SET_SELECTED_MESSAGES"){
-        return setSelectedMessages(state, action.messages);
-    }
-    if(action.type == "UPDATE_USERS_AFTER_EDIT_USER_DETAILS"){
-        return updateUsersAfterEditUserDetails(state, action.user);
-    }
-    if(action.type == "UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME"){
-        return updateGroupsAfterEditGroupName(state, action.group, action.updateErrorMsg);
-    }
-    if(action.type == "USER_AFTER_AUTH"){
-        return userAfterAuth(state, action.loggedInUser, action.loginErrorMsg);
-    }
-    if(action.type == "USER_AUTH_FAILED"){
-        return afterAuthFailed(state, action.loginErrorMsg)
-    }
-    if(action.type == "UPDATE_FAILED"){
-        return updateDetailsFailed(state, action.updateErrorMsg)
-    }
-    if(action.type == "SET_LOGGED_IN_USER"){
-        return updateLoggedInUser(state, null);
-    }
-    return state;
-}
-
-function setTree(state:IState, tree:{}[]){
-    return{
-        ...state,
-        tree
-    }
-}
-
-function setGroups(state:IState, groups:{}[]){
-    return{
-        ...state,
-        groups
-    }
-}
-
-function setUsers(state:IState, users:{}[]){
-    return{
-        ...state,
-        users
-    }
-}
-
-function setSelectedMessages(state:IState, selectedMessages:any[]){
-    return{
-        ...state,
-        selectedMessages
-    }
-}
-
-function updateUsersAfterEditUserDetails(state:IState, updatedUser:any){
-    const users = state.users;
-    const usersClone = [...users];
-    const userIndex = usersClone.findIndex((user) => {
-        return user._id === updatedUser.user._id;
-    });
-    usersClone[userIndex] = updatedUser.user;
-    return{
-        ...state,
-        users : usersClone
-    }
-}
-
-function updateGroupsAfterEditGroupName(state:IState, updatedGroup:any, updateErrorMsg:string){
-    const groups = state.groups;
-    const groupsClone = [...groups];
-    const groupIndex = groupsClone.findIndex((group) => {
-        return group._id === updatedGroup.group._id;
-    });
-    groupsClone[groupIndex] = updatedGroup.group;
-    return{
-        ...state,
-        groups : groupsClone,
-        updatedGroup,
-        updateErrorMsg
-    }
-    // const tree = await getTree();
-    // this._set('tree', tree);
-}
-
-function userAfterAuth(state:IState, loggedInUser:IClientUser, loginErrorMsg:string){
-    debugger;
-    return {
-        ...state,
-        loggedInUser,
-        loginErrorMsg
-    }
-}
-
-function afterAuthFailed(state:IState, loginErrorMsg:string){
-    return{
-        ...state,
-        loginErrorMsg
-    }
-}
-
-function updateDetailsFailed(state:IState, updateErrorMsg:string){
-    return{
-        ...state,
-        updateErrorMsg
-    }
-}
-
-function updateLoggedInUser(state:IState, loggedInUser:null){
-    return {
-        ...state,
-        loggedInUser
-    }
-}
-
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export const store = createStore(reducer, initialState, composeEnhancers(applyMiddleware(thunk)));
 
-
-// interface IStateStoreService {
-//     get(key: string): any | null,
-//     subscribe(listener:any): void,
-//     unsubscribe(listener:any):void
-// }
 
 export class StateStoreService {
     listeners: Function[];
 
     constructor() {
         this.listeners = [];
-        //this.init()
     }
-
-    // private async init() {
-    //     return Promise.all([getGroups()])
-    //         .then((results) => {
-    //             this._set('groups', results[0]);
-    //             this._set('users', results[1].data);
-    //             // this._set('tree', results[2]);
-    //             this.onStoreChanged(['users', 'groups']);
-    //         })
-    // }
 
     private _set(key: string, val: any) {
         StateStore.getInstance()[key] = val;
@@ -188,40 +50,37 @@ export class StateStoreService {
         return StateStore.getInstance()[key] || [];
     }
 
+    //
+    // private flatTreeGetAllGroups(items:any){
+    //     const result:any[] = [];
+    //     items.forEach((item:any)=>{
+    //         if(item.type === 'group'){
+    //             result.push(item);
+    //             if(item.items){
+    //                 //result.push(...this.flatTreeGetAllGroups(item.items));
+    //             }
+    //         }
+    //     });
+    //     return result;
+    // }
 
-    private flatTreeGetAllGroups(items:any){
-        const result:any[] = [];
-        items.forEach((item:any)=>{
-            if(item.type === 'group'){
-                result.push(item);
-                if(item.items){
-                    result.push(...this.flatTreeGetAllGroups(item.items));
-                }
-            }
-        });
-        return result;
-    }
 
 
+    // public getUsers() {
+    //     return StateStore.getInstance().users;
+    // }
 
-    public getUsers() {
-        return StateStore.getInstance().users;
-    }
+    // public getGroups() {
+    //     return StateStore.getInstance().groups;
+    // }
 
-    public getGroups() {
-        return StateStore.getInstance().groups;
-    }
-
-    public getTree() {
-        return StateStore.getInstance().tree;
-    }
+    // public getTree() {
+    //     return StateStore.getInstance().tree;
+    // }
 
     async getOptionalGroupParents() {
         return await getGroupsWithGroupsChildren();
     }
-
-
-
 
 
     public async deleteUser(userToDelete: IClientUser): Promise<void> {
@@ -280,16 +139,16 @@ export class StateStoreService {
         this.onStoreChanged(['tree']);
     }
 
-    public subscribe(listener: any) {
-        this.listeners.push(listener);
-    }
+    // public subscribe(listener: any) {
+    //     this.listeners.push(listener);
+    // }
 
-    public unsubscribe(listener: any) {
-        const index = this.listeners.findIndex(listener);
-        if (index !== -1) {
-            this.listeners.splice(index, 1);
-        }
-    }
+    // public unsubscribe(listener: any) {
+    //     const index = this.listeners.findIndex(listener);
+    //     if (index !== -1) {
+    //         this.listeners.splice(index, 1);
+    //     }
+    // }
 
     private onStoreChanged(whatChanged: string[]) {
         const event = {changed: whatChanged};
