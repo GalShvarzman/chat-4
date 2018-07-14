@@ -1,7 +1,6 @@
 import * as mongoose from 'mongoose';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 import { Document, Model } from 'mongoose';
-import {IUser, IUserModel} from "./user";
 
 export default interface IGroupDocument extends Document {
     id:string,

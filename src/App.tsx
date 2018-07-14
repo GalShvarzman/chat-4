@@ -14,18 +14,11 @@ import GroupAdmin from "./components/group-admin";
 import GroupEdit from "./components/group-edit";
 import NewGroup from "./components/new-group";
 import SelectUsers from "./components/select-users";
-import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import {connect} from 'react-redux';
-import {
-    authUser,
-    onCreateNewGroup,
-    getGroupOptionalParents,
-    logOut,
-    saveGroupNewName,
-    saveUserNewDetails
-} from "./state/actions";
+import {authUser, onCreateNewGroup, getGroupOptionalParents, logOut, saveGroupNewName, saveUserNewDetails,
+    onDeleteUser, onDeleteGroup} from "./state/actions";
 import {getGroups, getGroupsWithGroupChildren, getUsers} from "./selectors/selectors";
 import {RefObject} from "react";
 
@@ -33,26 +26,12 @@ export const socket = io('http://localhost:4000',{
     transports: ['websocket']
 });
 
-export enum ERROR_MSG{
-    none,
-    allGood,
-    credentials,
-    locked,
-    fail
-}
-
-// const changeOptions = {
-//     'users' : stateStoreService.getUsers.bind(stateStoreService),
-//     'groups' : stateStoreService.getGroups.bind(stateStoreService),
-//     'tree' : stateStoreService.getTree.bind(stateStoreService)
-// };
-
 interface IAppProps {
     users: IClientUser[],
     groups: IClientGroup[],
     loggedInUser:IClientUser,
     loginErrorMsg:string | null,
-    updateErrorMsg: string | null,
+    errorMsg: string | null,
     groupsWithGroupsChildren:IClientGroup[],
     createNewErrorMsg:string|null,
     onLogOut():void,
@@ -60,7 +39,9 @@ interface IAppProps {
     onEditGroupName(group:IClientGroup):void,
     onAuthUser(user:{name:string,password:string}):IClientUser,
     onGetGroupOptionalParents():void,
-    onCreateNewGroup(group:{name:string, parentId:string}):void
+    onCreateNewGroup(group:{name:string, parentId:string}):void,
+    onDeleteUser(user:{name: string, age: number, _id: string}):void,
+    onDeleteGroup(group:IClientGroup):void
 }
 
 type AppProps = RouteComponentProps<{}> & IAppProps;
@@ -108,17 +89,17 @@ class App extends React.PureComponent<AppProps , {}> {
     };
 
     public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
-        try{
-            const result = await stateStoreService.createNewUser(user);
-            this.setState({loggedInUser:{name:result.user.name, id:result.user._id}}, ()=>{
-                socket.emit('login', result.user.name);
-                this.setState({errorMsg: ERROR_MSG.none});
-                this.props.history.push('/chat');
-            });
-        }
-        catch(e){
-            this.setState({errorMsg: ERROR_MSG.credentials})
-        }
+        // try{
+        //     const result = await stateStoreService.createNewUser(user);
+        //     this.setState({loggedInUser:{name:result.user.name, id:result.user._id}}, ()=>{
+        //         socket.emit('login', result.user.name);
+        //         this.setState({errorMsg: ERROR_MSG.none});
+        //         this.props.history.push('/chat');
+        //     });
+        // }
+        // catch(e){
+        //     this.setState({errorMsg: ERROR_MSG.credentials})
+        // }
     };
 
     public loginRender = (props:any) => this.props.loggedInUser ? (<Redirect to={'/chat'}/>) :
@@ -133,18 +114,18 @@ class App extends React.PureComponent<AppProps , {}> {
         this.chat.current.getWrappedInstance().onUserLogOut();
     };
 
-    public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
+    public usersRender = () => (<UserAdmin errorMsg={this.props.errorMsg} deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
 
-    public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
+    public groupsRender = () => (<GroupAdmin errorMsg={this.props.errorMsg} deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
 
-    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.updateErrorMsg} onEditUserDetails={this.onEditUserDetails} {...props}/>);
+    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.errorMsg} onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
-    public  deleteUser = async(user:{name: string, age: number, _id: string}):Promise<void> => {
-        return await stateStoreService.deleteUser(user);
+    public deleteUser = (user:{name: string, age: number, _id: string}) => {
+        this.props.onDeleteUser(user);
     };
 
-    public deleteGroup = async(group:{_id:string, name:string}) => {
-        return await stateStoreService.deleteGroup(group);
+    public deleteGroup = (group:IClientGroup) => {
+         this.props.onDeleteGroup(group);
     };
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
@@ -157,7 +138,7 @@ class App extends React.PureComponent<AppProps , {}> {
         this.props.onGetGroupOptionalParents();
     };
 
-    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} updateErrorMsg={this.props.updateErrorMsg}
+    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} updateErrorMsg={this.props.errorMsg}
                                                         saveGroupNewName={this.onEditGroupName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
@@ -172,6 +153,7 @@ class App extends React.PureComponent<AppProps , {}> {
 
     public handelAddUsersToGroup = async(data:{usersIds:string[], groupId:string}) => {
         return await stateStoreService.addUsersToGroup(data);
+        // fixme
     };
 
     public render() {
@@ -223,7 +205,7 @@ const mapStateToProps = (state:any, ownProps:any) => {
         groups:getGroups(state),
         loggedInUser:state.loggedInUser,
         loginErrorMsg:state.loginErrorMsg,
-        updateErrorMsg: state.updateErrorMsg,
+        errorMsg: state.errorMsg,
         groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
         createNewErrorMsg:state.createNewErrorMsg
     }
@@ -248,6 +230,12 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         },
         onCreateNewGroup: (group:{name:string, parentId:string}) => {
             dispatch(onCreateNewGroup(group))
+        },
+        onDeleteUser: (user:{name: string, age: number, _id: string}) => {
+            dispatch(onDeleteUser(user));
+        },
+        onDeleteGroup:(group:IClientGroup) => {
+            dispatch(onDeleteGroup(group));
         }
     }
 };

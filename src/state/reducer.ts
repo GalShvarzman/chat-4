@@ -11,7 +11,7 @@ import {
     updateGroupsAfterEditGroupName,
     updateLoggedInUser,
     updateUsersAfterEditUserDetails,
-    userAfterAuth
+    userAfterAuth, setUsersAndGroupsAfterDeleteUser, setGroupsAfterDeleteGroup
 } from "./functions";
 
 const options = {
@@ -23,11 +23,13 @@ const options = {
     "UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME" : updateGroupsAfterEditGroupName,
     "USER_AFTER_AUTH" : userAfterAuth,
     "USER_AUTH_FAILED" : afterAuthFailed,
-    "SET_UPDATE_ERROR_MSG" : setUpdateErrorMsg,
+    "SET_ERROR_MSG" : setUpdateErrorMsg,
     "USER_LOGGED_OUT" : updateLoggedInUser,
     "SET_GROUP_OPTIONAL_PARENTS" : setGroupOptionalParents,
     "SET_GROUPS_AFTER_CREATE_NEW_GROUP" : setGroupsAfterCreateNewGroup,
-    'SET_NEW_ERROR_MSG' : setNewErrorMsg
+    'SET_NEW_ERROR_MSG' : setNewErrorMsg,
+    "SET_USERS_AND_GROUPS_AFTER_DELETE_USER" : setUsersAndGroupsAfterDeleteUser,
+    "SET_GROUPS_AFTER_DELETE_GROUP" : setGroupsAfterDeleteGroup
 };
 
 export function reducer (state:IState, action:any){

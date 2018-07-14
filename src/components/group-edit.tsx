@@ -5,11 +5,12 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-edit.css';
 import {stateStoreService} from "../state/store";
+import {IClientGroup} from "../interfaces";
 
 interface IGroupEditProps {
     location: any,
     saveGroupNewName(group: { name: string, id: string }): void,
-    deleteGroup(group:{id:string, name:string}):void,
+    deleteGroup(group:IClientGroup):void,
     updateErrorMsg:string
 }
 
@@ -27,7 +28,7 @@ interface IGroupEditState {
 class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     constructor(props:IGroupEditProps){
         super(props);
-        debugger;
+
         this.state = {
             group:{
                 name:props.location.state.group.name,
@@ -52,7 +53,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     }
 
-    public save = () => {
+    public saveGroupNewName = () => {
         this.props.saveGroupNewName({id: this.state.group.id, name: this.state.group.name});
     };
 
@@ -72,9 +73,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     }
 
     async getGroupData(){
-        debugger;
         const groupData = await stateStoreService.getGroupData(this.state.group.id);
-        debugger;
         if(groupData.children.length && groupData.children[0].kind === 'Group'){
             this.setState({addNewUserBtnIsHidden : true});
         }
@@ -91,32 +90,33 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
         return {
-            onClick: async(e:any, handleOriginal:any) => {
+            onClick: (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    try{
+                    //try{
                         if(rowInfo.original.kind === 'User'){
-                            await stateStoreService.deleteUserFromGroup(rowInfo.original._id, this.state.group.id);
+                            debugger;
+                             stateStoreService.deleteUserFromGroup(rowInfo.original.childId._id, this.state.group.id);
                         }
                         else{
-                            await this.props.deleteGroup(rowInfo.original);
+                            this.props.deleteGroup(rowInfo.original);
                         }
-                        const groupChildrenClone = [...this.state.group.children];
-                        const deletedGroupId = groupChildrenClone.findIndex((child)=>{
-                            return child._id === rowInfo.original._id;
-                        });
-                        groupChildrenClone.splice(deletedGroupId, 1);
-                        this.setState(prevState => {
-                            return{
-                                group:{
-                                    ...this.state.group,
-                                    children : groupChildrenClone
-                                }
-                            }
-                        })
-                    }
-                    catch (e) {
-                        //this.setState({message:"Delete failed"});
-                    }
+                    //     const groupChildrenClone = [...this.state.group.children];
+                    //     const deletedGroupId = groupChildrenClone.findIndex((child)=>{
+                    //         return child._id === rowInfo.original._id;
+                    //     });
+                    //     groupChildrenClone.splice(deletedGroupId, 1);
+                    //     this.setState(prevState => {
+                    //         return{
+                    //             group:{
+                    //                 ...this.state.group,
+                    //                 children : groupChildrenClone
+                    //             }
+                    //         }
+                    //     })
+                    // }
+                    // catch (e) {
+                    //     //this.setState({message:"Delete failed"});
+                    // }
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -136,7 +136,7 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
                         <span className="id">{this.state.group.id}</span>
                     </p>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
-                    <button onClick={this.save} className="edit-group-save-btn" type="button">Save</button>
+                    <button onClick={this.saveGroupNewName} className="edit-group-save-btn" type="button">Save</button>
                     <div>
                         <p className="parent-wrapper">
                             <span className="parent">Parent:</span><span className="parent-name">

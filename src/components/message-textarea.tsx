@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {ERROR_MSG} from "../App";
 import {IMessage} from "../models/message";
 import './message-textarea.css';
 import send from '../images/send.png';

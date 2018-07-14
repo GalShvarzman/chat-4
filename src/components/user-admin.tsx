@@ -7,12 +7,12 @@ import './user-admin.css';
 interface IUserAdminProps {
     users:any,
     refMenu:any,
-    deleteUser(user:{name: string, age: number, _id: string}):Promise<void>
+    deleteUser(user:{name: string, age: number, _id: string}):void,
+    errorMsg:string|null
 }
 
 interface IUserAdminState {
-    columns:any[],
-    message?:string
+    columns:any[]
 }
 
 class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
@@ -47,12 +47,7 @@ class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
         return {
             onClick: async (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    try {
-                        await this.props.deleteUser(rowInfo.original);
-                    }
-                    catch (e) {
-                        this.setState({message:"Delete user failed"});
-                    }
+                    this.props.deleteUser(rowInfo.original);
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -69,7 +64,7 @@ class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
                             defaultPageSize={10} minRows={10} className="users-table" data={this.props.users}
                             columns={this.state.columns}/>
-                <p hidden={!this.state.message}>{this.state.message}</p>
+                <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
             </>
         )
     }

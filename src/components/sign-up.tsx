@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 import Field from "./field";
-import {ERROR_MSG} from "../App";
+//import {ERROR_MSG} from "../App";
 import './sign-up.css'
 
 interface ISignUpProps {
     onSubmit(user:{name:string, age?:number, password:string}):void,
-    signUpStatus: ERROR_MSG
+    //signUpStatus: ERROR_MSG
 }
 
 interface ISignUpState {
@@ -15,17 +15,17 @@ interface ISignUpState {
 
 class SignUp extends React.Component<ISignUpProps, ISignUpState> {
 
-    private messages = {
-        [ERROR_MSG.allGood]: 'You have successfully registered',
-        [ERROR_MSG.credentials]: 'Username already exists. Choose a different name',
-        [ERROR_MSG.fail]:"sign up failed"
-    };
-
-    private colors = {
-        [ERROR_MSG.allGood]: 'green',
-        [ERROR_MSG.credentials]: 'red',
-        [ERROR_MSG.fail]: 'red'
-    };
+    // private messages = {
+    //     [ERROR_MSG.allGood]: 'You have successfully registered',
+    //     [ERROR_MSG.credentials]: 'Username already exists. Choose a different name',
+    //     [ERROR_MSG.fail]:"sign up failed"
+    // };
+    //
+    // private colors = {
+    //     [ERROR_MSG.allGood]: 'green',
+    //     [ERROR_MSG.credentials]: 'red',
+    //     [ERROR_MSG.fail]: 'red'
+    // };
 
     constructor(props:ISignUpProps){
         super(props);
@@ -63,7 +63,7 @@ class SignUp extends React.Component<ISignUpProps, ISignUpState> {
                             <Field name={'password'} type={'password'} onChange={this.updateField}/>
                             <button className='sign-up-btn' disabled={!this.state.user.name || !this.state.user.password}
                                     type="button" onClick={this.submitHandler}>Sign up</button>
-                            <p style={{color:this.colors[this.props.signUpStatus]}}>{this.messages[this.props.signUpStatus]}</p>
+                            {/*<p>{this.messages[this.props.signUpStatus]}</p>*/}
                         </div>
                     </form>
                 </div>

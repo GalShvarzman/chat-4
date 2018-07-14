@@ -72,10 +72,37 @@ export function saveUserNewDetails(user: IClientUser){
         try {
             const updatedUser = await saveUserDetails(user);
             dispatch(updateUsersAfterEditUserDetails(updatedUser));
-            dispatch(setUpdateDetailsErrorMsg("User details update successfully"));
+            dispatch(setErrorMsg("User details update successfully"));
         }
         catch (e) {
-            dispatch(setUpdateDetailsErrorMsg("Update user details failed"));
+            dispatch(setErrorMsg("Update user details failed"));
+        }
+    }
+}
+
+export function onDeleteUser(userToDelete: IClientUser){
+    return async (dispatch:Dispatch) => {
+        try {
+            await deleteUser(userToDelete);
+            dispatch(updateUsersAndGroupsAfterDeleteUser(userToDelete));
+            dispatch(setErrorMsg("User deleted successfully"));
+        }
+        catch (e) {
+            dispatch(setErrorMsg("Delete user failed"));
+        }
+    };
+}
+
+export function onDeleteGroup(groupToDelete: IClientGroup) {
+    return async (dispatch:Dispatch) => {
+        try {
+            await deleteGroup(groupToDelete);
+            debugger;
+            dispatch(setGroupsAfterDeleteGroup(groupToDelete));
+            dispatch(setErrorMsg(null));
+        }
+        catch (e) {
+            dispatch(setErrorMsg("Delete group failed"));
         }
     }
 }
@@ -85,11 +112,10 @@ export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
-            debugger;
-            dispatch(updateGroupsAfterEditGroupName(updatedGroup, "Group updated successfully"));
+            dispatch(updateGroupsAfterEditGroupName(updatedGroup, null));
         }
         catch (e) {
-            dispatch(setUpdateDetailsErrorMsg("Update group name failed"))
+            dispatch(setErrorMsg("Update group name failed"))
         }
     };
 }
@@ -136,11 +162,11 @@ function updateUsersAfterEditUserDetails(user:any){
     }
 }
 
-function updateGroupsAfterEditGroupName(group:IClientGroup, updateErrorMsg:string){
+function updateGroupsAfterEditGroupName(group:IClientGroup, errorMsg:null){
     return {
         type: 'UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME',
         group,
-        updateErrorMsg
+        errorMsg
     }
 }
 
@@ -166,10 +192,24 @@ function setGroupOptionalParents(groupOptionalParents:IClientGroup[]){
     }
 }
 
-function setUpdateDetailsErrorMsg(updateErrorMsg:string){
+function setErrorMsg(errorMsg:string){
     return{
-        type:'SET_UPDATE_ERROR_MSG',
-        updateErrorMsg
+        type:'SET_ERROR_MSG',
+        errorMsg
+    }
+}
+
+function setGroupsAfterDeleteGroup(deletedGroup:IClientGroup){
+    return {
+        type:'SET_GROUPS_AFTER_DELETE_GROUP',
+        deletedGroup
+    }
+}
+
+function updateUsersAndGroupsAfterDeleteUser(deletedUser:IClientUser){
+    return {
+        type:'SET_USERS_AND_GROUPS_AFTER_DELETE_USER',
+        deletedUser
     }
 }
 

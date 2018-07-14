@@ -15,7 +15,7 @@ export interface IState {
     selectedMessages:IMessage[],
     loggedInUser:IClientUser,
     loginErrorMsg:string | null,
-    updateErrorMsg:string,
+    errorMsg:string|null,
     createNewErrorMsg:string|null,
     updatedGroup:IClientGroup,
     groupsWithGroupsChildren:IClientGroup[]
@@ -30,7 +30,7 @@ const initialState:{} = {
     loggedInUser:null,
     loginErrorMsg:null,
     updatedGroup:null,
-    updateErrorMsg:null,
+    errorMsg:null,
     createNewErrorMsg:null
 };
 
@@ -54,59 +54,9 @@ export class StateStoreService {
         return StateStore.getInstance()[key] || [];
     }
 
-    //
-    // private flatTreeGetAllGroups(items:any){
-    //     const result:any[] = [];
-    //     items.forEach((item:any)=>{
-    //         if(item.type === 'group'){
-    //             result.push(item);
-    //             if(item.items){
-    //                 //result.push(...this.flatTreeGetAllGroups(item.items));
-    //             }
-    //         }
-    //     });
-    //     return result;
-    // }
 
 
 
-    // public getUsers() {
-    //     return StateStore.getInstance().users;
-    // }
-
-    // public getGroups() {
-    //     return StateStore.getInstance().groups;
-    // }
-
-    // public getTree() {
-    //     return StateStore.getInstance().tree;
-    // }
-
-
-
-
-    public async deleteUser(userToDelete: IClientUser): Promise<void> {
-        await deleteUser(userToDelete);
-        const users = this.get('users');
-        const usersClone = [...users];
-        const userIndex = usersClone.findIndex((user) => {
-            return user.id === userToDelete._id;
-        });
-        usersClone.splice(userIndex, 1);
-        this._set('users', usersClone);
-        const tree = await getTree();
-        this._set('tree', tree);
-        this.onStoreChanged(['users', 'tree']);
-    }
-
-    public async deleteGroup(groupToDelete: any) {
-        await deleteGroup(groupToDelete);
-        const groups = await getGroups();
-        this._set('groups', groups);
-        const tree = await getTree();
-        this._set('tree', tree);
-        this.onStoreChanged(['groups', 'tree']);
-    }
 
     public async getGroupData(groupId: string) {
         return await getGroupData(groupId);

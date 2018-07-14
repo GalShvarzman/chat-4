@@ -61,7 +61,7 @@ class UsersService{
         });
         await Promise.all(promises);
 
-        // await users.deleteUser(id);
+        // await users.onDeleteUser(id);
         // const connectorsList = await nTree.getConnectorsList();
         // connectorsList.data = connectorsList.data.filter((connector)=>{
         //     return connector.id !== id;

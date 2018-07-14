@@ -3,15 +3,16 @@ import {Link} from "react-router-dom";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-admin.css';
+import {IClientGroup} from "../interfaces";
 
 interface IGroupAdminProps {
     groups:{name:string, _id:string}[],
-    deleteGroup(group:{_id:string, name:string}):Promise<void>
+    deleteGroup(group:IClientGroup):void,
+    errorMsg:string|null
 }
 
 interface IGroupAdminState {
-    columns:any[],
-    message?:string
+    columns:any[]
 }
 
 class GroupAdmin extends React.PureComponent<IGroupAdminProps,IGroupAdminState>{
@@ -46,12 +47,7 @@ class GroupAdmin extends React.PureComponent<IGroupAdminProps,IGroupAdminState>{
         return {
             onClick: async (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    try {
-                        await this.props.deleteGroup(rowInfo.original);
-                    }
-                    catch (e) {
-                        this.setState({message:"Delete group failed"});
-                    }
+                    this.props.deleteGroup(rowInfo.original);
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -68,7 +64,7 @@ class GroupAdmin extends React.PureComponent<IGroupAdminProps,IGroupAdminState>{
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
                             defaultPageSize={9} minRows={9} className="groups-table" data={this.props.groups}
                             columns={this.state.columns}/>
-                <p hidden={!this.state.message}>{this.state.message}</p>
+                <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
             </>
         )
     }

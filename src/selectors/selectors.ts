@@ -10,7 +10,7 @@ const getGroup = (groupsObj:any, groupId:any) => groupsObj[groupId];
 export const treeSelectors = createSelector(
     [getUsers, getGroups],
     (users, groups) => {
-        if (users.length && groups.length) {
+        if (groups.length) {
             return createTree(groups, users)
         }
         else{
@@ -46,6 +46,7 @@ function walkGroups(group:any, groupsObj:{}, usersObj:{}) {
             let childData;
             if (group.children[0].kind === "Group") {
                 childData = getGroup(groupsObj, child["childId"] || child["_id"]);
+                debugger;
                 if(childData.children.length){
                     childData.children = walkGroups(childData, groupsObj, usersObj);
                 }

@@ -101,8 +101,15 @@ class GroupsService{
     }
 
     async deleteGroup(groupId):Promise<void> {
+        //fixme;
         const groupToDelete = await Group.findOne({_id:groupId});
         const groupsToDelete = await Group.walkGroups(groupToDelete, "checkForGroupChildren"); // fixme check.
+        const groupIndex = groupsToDelete.findIndex((group)=>{
+            return group._id === groupId;
+        });
+        if(groupIndex === -1){
+            groupsToDelete.push(groupToDelete);
+        }
         const groupsToDeleteIds = groupsToDelete.map((group)=>{
             return group._id;
         });

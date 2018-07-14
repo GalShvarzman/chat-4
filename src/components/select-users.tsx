@@ -68,17 +68,17 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
 
     private handleFormSubmit = async (e:React.MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
+        //try {
             const selectedUsersIterator = this.selectedUsers.values();
             await this.props.handelAddUsersToGroup({
                 usersIds: Array.from(selectedUsersIterator),
                 groupId: this.props.location.state.group.id
             });
-            this.setState({message: 'Users added successfully'})
-        }
-        catch (e) {
-            this.setState({message: 'Adding users to the group failed'});
-        }
+         //   this.setState({message: 'Users added successfully'})
+        // }
+        // catch (e) {
+        //     this.setState({message: 'Adding users to the group failed'});
+        // }
     };
 
     render(){

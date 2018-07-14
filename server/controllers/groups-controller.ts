@@ -52,7 +52,7 @@ class GroupsController{
     async saveGroupDetails(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async () => {
            const updatedGroup = await services.groupService.saveGroupDetails(req.body);
-            res.status(201).json(updatedGroup);
+            res.status(200).json(updatedGroup);
         })
     }
 
