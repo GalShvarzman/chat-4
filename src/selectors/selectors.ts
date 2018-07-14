@@ -3,6 +3,7 @@ import {IClientUser} from "../interfaces";
 
 export const getUsers = (state:any) => state.users;
 export const getGroups = (state:any) => state.groups;
+export const getGroupsWithGroupChildren = (state:any) => state.groupsWithGroupsChildren;
 const getUser = (usersObj:any, userId:any) => usersObj[userId];
 const getGroup = (groupsObj:any, groupId:any) => groupsObj[groupId];
 
@@ -44,13 +45,13 @@ function walkGroups(group:any, groupsObj:{}, usersObj:{}) {
         return group.children.map((child: any) => {
             let childData;
             if (group.children[0].kind === "Group") {
-                childData = getGroup(groupsObj, child["childId"]);
+                childData = getGroup(groupsObj, child["childId"] || child["_id"]);
                 if(childData.children.length){
                     childData.children = walkGroups(childData, groupsObj, usersObj);
                 }
             }
             else{
-                childData = getUser(usersObj, child["childId"]);
+                childData = getUser(usersObj, child["childId"] || child["_id"]);
             }
             return childData;
         });

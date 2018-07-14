@@ -27,10 +27,24 @@ export function addMessageToConversation(selectedType: string | undefined, selec
 export function getSelectedMessagesHistory(selectedId: string) {
     return async (dispatch:Dispatch)=>{
         const result = await getSelectedMessages(selectedId);
-        debugger;
         dispatch(setSelectedMessages(result.messages));
     }
 }
+
+export function onCreateNewGroup(group: { name: string, parentId: string }) {
+    return async (dispatch:Dispatch) => {
+        try {
+            const newGroup = await createNewGroup(group);
+            debugger;
+            dispatch(setGroupsAfterCreateNewGroup(newGroup, group.parentId));
+            dispatch(setNewErrorMsg("Group created successfully"));
+        }
+        catch (e) {
+            dispatch(setNewErrorMsg("Create new group failed"));
+        }
+    };
+}
+
 
 export function loadTree():any{
     return async (dispatch:Dispatch) => {
@@ -55,8 +69,14 @@ export function loadGroups():any{
 
 export function saveUserNewDetails(user: IClientUser){
     return async (dispatch:Dispatch)=>{
-        const updatedUser = await saveUserDetails(user);
-        dispatch(updateUsersAfterEditUserDetails(updatedUser));
+        try {
+            const updatedUser = await saveUserDetails(user);
+            dispatch(updateUsersAfterEditUserDetails(updatedUser));
+            dispatch(setUpdateDetailsErrorMsg("User details update successfully"));
+        }
+        catch (e) {
+            dispatch(setUpdateDetailsErrorMsg("Update user details failed"));
+        }
     }
 }
 
@@ -65,16 +85,17 @@ export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
+            debugger;
             dispatch(updateGroupsAfterEditGroupName(updatedGroup, "Group updated successfully"));
         }
         catch (e) {
-            dispatch(updateGroupNameFailed("Update group name failed"))
+            dispatch(setUpdateDetailsErrorMsg("Update group name failed"))
         }
     };
 }
 
 export function authUser(user: { name: string, password: string }) {
-    return async (dispatch:Dispatch)=>{
+    return async (dispatch:Dispatch) => {
         try{
             const loggedInUser = await auth(user);
             socket.emit('login', loggedInUser.name);
@@ -83,6 +104,13 @@ export function authUser(user: { name: string, password: string }) {
         catch (e) {
             dispatch(afterAuthUserFailed("Username or password are wrong"));
         }
+    }
+}
+
+export function getGroupOptionalParents(){
+    return async (dispatch:Dispatch) => {
+        const groupOptionalParents =  await getGroupsWithGroupsChildren();
+        dispatch(setGroupOptionalParents(groupOptionalParents));
     }
 }
 
@@ -131,9 +159,16 @@ function afterAuthUserFailed(loginErrorMsg:string){
     }
 }
 
-function updateGroupNameFailed(updateErrorMsg:string){
+function setGroupOptionalParents(groupOptionalParents:IClientGroup[]){
+    return {
+        type: 'SET_GROUP_OPTIONAL_PARENTS',
+        groupOptionalParents
+    }
+}
+
+function setUpdateDetailsErrorMsg(updateErrorMsg:string){
     return{
-        type:'UPDATE_FAILED',
+        type:'SET_UPDATE_ERROR_MSG',
         updateErrorMsg
     }
 }
@@ -145,15 +180,30 @@ function setSelectedMessages(messages:any[]){
     }
 }
 
+function setGroupsAfterCreateNewGroup(newGroup:IClientGroup, parent:any){
+    return {
+        type:'SET_GROUPS_AFTER_CREATE_NEW_GROUP',
+        newGroup,
+        parent
+    }
+}
+
+function setNewErrorMsg(createNewErrorMsg:string){
+    return {
+        type:'SET_NEW_ERROR_MSG',
+        createNewErrorMsg
+    }
+}
+
 function setUsers(users:IClientUser[]){
-    return{
+    return {
         type: 'SET_USERS',
         users
     }
 }
 
 function setGroups(groups:IClientGroup[]){
-    return{
+    return {
         type: 'SET_GROUPS',
         groups
     }

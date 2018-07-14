@@ -57,8 +57,9 @@ groupSchema.statics = {
     },
 
     async walkGroups(selectedGroup, checkFunc) {
-        const groups = [selectedGroup];
-        if (selectedGroup[checkFunc]()) {
+        const groups = [];
+        if (!!selectedGroup[checkFunc]()) {
+            groups.push(selectedGroup);
             const groupFullData = await selectedGroup.populate('children.childId');
             const promises = groupFullData.children.map(async (groupChild) => {
                 const group = await Group.findOne({_id : groupChild.childId._id}, {__v:0, parentId:0});

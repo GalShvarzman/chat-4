@@ -16,7 +16,7 @@ class UsersService{
         // return {result};
     }
 
-    async saveUserDetails(userDetails:IUserDocument):Promise<{user:{name:string, age:number, id:string}}> {
+    async saveUserDetails(userDetails:IUserDocument):Promise<{name:string, age:number, _id:string, kind:string}> {
         const newAge = userDetails.age;
         const newPassword = await createHash(userDetails.password);
         const user = await User.findOne({_id:userDetails.id});
@@ -28,7 +28,7 @@ class UsersService{
         }
         const updateUser = await user.save();
 
-        return ({user:{id:updateUser._id, name:updateUser["name"], age:updateUser["age"]}});
+        return ({_id:updateUser._id, name:updateUser["name"], age:updateUser["age"], kind:updateUser["kind"]});
 
 
         // const usersData = await users.getUsersFullData();

@@ -1,6 +1,17 @@
 import {IState} from "./store";
-import {afterAuthFailed, setGroups, setSelectedMessages, setTree, setUsers, updateDetailsFailed,
-    updateGroupsAfterEditGroupName, updateLoggedInUser, updateUsersAfterEditUserDetails, userAfterAuth
+import {
+    afterAuthFailed,
+    setGroupOptionalParents,
+    setGroups,
+    setGroupsAfterCreateNewGroup, setNewErrorMsg,
+    setSelectedMessages,
+    setTree,
+    setUsers,
+    setUpdateErrorMsg,
+    updateGroupsAfterEditGroupName,
+    updateLoggedInUser,
+    updateUsersAfterEditUserDetails,
+    userAfterAuth
 } from "./functions";
 
 const options = {
@@ -12,8 +23,11 @@ const options = {
     "UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME" : updateGroupsAfterEditGroupName,
     "USER_AFTER_AUTH" : userAfterAuth,
     "USER_AUTH_FAILED" : afterAuthFailed,
-    "UPDATE_FAILED" : updateDetailsFailed,
-    "USER_LOGGED_OUT" : updateLoggedInUser
+    "SET_UPDATE_ERROR_MSG" : setUpdateErrorMsg,
+    "USER_LOGGED_OUT" : updateLoggedInUser,
+    "SET_GROUP_OPTIONAL_PARENTS" : setGroupOptionalParents,
+    "SET_GROUPS_AFTER_CREATE_NEW_GROUP" : setGroupsAfterCreateNewGroup,
+    'SET_NEW_ERROR_MSG' : setNewErrorMsg
 };
 
 export function reducer (state:IState, action:any){

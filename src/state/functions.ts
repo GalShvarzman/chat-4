@@ -29,12 +29,12 @@ export function setSelectedMessages(state:IState, action:any){
 }
 
 export function updateUsersAfterEditUserDetails(state:IState, action:any){
-    const users = state.users;
-    const usersClone = [...users];
+    const usersClone = [...state.users];
     const userIndex = usersClone.findIndex((user) => {
-        return user._id === action.user.user._id;
+        return user._id === action.user._id;
     });
-    usersClone[userIndex] = action.user.user;
+    usersClone[userIndex] = action.user;
+
     return{
         ...state,
         users : usersClone
@@ -42,8 +42,7 @@ export function updateUsersAfterEditUserDetails(state:IState, action:any){
 }
 
 export function updateGroupsAfterEditGroupName(state:IState, action:any){
-    const groups = state.groups;
-    const groupsClone = [...groups];
+    const groupsClone = [...state.groups];
     const groupIndex = groupsClone.findIndex((group) => {
         return group._id === action.group.group._id;
     });
@@ -71,7 +70,7 @@ export function afterAuthFailed(state:IState, action:any){
     }
 }
 
-export function updateDetailsFailed(state:IState, action:any){
+export function setUpdateErrorMsg(state:IState, action:any){
     return{
         ...state,
         updateErrorMsg:action.updateErrorMsg
@@ -83,5 +82,36 @@ export function updateLoggedInUser(state:IState, action:any){
         ...state,
         loggedInUser:action.loggedInUser,
         loginErrorMsg:action.loginErrorMsg
+    }
+}
+
+export function setGroupOptionalParents(state:IState, action:any){
+    return {
+        ...state,
+        groupsWithGroupsChildren : action.groupOptionalParents
+    }
+}
+
+export function setGroupsAfterCreateNewGroup(state:IState, action:any){
+    const newGroup = action.newGroup;
+    const groupParentId = action.parent;
+    const groupsClone = [...state.groups];
+    const groupParentIndex = groupsClone.findIndex((group) => {
+        return group._id === groupParentId;
+    });
+    if(groupParentIndex !== -1){
+        groupsClone[groupParentIndex].children.push(newGroup);
+    }
+    debugger;
+    return{
+        ...state,
+        groups:groupsClone.concat([newGroup])
+    }
+}
+
+export function setNewErrorMsg(state:IState, action:any){
+    return{
+        ...state,
+        createNewErrorMsg:action.createNewErrorMsg
     }
 }

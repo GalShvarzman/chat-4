@@ -16,7 +16,9 @@ export interface IState {
     loggedInUser:IClientUser,
     loginErrorMsg:string | null,
     updateErrorMsg:string,
-    updatedGroup:IClientGroup
+    createNewErrorMsg:string|null,
+    updatedGroup:IClientGroup,
+    groupsWithGroupsChildren:IClientGroup[]
 }
 
 const initialState:{} = {
@@ -24,10 +26,12 @@ const initialState:{} = {
     users:[],
     groups:[],
     selectedMessages:[],
+    groupsWithGroupsChildren:[],
     loggedInUser:null,
     loginErrorMsg:null,
     updatedGroup:null,
-    updateErrorMsg:null
+    updateErrorMsg:null,
+    createNewErrorMsg:null
 };
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -78,9 +82,7 @@ export class StateStoreService {
     //     return StateStore.getInstance().tree;
     // }
 
-    async getOptionalGroupParents() {
-        return await getGroupsWithGroupsChildren();
-    }
+
 
 
     public async deleteUser(userToDelete: IClientUser): Promise<void> {
@@ -118,15 +120,7 @@ export class StateStoreService {
         return newUser;
     }
 
-    public async createNewGroup(group: { name: string, parent: string }): Promise<{ group: IClientGroup }> {
-        const newGroup = await createNewGroup(group);
-        const groups = this.get('groups');
-        this._set('groups', groups.concat([newGroup]));
-        const tree = await getTree();
-        this._set('tree', tree);
-        this.onStoreChanged(['groups', 'tree']);
-        return newGroup;
-    }
+
 
     public async getOptionalUsers(groupId: string) {
         return await getGroupOptionalUsers(groupId);

@@ -72,7 +72,7 @@ class DB{
             return await this.writeFile(data, fileName);
         }
         catch(e){
-            throw new ClientError(500,"updateDetailsFailed");
+            throw new ClientError(500,"setUpdateErrorMsg");
         }
     }
 

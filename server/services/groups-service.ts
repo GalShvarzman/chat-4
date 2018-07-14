@@ -25,8 +25,7 @@ class GroupsService{
     }
 
     async getGroupsWithGroupsChildren():Promise<IGroup[]>{
-        return await Group.walkGroups(await Group.getRootGroup(), "checkForOptionalGroupParents"); // fixme
-        // fixme
+        return await Group.walkGroups(await Group.getRootGroup(), "checkForOptionalGroupParents");
 
         // const allGroups = await this.getAllGroups();
         // const connectorsList = await this.getConnectorsList();
@@ -92,7 +91,7 @@ class GroupsService{
                 }
             }, {new: true});
         }
-        return newGroup;
+        return ({_id:newGroup._id, name:newGroup.name, kind:'Group', children:newGroup.children});
         // const newGroup = new Group(newGroupDetails.name);
         // return Promise.all([nTree.createNew({type:'group', id:newGroup.id, pId:groupParentId}, 'connectors.json'),
         //                    nTree.createNew(newGroup, 'groups.json')])
@@ -103,7 +102,7 @@ class GroupsService{
 
     async deleteGroup(groupId):Promise<void> {
         const groupToDelete = await Group.findOne({_id:groupId});
-        const groupsToDelete = await Group.walkGroups(groupToDelete, "checkForGroupChildren");
+        const groupsToDelete = await Group.walkGroups(groupToDelete, "checkForGroupChildren"); // fixme check.
         const groupsToDeleteIds = groupsToDelete.map((group)=>{
             return group._id;
         });

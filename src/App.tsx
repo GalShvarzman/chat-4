@@ -18,8 +18,15 @@ import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import {connect} from 'react-redux';
-import {authUser, logOut, saveGroupNewName, saveUserNewDetails} from "./state/actions";
-import {getGroups, getUsers} from "./selectors/selectors";
+import {
+    authUser,
+    onCreateNewGroup,
+    getGroupOptionalParents,
+    logOut,
+    saveGroupNewName,
+    saveUserNewDetails
+} from "./state/actions";
+import {getGroups, getGroupsWithGroupChildren, getUsers} from "./selectors/selectors";
 import {RefObject} from "react";
 
 export const socket = io('http://localhost:4000',{
@@ -46,10 +53,14 @@ interface IAppProps {
     loggedInUser:IClientUser,
     loginErrorMsg:string | null,
     updateErrorMsg: string | null,
+    groupsWithGroupsChildren:IClientGroup[],
+    createNewErrorMsg:string|null,
     onLogOut():void,
-    onEditUserDetails(user: IClientUser): IClientUser,
+    onEditUserDetails(user: IClientUser): void,
     onEditGroupName(group:IClientGroup):void,
-    onAuthUser(user:{name:string,password:string}):IClientUser
+    onAuthUser(user:{name:string,password:string}):IClientUser,
+    onGetGroupOptionalParents():void,
+    onCreateNewGroup(group:{name:string, parentId:string}):void
 }
 
 type AppProps = RouteComponentProps<{}> & IAppProps;
@@ -84,8 +95,8 @@ class App extends React.PureComponent<AppProps , {}> {
     //     }
     // };
 
-    public onEditUserDetails = async (user:IClientUser) => {
-        return await this.props.onEditUserDetails(user);
+    public onEditUserDetails = (user:IClientUser) => {
+        this.props.onEditUserDetails(user);
     };
 
     public onEditGroupName = async (group:IClientGroup) => {
@@ -126,7 +137,7 @@ class App extends React.PureComponent<AppProps , {}> {
 
     public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
 
-    public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
+    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.updateErrorMsg} onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
     public  deleteUser = async(user:{name: string, age: number, _id: string}):Promise<void> => {
         return await stateStoreService.deleteUser(user);
@@ -138,7 +149,13 @@ class App extends React.PureComponent<AppProps , {}> {
 
     public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
+    public newGroupRender = (props:any) => (<NewGroup createNewErrorMsg={this.props.createNewErrorMsg} groupsWithGroupsChildren={this.props.groupsWithGroupsChildren}
+                                                      {...props} onGetGroupOptionalParents={this.onGetGroupOptionalParents}
+                                                      onCreateNewGroup={this.onCreateNewGroup}/>);
+
+    public onGetGroupOptionalParents = () => {
+        this.props.onGetGroupOptionalParents();
+    };
 
     public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} updateErrorMsg={this.props.updateErrorMsg}
                                                         saveGroupNewName={this.onEditGroupName} {...props}/>);
@@ -149,8 +166,8 @@ class App extends React.PureComponent<AppProps , {}> {
         return await stateStoreService.createNewUser(user);
     };
 
-    public onCreateNewGroup = async (group:{name:string, parent:string}) => {
-        return await stateStoreService.createNewGroup(group);
+    public onCreateNewGroup = (group:{name:string, parentId:string}) => {
+        return this.props.onCreateNewGroup(group);
     };
 
     public handelAddUsersToGroup = async(data:{usersIds:string[], groupId:string}) => {
@@ -203,11 +220,12 @@ class App extends React.PureComponent<AppProps , {}> {
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
         users:getUsers(state),
-        //groupsWithUsers:treeSelectors(state),
         groups:getGroups(state),
         loggedInUser:state.loggedInUser,
         loginErrorMsg:state.loginErrorMsg,
-        updateErrorMsg: state.updateErrorMsg
+        updateErrorMsg: state.updateErrorMsg,
+        groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
+        createNewErrorMsg:state.createNewErrorMsg
     }
 };
 
@@ -224,6 +242,12 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         },
         onLogOut: () => {
             dispatch(logOut(null, null));
+        },
+        onGetGroupOptionalParents: () => {
+            dispatch(getGroupOptionalParents())
+        },
+        onCreateNewGroup: (group:{name:string, parentId:string}) => {
+            dispatch(onCreateNewGroup(group))
         }
     }
 };

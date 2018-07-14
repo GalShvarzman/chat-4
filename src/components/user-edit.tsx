@@ -6,7 +6,9 @@ import {IClientUser} from "../interfaces";
 
 interface IUserEditProps {
     location:any,
-    onEditUserDetails(user:IClientUser):Promise<void>}
+    onEditUserDetails(user:IClientUser):void,
+    updateErrorMsg:string|null
+}
 
 interface IUserEditState {
     user: {
@@ -14,8 +16,7 @@ interface IUserEditState {
         age?:number,
         id:string,
         password?:string
-    },
-    message?:string
+    }
 }
 
 class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
@@ -30,14 +31,8 @@ class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
         }
     }
 
-    public save = async () => {
-        try{
-            await this.props.onEditUserDetails(this.state.user);
-            this.setState({message:"Users details updated successfully"});
-        }
-        catch (e) {
-            this.setState({message:"Update user details failed"});
-        }
+    public saveUserNewDetails = () => {
+        this.props.onEditUserDetails(this.state.user);
     };
 
     public updateField = (fieldName: string, value: string) => {
@@ -60,8 +55,8 @@ class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
                     <Field name={'age'} type={'number'} user={this.state.user.age}
                            onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                    <button className="edit-user-save-btn" type="button" onClick={this.save}>Save</button>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
+                    <button className="edit-user-save-btn" type="button" onClick={this.saveUserNewDetails}>Save</button>
+                    <p hidden={!this.props.updateErrorMsg}>{this.props.updateErrorMsg}</p>
                 </div>
             </div>
         )

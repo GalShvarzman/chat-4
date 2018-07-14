@@ -5,26 +5,36 @@ import './new-user.css';
 import './new-group.css';
 import Select from "./select";
 import {stateStoreService} from "../state/store";
+import {IClientGroup} from "../interfaces";
 
 interface INewGroupProps {
     history:any;
-    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, _id:string}
+    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, _id:string},
+    onGetGroupOptionalParents():void,
+    groupsWithGroupsChildren:IClientGroup[],
+    createNewErrorMsg:string|null
 }
 
 interface INewGroupState {
-    group: {name: string, parentId:string},
-    message?:string,
-    groupsWithGroupsChildren:{name:string, _id:string}[]
+    group: {name: string, parentId:string}
 }
 
 class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
     constructor(props:INewGroupProps){
         super(props);
         this.state = {
-            group: {name: '', parentId: 'select'},
-            groupsWithGroupsChildren:[]
+            group: {name: '', parentId: 'select'}
         };
     }
+
+    // static getDerivedStateFromProps(nextProps:INewGroupProps, prevState:INewGroupState){
+    //     if (prevState.groupsWithGroupsChildren !== nextProps.groupsWithGroupsChildren) {
+    //         return {
+    //             groupsWithGroupsChildren: nextProps.groupsWithGroupsChildren,
+    //         };
+    //     }
+    //     return null;
+    // }
 
     public handleSelect = (parentId:any) => {
         this.setState((prevState)=>{
@@ -49,25 +59,16 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
         })
     };
 
-    private getOptions = async ()=>{
-        const groupsWithGroupsChildren = await stateStoreService.getOptionalGroupParents();
-        this.setState({groupsWithGroupsChildren});
+    private getGroupOptionalParents = ()=>{
+        this.props.onGetGroupOptionalParents();
     };
 
     componentDidMount(){
-        this.getOptions();
+        this.getGroupOptionalParents();
     }
 
-    private onCreateNewGroup = async () => {
-        try {
-            const group = await this.props.onCreateNewGroup(this.state.group);
-            const id = group._id;
-            this.props.history.push(id);
-            this.setState({message: "Group created successfully", groupsWithGroupsChildren:this.state.groupsWithGroupsChildren.concat([group])});
-        }
-        catch(e){
-            this.setState({message:"Create group failed"});
-        }
+    private onCreateNewGroup = () => {
+        this.props.onCreateNewGroup(this.state.group);
     };
 
     render(){
@@ -79,8 +80,8 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
                     <div className="new-group-select-parent">Parent</div>
                     <Select parent={this.state.group.parentId} handleSelect={this.handleSelect}
-                            groups={this.state.groupsWithGroupsChildren}/>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
+                            groups={this.props.groupsWithGroupsChildren}/>
+                    <p hidden={!this.props.createNewErrorMsg}>{this.props.createNewErrorMsg}</p>
                     <button onClick={this.onCreateNewGroup} className="create-new-group-btn"
                             disabled={!this.state.group.name || this.state.group.parentId == "select"} type="button">Create</button>
                 </div>
