@@ -24,7 +24,7 @@ export function setUsers(state:IState, action:any){
 export function setSelectedMessages(state:IState, action:any){
     return{
         ...state,
-        selectedMessages:action.selectedMessages
+        selectedMessages:action.messages
     }
 }
 

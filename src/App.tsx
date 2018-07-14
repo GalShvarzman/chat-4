@@ -119,7 +119,7 @@ class App extends React.PureComponent<AppProps , {}> {
 
     public logOut = () => {
         this.props.onLogOut();
-        this.chat.current.onUserLogOut();
+        this.chat.current.getWrappedInstance().onUserLogOut();
     };
 
     public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);

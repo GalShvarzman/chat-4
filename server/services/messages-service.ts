@@ -11,7 +11,7 @@ class MessagesService{
         //return await messagesDb.getConversationMessages(conversationId);
     }
     async saveMessage(message, conversationId){
-        const newMessage = await new Message({message:message.message, date:message.date, sender:message.sender.id});
+        const newMessage = await new Message({message:message.message, date:message.date, sender:message.sender._id});
         await newMessage.save();
         let conversation = await Conversation.findOne({conversationId});
         if (!conversation) {

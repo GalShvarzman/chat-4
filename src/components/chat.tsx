@@ -32,7 +32,7 @@ interface IChatState {
     isAllowedToJoinTheGroup : boolean
 }
 
-class Chat extends React.Component<IChatProps, IChatState> {
+class Chat extends React.PureComponent<IChatProps, IChatState> {
     public messagesRef:any;
 
     constructor(props:IChatProps) {
@@ -55,14 +55,12 @@ class Chat extends React.Component<IChatProps, IChatState> {
     };
 
     public getSelectedConversationMessagesHistory = (eventTarget:any) => {
-        debugger;
         if (eventTarget.tagName !== 'UL' && eventTarget.tagName !== 'LI' && this.props.loggedInUser) {
             this.setStateOnSelected(eventTarget);
         }
     };
 
     private setStateOnSelected = (eventTarget:any) => {
-        debugger;
         let previousSelectedId;
         const previousSelectedType = this.state.selectedType;
         if(previousSelectedType === "user"){
@@ -243,4 +241,4 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps)(Chat);
+    mapDispatchToProps, null,{ withRef: true })(Chat);
