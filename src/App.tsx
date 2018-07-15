@@ -17,8 +17,10 @@ import SelectUsers from "./components/select-users";
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import {connect} from 'react-redux';
-import {authUser, onCreateNewGroup, getGroupOptionalParents, logOut, saveGroupNewName, saveUserNewDetails,
-    onDeleteUser, onDeleteGroup} from "./state/actions";
+import {
+    authUser, onCreateNewGroup, getGroupOptionalParents, logOut, saveGroupNewName, saveUserNewDetails,
+    onDeleteUser, onDeleteGroup, getSelectedGroupData
+} from "./state/actions";
 import {getGroups, getGroupsWithGroupChildren, getUsers} from "./selectors/selectors";
 import {RefObject} from "react";
 
@@ -34,6 +36,8 @@ interface IAppProps {
     errorMsg: string | null,
     groupsWithGroupsChildren:IClientGroup[],
     createNewErrorMsg:string|null,
+    selectedGroupData:{}|null,
+    onSelectGroupToEdit(groupId:string):void,
     onLogOut():void,
     onEditUserDetails(user: IClientUser): void,
     onEditGroupName(group:IClientGroup):void,
@@ -54,27 +58,6 @@ class App extends React.PureComponent<AppProps , {}> {
         super(props);
         this.chat = React.createRef();
     }
-
-    // componentWillMount(){
-    //     stateStoreService.subscribe(this.onSubscribe);
-    // }
-    //
-    // componentWillUnmount(){
-    //     stateStoreService.unsubscribe(this.onSubscribe);
-    // };
-    //
-    // componentDidMount(){
-    //     this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups')})
-    // }
-    //
-    // private onSubscribe = async (event:{changed:string[]}) => {
-    //     if(event.changed){
-    //         event.changed.forEach((change)=>{
-    //             const result  = changeOptions[change]();
-    //             this.setState({[change]:result});
-    //         })
-    //     }
-    // };
 
     public onEditUserDetails = (user:IClientUser) => {
         this.props.onEditUserDetails(user);
@@ -138,7 +121,7 @@ class App extends React.PureComponent<AppProps , {}> {
         this.props.onGetGroupOptionalParents();
     };
 
-    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup} updateErrorMsg={this.props.errorMsg}
+    public groupEditRender = (props:any) => (<GroupEdit selectedGroupData={this.props.selectedGroupData} onSelectGroupToEdit={this.props.onSelectGroupToEdit} deleteGroup={this.deleteGroup} updateErrorMsg={this.props.errorMsg}
                                                         saveGroupNewName={this.onEditGroupName} {...props}/>);
 
     public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
@@ -207,7 +190,8 @@ const mapStateToProps = (state:any, ownProps:any) => {
         loginErrorMsg:state.loginErrorMsg,
         errorMsg: state.errorMsg,
         groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
-        createNewErrorMsg:state.createNewErrorMsg
+        createNewErrorMsg:state.createNewErrorMsg,
+        selectedGroupData:state.selectedGroupData
     }
 };
 
@@ -236,6 +220,9 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         },
         onDeleteGroup:(group:IClientGroup) => {
             dispatch(onDeleteGroup(group));
+        },
+        onSelectGroupToEdit:(groupId:string) => {
+            dispatch(getSelectedGroupData(groupId))
         }
     }
 };

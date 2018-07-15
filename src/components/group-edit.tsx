@@ -11,7 +11,9 @@ interface IGroupEditProps {
     location: any,
     saveGroupNewName(group: { name: string, id: string }): void,
     deleteGroup(group:IClientGroup):void,
-    updateErrorMsg:string
+    updateErrorMsg:string,
+    onSelectGroupToEdit(groupId:string):void,
+    selectedGroupData:{}|null
 }
 
 interface IGroupEditState {
@@ -25,7 +27,7 @@ interface IGroupEditState {
     addNewUserBtnIsHidden:boolean
 }
 
-class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
+class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
     constructor(props:IGroupEditProps){
         super(props);
 
@@ -69,54 +71,43 @@ class GroupEdit extends React.Component<IGroupEditProps, IGroupEditState>{
     };
 
     async componentDidMount(){
-       this.getGroupData();
+       this.props.onSelectGroupToEdit(this.state.group.id);
     }
 
-    async getGroupData(){
-        const groupData = await stateStoreService.getGroupData(this.state.group.id);
-        if(groupData.children.length && groupData.children[0].kind === 'Group'){
-            this.setState({addNewUserBtnIsHidden : true});
-        }
-        this.setState(prevState=>{
-            return{
+    static getDerivedStateFromProps(nextProps:IGroupEditProps, prevState:IGroupEditState) {
+        if (nextProps.selectedGroupData !== null && nextProps.selectedGroupData !== prevState.group) {
+            debugger;
+            return {
                 group:{
                     ...prevState.group,
-                    children:groupData.children,
-                    parentId:groupData.parentId
+                    children:nextProps.selectedGroupData["children"],
+                    parentId:nextProps.selectedGroupData["parentId"]
                 }
             }
-        });
+        }
+        return null;
     }
+
+    componentDidUpdate(){
+        this.groupChildrenCheck();
+    }
+
+    groupChildrenCheck = () => {
+        if(this.props.selectedGroupData["children"].length && this.props.selectedGroupData["children"][0].kind === 'Group'){
+            this.setState({addNewUserBtnIsHidden : true});
+        }
+    };
 
     private onClickEvent = (state:any, rowInfo:any, column:any, instance:any) => {
         return {
             onClick: (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    //try{
-                        if(rowInfo.original.kind === 'User'){
-                            debugger;
-                             stateStoreService.deleteUserFromGroup(rowInfo.original.childId._id, this.state.group.id);
-                        }
-                        else{
-                            this.props.deleteGroup(rowInfo.original);
-                        }
-                    //     const groupChildrenClone = [...this.state.group.children];
-                    //     const deletedGroupId = groupChildrenClone.findIndex((child)=>{
-                    //         return child._id === rowInfo.original._id;
-                    //     });
-                    //     groupChildrenClone.splice(deletedGroupId, 1);
-                    //     this.setState(prevState => {
-                    //         return{
-                    //             group:{
-                    //                 ...this.state.group,
-                    //                 children : groupChildrenClone
-                    //             }
-                    //         }
-                    //     })
-                    // }
-                    // catch (e) {
-                    //     //this.setState({message:"Delete failed"});
-                    // }
+                    if(rowInfo.original.kind === 'User'){
+                         stateStoreService.deleteUserFromGroup(rowInfo.original.childId._id, this.state.group.id);
+                    }
+                    else{
+                        this.props.deleteGroup(rowInfo.original);
+                    }
                 }
                 if (handleOriginal) {
                     handleOriginal();

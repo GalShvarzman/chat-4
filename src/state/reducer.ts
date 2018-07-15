@@ -1,7 +1,21 @@
 import {IState} from "./store";
-import {afterAuthFailed, setGroupOptionalParents, setGroups, setGroupsAfterCreateNewGroup, setNewErrorMsg,
-    setSelectedMessages, setTree, setUsers, setUpdateErrorMsg, updateGroupsAfterEditGroupName, updateLoggedInUser,
-    updateUsersAfterEditUserDetails, userAfterAuth, setUsersAndGroupsAfterDeleteUser, setGroupsAfterDeleteGroup
+import {
+    afterAuthFailed,
+    setGroupOptionalParents,
+    setGroups,
+    setGroupsAfterCreateNewGroup,
+    setNewErrorMsg,
+    setSelectedMessages,
+    setTree,
+    setUsers,
+    setUpdateErrorMsg,
+    updateGroupsAfterEditGroupName,
+    updateLoggedInUser,
+    updateUsersAfterEditUserDetails,
+    userAfterAuth,
+    setUsersAndGroupsAfterDeleteUser,
+    setGroupsAfterDeleteGroup,
+    setSelectedGroupData
 } from "./functions";
 
 const options = {
@@ -19,7 +33,8 @@ const options = {
     "SET_GROUPS_AFTER_CREATE_NEW_GROUP" : setGroupsAfterCreateNewGroup,
     'SET_NEW_ERROR_MSG' : setNewErrorMsg,
     "SET_USERS_AND_GROUPS_AFTER_DELETE_USER" : setUsersAndGroupsAfterDeleteUser,
-    "SET_GROUPS_AFTER_DELETE_GROUP" : setGroupsAfterDeleteGroup
+    "SET_GROUPS_AFTER_DELETE_GROUP" : setGroupsAfterDeleteGroup,
+    "SET_SELECTED_GROUP_DATA" : setSelectedGroupData
 };
 
 export function reducer (state:IState, action:any){

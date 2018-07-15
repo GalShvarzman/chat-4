@@ -109,6 +109,18 @@ export function onDeleteGroup(groupToDelete: IClientGroup) {
     }
 }
 
+export function getSelectedGroupData(groupId: string) {
+    return async (dispatch:Dispatch) => {
+        try {
+            const groupData = await getGroupData(groupId);
+            dispatch(setSelectedGroupData(groupData));
+        }
+        catch (e) {
+            //fixme
+        }
+    }
+}
+
 
 export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
@@ -203,6 +215,13 @@ function setErrorMsg(errorMsg:string){
     return{
         type:'SET_ERROR_MSG',
         errorMsg
+    }
+}
+
+function setSelectedGroupData(groupData:{}){
+    return {
+        type:'SET_SELECTED_GROUP_DATA',
+        groupData
     }
 }
 

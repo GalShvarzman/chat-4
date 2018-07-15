@@ -127,6 +127,13 @@ function walkGroups(selectedGroup:IClientGroup){
     return groupsToDelete;
 }
 
+export function setSelectedGroupData(state:IState, action:any){
+    return {
+        ...state,
+        selectedGroupData:action.groupData
+    }
+}
+
 export function setGroupsAfterDeleteGroup(state:IState, action:any){
     const deletedGroup = action.deletedGroup;
     const groupsToDelete = walkGroups(deletedGroup);

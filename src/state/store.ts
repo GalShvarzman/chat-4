@@ -18,7 +18,8 @@ export interface IState {
     errorMsg:string|null,
     createNewErrorMsg:string|null,
     updatedGroup:IClientGroup,
-    groupsWithGroupsChildren:IClientGroup[]
+    groupsWithGroupsChildren:IClientGroup[],
+    selectedGroupDate:{}|null
 }
 
 const initialState:{} = {
@@ -26,6 +27,7 @@ const initialState:{} = {
     users:[],
     groups:[],
     selectedMessages:[],
+    selectedGroupData:null,
     groupsWithGroupsChildren:[],
     loggedInUser:null,
     loginErrorMsg:null,
@@ -40,11 +42,6 @@ export const store = createStore(reducer, initialState, composeEnhancers(applyMi
 
 
 export class StateStoreService {
-    listeners: Function[];
-
-    constructor() {
-        this.listeners = [];
-    }
 
     private _set(key: string, val: any) {
         StateStore.getInstance()[key] = val;
@@ -57,16 +54,11 @@ export class StateStoreService {
 
 
 
-
-    public async getGroupData(groupId: string) {
-        return await getGroupData(groupId);
-    }
-
     public async createNewUser(user: IClientUser): Promise<{ user: IClientUser }> {
         const newUser = await createNewUser(user);
         const users = this.get('users');
         this._set('users', users.concat([newUser.user]));
-        this.onStoreChanged(['users']);
+        //this.onStoreChanged(['users']);
         return newUser;
     }
 
@@ -80,7 +72,7 @@ export class StateStoreService {
         await addUsersToGroup(data);
         const tree = await getTree();
         this._set('tree', tree);
-        this.onStoreChanged(['tree']);
+        //this.onStoreChanged(['tree']);
     }
 
     // public subscribe(listener: any) {
@@ -94,18 +86,18 @@ export class StateStoreService {
     //     }
     // }
 
-    private onStoreChanged(whatChanged: string[]) {
-        const event = {changed: whatChanged};
-        for (const listener of this.listeners) {
-            listener(event);
-        }
-    }
+    // private onStoreChanged(whatChanged: string[]) {
+    //     const event = {changed: whatChanged};
+    //     for (const listener of this.listeners) {
+    //         listener(event);
+    //     }
+    // }
 
     public async deleteUserFromGroup(userId: string, groupId: string) {
         await deleteUserFromGroup(userId, groupId);
         const tree = await getTree();
         this._set('tree', tree);
-        this.onStoreChanged(['tree']);
+        //this.onStoreChanged(['tree']);
     }
 
 }
