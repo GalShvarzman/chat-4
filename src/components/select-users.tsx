@@ -22,7 +22,7 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
 
     constructor(props:ISelectUsersProps){
         super(props);
-        debugger;
+
         this.state = {
             users:[],
             columns : [

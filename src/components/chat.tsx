@@ -50,7 +50,6 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     }
 
     public onUserLogOut = () => {
-        debugger;
         this.setState({selectedId:"", selectedType:"", selectedName:""});
     };
 
@@ -150,7 +149,6 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     };
 
     public onClickSend = (event:React.MouseEvent<HTMLButtonElement>) => {
-        debugger;
         if(this.props.loggedInUser && this.state.selectedName){
             this.addMessage();
         }
@@ -175,7 +173,6 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     public addMessage = ()=>{
         this.setState({message : new Message(this.state.message.message, new Date(), this.props.loggedInUser)}, async()=>{
             let conversationId;
-            debugger;
             if(this.state.selectedType === "User"){
                 conversationId = [this.props.loggedInUser._id, this.state.selectedId].sort().join("_");
             }

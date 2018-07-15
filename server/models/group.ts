@@ -17,7 +17,8 @@ export interface IGroup extends IGroupDocument {
 export interface IGroupModel extends Model<IGroup> {
     getAllGroups():IGroup[],
     getRootGroup():IGroup,
-    walkGroups(selectedGroup, checkFunc):IGroup[]
+    walkGroups(selectedGroup, checkFunc):IGroup[],
+    getGroupsToDelete(selectedGroup, checkFunc):IGroup[]
 }
 
 const groupSchema = new mongoose.Schema({
@@ -48,7 +49,7 @@ groupSchema.methods = {
 
 groupSchema.statics = {
     async getAllGroups() {
-        return await Group.find({}, {__v: 0, parentId: 0});
+        return await Group.find({}, {__v: 0});
     },
 
     async getRootGroup() {
@@ -63,6 +64,19 @@ groupSchema.statics = {
             const promises = groupFullData.children.map(async (groupChild) => {
                 const group = await Group.findOne({_id : groupChild.childId._id}, {__v:0, parentId:0});
                 groups.push(...await this.walkGroups(group, checkFunc));
+            });
+            await Promise.all(promises);
+        }
+        return groups;
+    },
+
+    async getGroupsToDelete(selectedGroup, checkFunc) {
+        const groups = [selectedGroup];
+        if (!!selectedGroup[checkFunc]()) {
+            const groupFullData = await selectedGroup.populate('children.childId');
+            const promises = groupFullData.children.map(async (groupChild) => {
+                const group = await Group.findOne({_id : groupChild.childId._id}, {__v:0, parentId:0});
+                groups.push(...await this.getGroupsToDelete(group, checkFunc));
             });
             await Promise.all(promises);
         }

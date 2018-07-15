@@ -8,7 +8,6 @@ import {IMessage} from "../models/message";
 import {socket} from "../App";
 
 export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, _id: string } | null) {
-    debugger;
     return async (dispatch:Dispatch)=>{
         if (loggedInUser && selectedId) {
             let conversationId;
@@ -35,7 +34,6 @@ export function onCreateNewGroup(group: { name: string, parentId: string }) {
     return async (dispatch:Dispatch) => {
         try {
             const newGroup = await createNewGroup(group);
-            debugger;
             dispatch(setGroupsAfterCreateNewGroup(newGroup, group.parentId));
             dispatch(setNewErrorMsg("Group created successfully"));
         }
@@ -62,8 +60,13 @@ export function loadUsers():any{
 
 export function loadGroups():any{
     return async (dispatch:Dispatch) => {
-        const groups = await getGroups();
-        dispatch(setGroups(groups));
+        try {
+            const groups = await getGroups();
+            dispatch(setGroups(groups));
+        }
+        catch (e) {
+            //fixme;
+        }
     }
 }
 
@@ -97,7 +100,6 @@ export function onDeleteGroup(groupToDelete: IClientGroup) {
     return async (dispatch:Dispatch) => {
         try {
             await deleteGroup(groupToDelete);
-            debugger;
             dispatch(setGroupsAfterDeleteGroup(groupToDelete));
             dispatch(setErrorMsg(null));
         }
@@ -135,8 +137,13 @@ export function authUser(user: { name: string, password: string }) {
 
 export function getGroupOptionalParents(){
     return async (dispatch:Dispatch) => {
-        const groupOptionalParents =  await getGroupsWithGroupsChildren();
-        dispatch(setGroupOptionalParents(groupOptionalParents));
+        try {
+            const groupOptionalParents = await getGroupsWithGroupsChildren();
+            dispatch(setGroupOptionalParents(groupOptionalParents));
+        }
+        catch (e) {
+            //fixme
+        }
     }
 }
 

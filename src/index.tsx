@@ -5,11 +5,9 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter} from 'react-router-dom';
 import {store} from './state/store';
-import {loadGroups, loadTree, loadUsers} from "./state/actions";
+import {loadGroups, loadUsers} from "./state/actions";
 import {Provider} from "react-redux";
 
-
-//store.dispatch(loadTree());
 store.dispatch(loadUsers());
 store.dispatch(loadGroups());
 

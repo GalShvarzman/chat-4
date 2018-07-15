@@ -131,30 +131,21 @@ export function setGroupsAfterDeleteGroup(state:IState, action:any){
     const deletedGroup = action.deletedGroup;
     const groupsToDelete = walkGroups(deletedGroup);
     const groupsToDeleteIds = groupsToDelete.map(group => group._id);
-    const groupsClone = [...state.groups];
-    const newGroups = groupsClone.filter((group)=>{
-        return groupsToDeleteIds.indexOf(group._id) == -1;
+    let groupsClone = [...state.groups];
+    groupsClone = groupsClone.filter((group)=>{
+        return groupsToDeleteIds.indexOf(group._id) === -1;
     });
-    debugger;
-    // const deletedGroupIndex = groupsClone.findIndex((group)=>{
-    //     return group._id === deletedGroup._id;
-    // });
-    // if(deletedGroupIndex !== -1){
-    //     //groupsClone.splice(deletedGroupIndex, 1);
-    //     groupsClone.forEach((group)=>{
-    //         if(group.children.length && group.children[0].kind === 'Group'){
-    //             const groupIndex = group.children.findIndex((group:any)=>{
-    //                 return group._id === deletedGroup._id;
-    //             });
-    //             if(groupIndex !== -1){
-    //                 group.children.splice(groupIndex, 1);
-    //             }
-    //         }
-    //     })
-    //}
+    const parentGroupId = deletedGroup.parentId;
+    const parentGroup = groupsClone.find((group) => group._id === parentGroupId);
+    if(parentGroup){
+        const deletedGroupIndexInParentChildren = parentGroup.children.findIndex((child:any) => child.childId === deletedGroup._id);
+        if(deletedGroupIndexInParentChildren !== -1){
+            parentGroup.children.splice(deletedGroupIndexInParentChildren, 1);
+        }
+    }
     return {
         ...state,
-        groups:newGroups
+        groups:groupsClone
     }
 }
 

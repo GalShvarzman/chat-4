@@ -1,17 +1,7 @@
 import {IState} from "./store";
-import {
-    afterAuthFailed,
-    setGroupOptionalParents,
-    setGroups,
-    setGroupsAfterCreateNewGroup, setNewErrorMsg,
-    setSelectedMessages,
-    setTree,
-    setUsers,
-    setUpdateErrorMsg,
-    updateGroupsAfterEditGroupName,
-    updateLoggedInUser,
-    updateUsersAfterEditUserDetails,
-    userAfterAuth, setUsersAndGroupsAfterDeleteUser, setGroupsAfterDeleteGroup
+import {afterAuthFailed, setGroupOptionalParents, setGroups, setGroupsAfterCreateNewGroup, setNewErrorMsg,
+    setSelectedMessages, setTree, setUsers, setUpdateErrorMsg, updateGroupsAfterEditGroupName, updateLoggedInUser,
+    updateUsersAfterEditUserDetails, userAfterAuth, setUsersAndGroupsAfterDeleteUser, setGroupsAfterDeleteGroup
 } from "./functions";
 
 const options = {

@@ -1,7 +1,6 @@
 import {db} from "../lib/DB";
 const groupsFile = 'groups.json';
 const connectorsFile = 'connectors.json';
-import {IConnector} from '../services/groups-service';
 export class NTree{
 
     public async createNew(newDetails, fileName){
@@ -32,7 +31,7 @@ export class NTree{
         return await db.getFullData(groupsFile);
     }
 
-    public async getConnectorsList():Promise<{data:IConnector[]}>{
+    public async getConnectorsList():Promise<{data:any[]}>{
         return await db.getFullData(connectorsFile);
     }
 
