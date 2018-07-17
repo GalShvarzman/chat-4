@@ -19,11 +19,10 @@ export function addMessageToConversation(selectedType: string | undefined, selec
                     conversationId = [selectedId, loggedInUser._id].sort().join("_");
                 }
                 await addMessage(message, conversationId);
-                dispatch({type: ""});
             }
         }
         catch (e) {
-            //fixme
+            dispatch(setErrorMsg("Failed to save the message"));
         }
     }
 }
@@ -35,7 +34,7 @@ export function getSelectedMessagesHistory(selectedId: string) {
             dispatch(setSelectedMessages(result.messages));
         }
         catch(e){
-            //fixme
+            dispatch(setErrorMsg("Fetch messages history failed"));
         }
     }
 }
@@ -45,10 +44,10 @@ export function onCreateNewGroup(group: { name: string, parentId: string }) {
         try {
             const newGroup = await createNewGroup(group);
             dispatch(setGroupsAfterCreateNewGroup(newGroup, group.parentId));
-            dispatch(setCreateNewErrorMsg("Group created successfully"));
+            dispatch(setErrorMsg("Group created successfully"));
         }
         catch (e) {
-            dispatch(setCreateNewErrorMsg("Create new group failed"));
+            dispatch(setErrorMsg("Create new group failed"));
         }
     };
 }
@@ -60,7 +59,7 @@ export function loadUsers():any{
             dispatch(setUsers(users));
         }
         catch (e) {
-            //fixme
+            dispatch(setErrorMsg("Fetch users failed"));
         }
     }
 }
@@ -72,7 +71,7 @@ export function loadGroups():any{
             dispatch(setGroups(groups));
         }
         catch (e) {
-            //fixme;
+            dispatch(setErrorMsg("Fetch groups failed"));
         }
     }
 }
@@ -123,7 +122,7 @@ export function getSelectedGroupData(groupId: string) {
             dispatch(setSelectedGroupData(groupData));
         }
         catch (e) {
-            //fixme
+            dispatch(setErrorMsg("Fetch group data failed"));
         }
     }
 }
@@ -133,10 +132,10 @@ export function onCreateNewUser(user: IClientUser){
         try {
             const newUser = await createNewUser(user);
             dispatch(setUsersAfterCreateNewUser(newUser));
-            dispatch(setNewUserErrorMsg("User created successfully"));
+            dispatch(setErrorMsg("User created successfully"));
         }
         catch (e) {
-            dispatch(setNewUserErrorMsg("Username already exist, choose a different name"));
+            dispatch(setErrorMsg("Username already exist, choose a different name"));
         }
     };
 }
@@ -146,10 +145,11 @@ export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
-            dispatch(updateGroupsAfterEditGroup(updatedGroup, null));
+            dispatch(updateGroupsAfterEditGroup(updatedGroup));
+            dispatch(setErrorMsg("Group name updated successfully"));
         }
         catch (e) {
-            dispatch(setErrorMsg("Update group name failed"))
+            dispatch(setErrorMsg("Update group name failed"));
         }
     };
 }
@@ -159,10 +159,10 @@ export function authUser(user: { name: string, password: string }) {
         try{
             const loggedInUser = await auth(user);
             socket.emit('login', loggedInUser.name);
-            dispatch(afterAuthUser(loggedInUser, "You are logged in"));
+            dispatch(setLoggedInUser(loggedInUser));
         }
         catch (e) {
-            dispatch(afterAuthUserFailed("Username or password are wrong"));
+            dispatch(setErrorMsg("Username or password are wrong"));
         }
     }
 }
@@ -174,7 +174,7 @@ export function getGroupOptionalParents(){
             dispatch(setGroupOptionalParents(groupOptionalParents));
         }
         catch (e) {
-            //fixme
+            dispatch(setErrorMsg("Fetch group optional parents failed"));
         }
     }
 }
@@ -183,7 +183,8 @@ export function onAddUsersToGroup(data: { usersIds: string[], groupId: string })
     return async(dispatch:Dispatch) => {
         try {
             const updatedGroup = await addUsersToGroup(data);
-            dispatch(updateGroupsAfterEditGroup(updatedGroup, "Users added successfully to group"));
+            dispatch(updateGroupsAfterEditGroup(updatedGroup));
+            dispatch(setErrorMsg("Users added successfully to group"));
         }
         catch (e) {
             dispatch(setErrorMsg("Add users to group failed"));
@@ -198,7 +199,7 @@ export function onGetGroupOptionalUsers(groupId: string) {
             dispatch(setGroupOptionalUsers(groupOptionalUsers));
         }
         catch (e) {
-            dispatch(setAddUsersToGroupErrorMsg("Fetch optional users failed"));
+            dispatch(setErrorMsg("Fetch optional users failed"));
         }
     };
 }
@@ -216,14 +217,6 @@ export function onDeleteUserFromGroup(userId: string, groupId: string):any {
     }
 }
 
-export function logOut(loggedInUser:null, loginErrorMsg:null){
-    return {
-        type:'USER_LOGGED_OUT',
-        loggedInUser,
-        loginErrorMsg
-    }
-}
-
 function updateUsersAfterEditUserDetails(user:any){
     return {
         type: 'UPDATE_USERS_AFTER_EDIT_USER_DETAILS',
@@ -231,11 +224,10 @@ function updateUsersAfterEditUserDetails(user:any){
     }
 }
 
-function updateGroupsAfterEditGroup(group:IClientGroup, errorMsg:null|string){
+function updateGroupsAfterEditGroup(group:IClientGroup){
     return {
         type: 'UPDATE_GROUPS_AFTER_EDIT_GROUP',
-        group,
-        errorMsg
+        group
     }
 }
 
@@ -246,18 +238,10 @@ function setUsersAfterCreateNewUser(newUser:any){
     }
 }
 
-function afterAuthUser(loggedInUser:IClientUser, loginErrorMsg:string){
+export function setLoggedInUser(loggedInUser:IClientUser){
     return {
-        type: 'USER_AFTER_AUTH',
-        loggedInUser,
-        loginErrorMsg
-    }
-}
-
-function afterAuthUserFailed(loginErrorMsg:string){
-    return {
-        type: 'USER_AUTH_FAILED',
-        loginErrorMsg
+        type: 'SET_LOGGED_IN_USER',
+        loggedInUser
     }
 }
 
@@ -275,13 +259,6 @@ function setGroupOptionalUsers(groupOptionalUsers:any[]){
     }
 }
 
-export function setAddUsersToGroupErrorMsg(addUsersToGroupErrorMsg:string|null){
-    return{
-     type:'SET_ADD_USERS_TO_GROUP_ERROR_MSG',
-     addUsersToGroupErrorMsg
-    }
-}
-
 export function setErrorMsg(errorMsg:string){
     return{
         type:'SET_ERROR_MSG',
@@ -294,13 +271,6 @@ function setGroupsAfterDeleteUserFromGroup(userId:string, groupId:string){
         type:'SET_GROUPS_AFTER_DELETE_USER_FROM_GROUP',
         userId,
         groupId
-    }
-}
-
-export function setNewUserErrorMsg(newUserErrorMsg:string|null){
-    return{
-        type:'SET_NEW_USER_ERROR_MSG',
-        newUserErrorMsg
     }
 }
 
@@ -325,7 +295,7 @@ function updateUsersAndGroupsAfterDeleteUser(deletedUser:IClientUser){
     }
 }
 
-function setSelectedMessages(messages:any[]){
+export function setSelectedMessages(messages:any[]){
     return {
         type:'SET_SELECTED_MESSAGES',
         messages
@@ -337,13 +307,6 @@ function setGroupsAfterCreateNewGroup(newGroup:IClientGroup, parent:any){
         type:'SET_GROUPS_AFTER_CREATE_NEW_GROUP',
         newGroup,
         parent
-    }
-}
-
-export function setCreateNewErrorMsg(createNewErrorMsg:string){
-    return {
-        type:'SET_NEW_ERROR_MSG',
-        createNewErrorMsg
     }
 }
 

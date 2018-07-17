@@ -6,14 +6,14 @@ import './new-group.css';
 import Select from "./select";
 import {IClientGroup} from "../interfaces";
 import {store} from "../state/store";
-import {setCreateNewErrorMsg} from "../state/actions";
+import {setErrorMsg} from "../state/actions";
 
 interface INewGroupProps {
     history:any;
     onCreateNewGroup(group:{name:string, parentId:string}):{name:string, _id:string},
     onGetGroupOptionalParents():void,
     groupsWithGroupsChildren:IClientGroup[],
-    createNewErrorMsg:string|null
+    errorMsg:string|null
 }
 
 interface INewGroupState {
@@ -29,7 +29,7 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
     }
 
     componentWillUnmount(){
-        store.dispatch(setCreateNewErrorMsg(null));
+        store.dispatch(setErrorMsg(null));
     }
 
     public handleSelect = (parentId:any) => {
@@ -77,7 +77,7 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
                     <div className="new-group-select-parent">Parent</div>
                     <Select parent={this.state.group.parentId} handleSelect={this.handleSelect}
                             groups={this.props.groupsWithGroupsChildren}/>
-                    <p hidden={!this.props.createNewErrorMsg}>{this.props.createNewErrorMsg}</p>
+                    <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                     <button onClick={this.onCreateNewGroup} className="create-new-group-btn"
                             disabled={!this.state.group.name || this.state.group.parentId == "select"} type="button">Create</button>
                 </div>

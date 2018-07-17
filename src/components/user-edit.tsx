@@ -3,6 +3,8 @@ import Field from "./field";
 import './user-edit.css';
 import {Link} from "react-router-dom";
 import {IClientUser} from "../interfaces";
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface IUserEditProps {
     location:any,
@@ -45,6 +47,10 @@ class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
             }
         })
     };
+
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
 
     render(){
         return(

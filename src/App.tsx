@@ -4,7 +4,6 @@ import {Switch, Route, Link} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
 import SignUp from "./components/sign-up";
-import {stateStoreService} from "./state/store";
 import Chat from "./components/chat";
 import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
@@ -18,8 +17,19 @@ import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import {connect} from 'react-redux';
 import {
-    authUser, onCreateNewGroup, getGroupOptionalParents, logOut, saveGroupNewName, saveUserNewDetails,
-    onDeleteUser, onDeleteGroup, getSelectedGroupData, onCreateNewUser, onGetGroupOptionalUsers, onAddUsersToGroup
+    authUser,
+    onCreateNewGroup,
+    getGroupOptionalParents,
+    saveGroupNewName,
+    saveUserNewDetails,
+    onDeleteUser,
+    onDeleteGroup,
+    getSelectedGroupData,
+    onCreateNewUser,
+    onGetGroupOptionalUsers,
+    onAddUsersToGroup,
+    setErrorMsg,
+    setLoggedInUser
 } from "./state/actions";
 import {getGroups, getGroupsWithGroupChildren, getUsers} from "./selectors/selectors";
 import {RefObject} from "react";
@@ -32,15 +42,11 @@ interface IAppProps {
     users: IClientUser[],
     groups: IClientGroup[],
     loggedInUser:IClientUser,
-    loginErrorMsg:string | null,
     errorMsg: string | null,
     groupsWithGroupsChildren:IClientGroup[],
-    createNewErrorMsg:string|null,
     selectedGroupData:{}|null,
     newUser:IClientUser|null,
-    newUserErrorMsg:string|null,
     groupOptionalUsers:IClientUser[]|null,
-    addUsersToGroupErrorMsg:string|null,
     onSelectGroupToEdit(groupId:string):void,
     onLogOut():void,
     onEditUserDetails(user: IClientUser): void,
@@ -93,7 +99,7 @@ class App extends React.PureComponent<AppProps , {}> {
     };
 
     public loginRender = (props:any) => this.props.loggedInUser ? (<Redirect to={'/chat'}/>) :
-        (<Login {...props} onSubmit={this.onLoginSubmitHandler} loginErrorMsg={this.props.loginErrorMsg}/>);
+        (<Login {...props} onSubmit={this.onLoginSubmitHandler} errorMsg={this.props.errorMsg}/>);
 
     public signUpRender = (props:any)=>(<SignUp {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
@@ -118,9 +124,9 @@ class App extends React.PureComponent<AppProps , {}> {
          this.props.onDeleteGroup(group);
     };
 
-    public newUserRender = (props:any) => (<NewUser {...props} newUserErrorMsg={this.props.newUserErrorMsg} newUser={this.props.newUser} onCreateNewUser={this.onCreateNewUser}/>);
+    public newUserRender = (props:any) => (<NewUser {...props} errorMsg={this.props.errorMsg} newUser={this.props.newUser} onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup createNewErrorMsg={this.props.createNewErrorMsg} groupsWithGroupsChildren={this.props.groupsWithGroupsChildren}
+    public newGroupRender = (props:any) => (<NewGroup errorMsg={this.props.errorMsg} groupsWithGroupsChildren={this.props.groupsWithGroupsChildren}
                                                       {...props} onGetGroupOptionalParents={this.onGetGroupOptionalParents}
                                                       onCreateNewGroup={this.onCreateNewGroup}/>);
 
@@ -134,7 +140,7 @@ class App extends React.PureComponent<AppProps , {}> {
                                                         deleteGroup={this.deleteGroup}
                                                         saveGroupNewName={this.onEditGroupName} {...props}/>);
 
-    public selectUsersRender = (props:any) => (<SelectUsers errorMsg={this.props.errorMsg} addUsersToGroupErrorMsg={this.props.addUsersToGroupErrorMsg} getGroupOptionalUsers={this.props.getGroupOptionalUsers} groupOptionalUsers={this.props.groupOptionalUsers} {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
+    public selectUsersRender = (props:any) => (<SelectUsers errorMsg={this.props.errorMsg} getGroupOptionalUsers={this.props.getGroupOptionalUsers} groupOptionalUsers={this.props.groupOptionalUsers} {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
 
     public onCreateNewUser = (user:IClientUser) => {
         this.props.onCreateNewUser(user);
@@ -196,15 +202,11 @@ const mapStateToProps = (state:any, ownProps:any) => {
         users:getUsers(state),
         groups:getGroups(state),
         loggedInUser:state.loggedInUser,
-        loginErrorMsg:state.loginErrorMsg,
         errorMsg: state.errorMsg,
         groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
-        createNewErrorMsg:state.createNewErrorMsg,
         selectedGroupData:state.selectedGroupData,
         newUser:state.newUser,
-        newUserErrorMsg:state.newUserErrorMsg,
-        groupOptionalUsers:state.groupOptionalUsers,
-        addUsersToGroupErrorMsg:state.addUsersToGroupErrorMsg
+        groupOptionalUsers:state.groupOptionalUsers
     }
 };
 
@@ -220,7 +222,8 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
             dispatch(authUser(user))
         },
         onLogOut: () => {
-            dispatch(logOut(null, null));
+            dispatch(setLoggedInUser(null));
+            dispatch(setErrorMsg(null));
         },
         onGetGroupOptionalParents: () => {
             dispatch(getGroupOptionalParents())

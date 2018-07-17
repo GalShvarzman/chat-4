@@ -3,6 +3,8 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css'
 import {Link} from "react-router-dom";
 import './user-admin.css';
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface IUserAdminProps {
     users:any,
@@ -55,6 +57,10 @@ class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
             }
         };
     };
+
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
 
     render(){
         return(

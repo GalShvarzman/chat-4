@@ -4,12 +4,12 @@ import './new-user.css';
 import {Link} from "react-router-dom";
 import {IClientUser} from "../interfaces";
 import {store} from "../state/store";
-import {setNewUserErrorMsg} from "../state/actions";
+import {setErrorMsg} from "../state/actions";
 
 interface INewUserProps {
     onCreateNewUser(user:IClientUser):void
     history:any;
-    newUserErrorMsg:string|null,
+    errorMsg:string|null,
     newUser:IClientUser
 }
 
@@ -47,7 +47,7 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
     }
 
     componentWillUnmount(){
-        store.dispatch(setNewUserErrorMsg(null));
+        store.dispatch(setErrorMsg(null));
     }
 
     render(){
@@ -59,7 +59,7 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
                     <Field name={'age'} type={'number'} onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                    <p hidden={!this.props.newUserErrorMsg}>{this.props.newUserErrorMsg}</p>
+                    <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                     <button onClick={this.onCreateNewUser} className="create-new-user-btn"
                             disabled={!this.state.user.name || !this.state.user.password} type="button">Create</button>
                 </div>

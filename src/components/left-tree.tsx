@@ -1,5 +1,8 @@
 import * as React from 'react';
 import './left-tree.css'
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
+import {IClientUser} from "../interfaces";
 
 export interface listItem{
     children?: object[],
@@ -10,7 +13,9 @@ export interface listItem{
 
 interface ILeftTreeProps {
     getSelected(eventTarget:any):void,
-    tree:listItem[]
+    tree:listItem[],
+    errorMsg:string|null,
+    loggedInUser:IClientUser|null
 }
 
 interface ILeftTreeState {
@@ -220,11 +225,17 @@ class LeftTree extends React.PureComponent<ILeftTreeProps, ILeftTreeState> {
         return React.createElement("li", {key:item._id}, a);
     };
 
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
+
     public render() {
         const list = this.props.tree.length ? this.load() : [];
-        return (
+        return (<>
+                <p hidden={!this.props.errorMsg || !this.props.loggedInUser}>{this.props.errorMsg}</p>
                 <ul onClick={this.clickListener} onDoubleClick={this.dblClickListener} onKeyUp={this.onKeyUp}
                     className="left tree">{list}</ul>
+            </>
 
         );
     }

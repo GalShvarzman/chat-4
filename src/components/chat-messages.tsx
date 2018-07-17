@@ -2,11 +2,14 @@ import * as React from 'react';
 import MessageListItem from "./message-list-item";
 import './chat-messages.css';
 import {IMessage} from "../models/message";
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface IChatMessagesProps {
     messages:IMessage[]|undefined,
     selectedName:string|undefined,
-    loggedInUser: {name:string, _id:string}|null
+    loggedInUser: {name:string, _id:string}|null,
+    errorMsg:string|null
 }
 
 class ChatMessages extends React.PureComponent<IChatMessagesProps, {}> {
@@ -17,6 +20,10 @@ class ChatMessages extends React.PureComponent<IChatMessagesProps, {}> {
     public ulWrapper = {
         width: '100%'
     };
+
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
 
     public render() {
         let messagesHistory;
@@ -40,6 +47,7 @@ class ChatMessages extends React.PureComponent<IChatMessagesProps, {}> {
                  </div>
                 <div style={this.ulWrapper}>
                     <ul>{messagesHistory}</ul>
+                    <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                 </div>
             </div>
         );

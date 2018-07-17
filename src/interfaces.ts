@@ -12,11 +12,3 @@ export interface IClientGroup {
     kind?:string,
     parentId?:string
 }
-
-export interface ITree {
-    id: string,
-    items?: ITree[],
-    name: string,
-    type: string
-}
-

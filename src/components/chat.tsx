@@ -11,14 +11,17 @@ import {addMessageToConversation, getSelectedMessagesHistory} from "../state/act
 import {connect} from "react-redux";
 import {getGroups, treeSelectors} from "../selectors/selectors";
 import {IClientGroup} from "../interfaces";
+import {setSelectedMessages} from "../state/actions";
 
 interface IChatProps {
     tree:listItem[],
     groups:IClientGroup[],
     onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, _id:string}):void,
-    onSelectConversation(selectedId:string):Promise<void>,
+    onSelectConversation(selectedId:string):void,
     selectedMessages:IMessage[],
-    loggedInUser:{name:string, _id:string}
+    loggedInUser:{name:string, _id:string},
+    onSelectGroupThatTheUserDoesNotBelongTo():void,
+    errorMsg:string|null
 }
 
 interface IChatState {
@@ -96,7 +99,7 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
             if(this.state.previousSelectedId){
                 socket.emit('leave-group', loggedInUserName, this.state.previousSelectedId);
             }
-            if(this.state.selectedType === 'user'){
+            if(this.state.selectedType === 'User'){
                 selectedId = [this.state.selectedId , loggedInUserId].sort().join('_');
                 socket.emit('join-group', loggedInUserName, selectedId);
                 this.getSelectedMessages(selectedId);
@@ -109,6 +112,7 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
                 }
                 else{
                     this.setState({isAllowedToJoinTheGroup:false});
+                    this.props.onSelectGroupThatTheUserDoesNotBelongTo()
                 }
             }
         }
@@ -130,8 +134,8 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     }
 
 
-    private getSelectedMessages = async(selectedId:string)=>{
-        await this.props.onSelectConversation(selectedId);
+    private getSelectedMessages = (selectedId:string)=>{
+        this.props.onSelectConversation(selectedId);
         this.setState({message:{message:""}, isAllowedToJoinTheGroup:true});
     };
 
@@ -196,11 +200,11 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
         return (
             <div className="chat">
                 <div className="chat-left">
-                    <LeftTree tree={this.props.tree} getSelected={this.getSelectedConversationMessagesHistory}/>
+                    <LeftTree loggedInUser={this.props.loggedInUser} errorMsg={this.props.errorMsg} tree={this.props.tree} getSelected={this.getSelectedConversationMessagesHistory}/>
                 </div>
                 <div className="chat-right">
                     <div ref={this.messagesRef} className="massages">
-                        <ChatMessages loggedInUser={this.props.loggedInUser} selectedName={this.state.selectedName}
+                        <ChatMessages errorMsg={this.props.errorMsg} loggedInUser={this.props.loggedInUser} selectedName={this.state.selectedName}
                                       messages={this.state.selectedMessages}/>
                     </div>
                     <div className="massage-text-area">
@@ -221,7 +225,8 @@ const mapStateToProps = (state:any, ownProps:any) => {
         tree: treeSelectors(state),
         selectedMessages : state.selectedMessages,
         loggedInUser : state.loggedInUser,
-        groups: getGroups(state)
+        groups: getGroups(state),
+        errorMsg:state.errorMsg
     }
 };
 
@@ -230,8 +235,11 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:{name:string, _id:string}) => {
             dispatch(addMessageToConversation(selectedType, selectedId, msg, loggedInUser))
         },
-        onSelectConversation:(selectedId:string)=>{
+        onSelectConversation: (selectedId:string) => {
             dispatch(getSelectedMessagesHistory(selectedId));
+        },
+        onSelectGroupThatTheUserDoesNotBelongTo: () => {
+            dispatch(setSelectedMessages(null));
         }
     }
 };

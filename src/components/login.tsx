@@ -2,10 +2,12 @@ import * as React from 'react';
 import {Link} from 'react-router-dom';
 import Field from './field';
 import './login.css'
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface ILoginProps {
     onSubmit(user: {name:string, password:string}):void,
-    loginErrorMsg: string | null
+    errorMsg: string | null
 }
 
 interface ILoginState {
@@ -32,6 +34,10 @@ class Login extends React.PureComponent<ILoginProps, ILoginState> {
         })
     };
 
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
+
     public submitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
         this.props.onSubmit(this.state.user);
     };
@@ -49,7 +55,7 @@ class Login extends React.PureComponent<ILoginProps, ILoginState> {
                             <Field className="login-field" name={'password'} type={'password'} onChange={this.updateField}/>
                             <button className="login-btn" disabled={!this.state.user.name || !this.state.user.password}
                                     type="button" onClick={this.submitHandler}>Login</button>
-                            <p className="login-err-msg">{this.props.loginErrorMsg}</p>
+                            <p className="login-err-msg" hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                         </div>
                     </form>
                 </div>

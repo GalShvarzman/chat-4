@@ -6,14 +6,13 @@ import {Link} from "react-router-dom";
 import './select-users.css';
 import {IClientUser} from "../interfaces";
 import {store} from "../state/store";
-import {setAddUsersToGroupErrorMsg, setErrorMsg} from "../state/actions";
+import {setErrorMsg} from "../state/actions";
 
 interface ISelectUsersProps {
     handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, _id:string}[]>,
     location:any,
     groupOptionalUsers:IClientUser[]|null,
     getGroupOptionalUsers(groupId:string):void,
-    addUsersToGroupErrorMsg:string|null,
     errorMsg:string|null
 }
 
@@ -64,7 +63,6 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
     }
 
     componentWillUnmount(){
-        store.dispatch(setAddUsersToGroupErrorMsg(null));
         store.dispatch(setErrorMsg(null));
     }
 
@@ -94,7 +92,7 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
                                 minRows={7} className="users-select-table" data={this.props.groupOptionalUsers}
                                 columns={this.state.columns}/>
                     <button className="select-users-save-btn" type='submit'>Save</button>
-                    <p className="select-users-message" hidden={!this.props.addUsersToGroupErrorMsg && !this.props.errorMsg}>{this.props.addUsersToGroupErrorMsg || this.props.errorMsg}</p>
+                    <p className="select-users-message" hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                 </form>
             </>
         )

@@ -44,23 +44,7 @@ export function updateGroupsAfterEditGroup(state:IState, action:any){
     return{
         ...state,
         groups : groupsClone,
-        updatedGroup:action.group,
-        errorMsg:action.errorMsg
-    }
-}
-
-export function userAfterAuth(state:IState, action:any){
-    return {
-        ...state,
-        loggedInUser:action.loggedInUser,
-        loginErrorMsg:action.loginErrorMsg
-    }
-}
-
-export function afterAuthFailed(state:IState, action:any){
-    return{
-        ...state,
-        loginErrorMsg:action.loginErrorMsg
+        updatedGroup:action.group
     }
 }
 
@@ -71,11 +55,10 @@ export function setUpdateErrorMsg(state:IState, action:any){
     }
 }
 
-export function updateLoggedInUser(state:IState, action:any){
+export function setLoggedInUser(state:IState, action:any){
     return {
         ...state,
-        loggedInUser:action.loggedInUser,
-        loginErrorMsg:action.loginErrorMsg
+        loggedInUser:action.loggedInUser
     }
 }
 
@@ -104,13 +87,6 @@ export function setGroupsAfterCreateNewGroup(state:IState, action:any){
     }
 }
 
-export function setNewErrorMsg(state:IState, action:any){
-    return{
-        ...state,
-        createNewErrorMsg:action.createNewErrorMsg
-    }
-}
-
 function walkGroups(selectedGroup:IClientGroup){
     const groupsToDelete = [selectedGroup];
     if(selectedGroup.children.length && selectedGroup.children[0].kind === 'Group'){
@@ -136,24 +112,10 @@ export function setUsersAfterCreateNewUser(state:IState, action:any){
     }
 }
 
-export function setNewUserErrorMsg(state:IState, action:any){
-    return{
-        ...state,
-        newUserErrorMsg:action.newUserErrorMsg
-    }
-}
-
 export function setGroupOptionalUsers(state:IState, action:any){
     return{
         ...state,
         groupOptionalUsers:action.groupOptionalUsers
-    }
-}
-
-export function setAddUsersToGroupErrorMsg(state:IState, action:any){
-    return{
-        ...state,
-        addUsersToGroupErrorMsg:action.addUsersToGroupErrorMsg
     }
 }
 
