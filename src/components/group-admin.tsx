@@ -3,27 +3,28 @@ import {Link} from "react-router-dom";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-admin.css';
+import {IClientGroup} from "../interfaces";
 
 interface IGroupAdminProps {
-    groups:{name:string, id:string}[],
-    deleteGroup(group:{id:string, name:string}):Promise<void>
+    groups:IClientGroup[],
+    deleteGroup(group:IClientGroup):void,
+    errorMsg:string|null
 }
 
 interface IGroupAdminState {
-    columns:any[],
-    message?:string
+    columns:any[]
 }
 
-class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
+class GroupAdmin extends React.PureComponent<IGroupAdminProps,IGroupAdminState>{
     constructor(props:IGroupAdminProps){
         super(props);
         this.state = {
             columns : [
                 {
                     Header: 'ID',
-                    accessor: 'id',
+                    accessor: '_id',
                     Cell:(props:any) => (<div className="group-id-trash">
-                        {props.value === "0f5383e5-69b8-4611-9f95-fd3bbf851d4a" ?
+                        {props.value === "5b45f2306bf29f4108dcbed6" ?
                             (<span>{props.value}</span>)
                             :
                             (<><button className="delete-group-btn"><i className="fa fa-trash"/></button>
@@ -34,7 +35,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
                     Header: 'Name',
                     accessor: 'name',
                     Cell: (props: any) => (
-                        <Link className="group-name" to={{pathname: `/groups/${props.original.id}/edit`,
+                        <Link className="group-name" to={{pathname: `/groups/${props.original._id}/edit`,
                             state:{group:props.original}}}>
                             {props.value}
                             </Link>)
@@ -46,12 +47,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
         return {
             onClick: async (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
-                    try {
-                        await this.props.deleteGroup(rowInfo.original);
-                    }
-                    catch (e) {
-                        this.setState({message:"Delete group failed"});
-                    }
+                    this.props.deleteGroup(rowInfo.original);
                 }
                 if (handleOriginal) {
                     handleOriginal();
@@ -68,7 +64,7 @@ class GroupAdmin extends React.Component<IGroupAdminProps,IGroupAdminState>{
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
                             defaultPageSize={9} minRows={9} className="groups-table" data={this.props.groups}
                             columns={this.state.columns}/>
-                <p hidden={!this.state.message}>{this.state.message}</p>
+                <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
             </>
         )
     }

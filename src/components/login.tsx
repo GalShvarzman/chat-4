@@ -1,32 +1,20 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 import Field from './field';
-import {ERROR_MSG} from '../App'
 import './login.css'
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface ILoginProps {
-    state:{},
     onSubmit(user: {name:string, password:string}):void,
-    loginStatus: ERROR_MSG
+    errorMsg: string | null
 }
 
 interface ILoginState {
     user: {name:string, password:string}
 }
 
-class Login extends React.Component<ILoginProps, ILoginState> {
-
-    private messages = {
-        [ERROR_MSG.allGood]: 'you\'re logged in!!!',
-        [ERROR_MSG.credentials]: 'username or password are wrong!',
-        [ERROR_MSG.locked]: 'you\'re locked!!'
-    };
-
-    private colors = {
-        [ERROR_MSG.allGood]: 'green',
-        [ERROR_MSG.credentials]: 'red',
-        [ERROR_MSG.locked]: 'red'
-    };
+class Login extends React.PureComponent<ILoginProps, ILoginState> {
 
     constructor(props:ILoginProps){
         super(props);
@@ -39,18 +27,20 @@ class Login extends React.Component<ILoginProps, ILoginState> {
         this.setState(prevState => {
             return {
                 user: {
-                    ...this.state.user,
+                    ...prevState.user,
                     [fieldName]: value
                 }
             }
         })
     };
 
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
+
     public submitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
         this.props.onSubmit(this.state.user);
     };
-
-
 
     public render() {
         return (
@@ -65,7 +55,7 @@ class Login extends React.Component<ILoginProps, ILoginState> {
                             <Field className="login-field" name={'password'} type={'password'} onChange={this.updateField}/>
                             <button className="login-btn" disabled={!this.state.user.name || !this.state.user.password}
                                     type="button" onClick={this.submitHandler}>Login</button>
-                            <p style={{color:this.colors[this.props.loginStatus]}}>{this.messages[this.props.loginStatus]}</p>
+                            <p className="login-err-msg" hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                         </div>
                     </form>
                 </div>

@@ -8,9 +8,6 @@ class GroupsController{
             if(req.query['groups_with_children']=='true'){
                 res.status(200).json(await services.groupService.getGroupsWithGroupsChildren());
             }
-            else if(req.query['tree']=='true'){
-                res.status(200).json(await services.groupService.getTree());
-            }
             else{
                 res.status(200).json(await services.groupService.getAllGroups());
             }
@@ -52,7 +49,7 @@ class GroupsController{
     async saveGroupDetails(req:Request, res:Response, next:NextFunction){
         return tryCatch(next, async () => {
            const updatedGroup = await services.groupService.saveGroupDetails(req.body);
-            res.status(201).json(updatedGroup);
+            res.status(200).json(updatedGroup);
         })
     }
 

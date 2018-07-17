@@ -3,10 +3,14 @@ import Field from "./field";
 import './user-edit.css';
 import {Link} from "react-router-dom";
 import {IClientUser} from "../interfaces";
+import {setErrorMsg} from "../state/actions";
+import {store} from "../state/store";
 
 interface IUserEditProps {
     location:any,
-    onEditUserDetails(user:IClientUser):Promise<void>}
+    onEditUserDetails(user:IClientUser):void,
+    errorMsg:string|null
+}
 
 interface IUserEditState {
     user: {
@@ -14,42 +18,39 @@ interface IUserEditState {
         age?:number,
         id:string,
         password?:string
-    },
-    message?:string
+    }
 }
 
-class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
+class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
     constructor(props:IUserEditProps){
         super(props);
         this.state = {
             user:{
                 name:props.location.state.user.name,
                 age:props.location.state.user.age,
-                id:props.location.state.user.id
+                id:props.location.state.user._id
             }
         }
     }
 
-    public save = async () => {
-        try{
-            await this.props.onEditUserDetails(this.state.user);
-            this.setState({message:"Users details updated successfully"});
-        }
-        catch (e) {
-            this.setState({message:"Update user details failed"});
-        }
+    public saveUserNewDetails = () => {
+        this.props.onEditUserDetails(this.state.user);
     };
 
     public updateField = (fieldName: string, value: string) => {
         this.setState(prevState => {
             return {
                 user: {
-                    ...this.state.user,
+                    ...prevState.user,
                     [fieldName]: value
                 }
             }
         })
     };
+
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
 
     render(){
         return(
@@ -60,8 +61,8 @@ class UserEdit extends React.Component<IUserEditProps, IUserEditState>{
                     <Field name={'age'} type={'number'} user={this.state.user.age}
                            onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                    <button className="edit-user-save-btn" type="button" onClick={this.save}>Save</button>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
+                    <button className="edit-user-save-btn" type="button" onClick={this.saveUserNewDetails}>Save</button>
+                    <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                 </div>
             </div>
         )

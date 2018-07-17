@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router';
+import {withRouter, RouteComponentProps, Redirect} from 'react-router';
 import {Switch, Route, Link} from "react-router-dom";
 import Login from "./components/login";
 import './App.css';
 import SignUp from "./components/sign-up";
-import {stateStoreService} from "./state/state-store";
 import Chat from "./components/chat";
 import Menu from "./components/menu";
 import UserAdmin from "./components/user-admin";
@@ -14,175 +13,129 @@ import GroupAdmin from "./components/group-admin";
 import GroupEdit from "./components/group-edit";
 import NewGroup from "./components/new-group";
 import SelectUsers from "./components/select-users";
-import {listItem} from './components/left-tree';
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
+import {connect} from 'react-redux';
+import {authUser, onCreateNewGroup, getGroupOptionalParents, saveGroupNewName,
+    saveUserNewDetails, onDeleteUser, onDeleteGroup, getSelectedGroupData, onCreateNewUser,
+    onGetGroupOptionalUsers, onAddUsersToGroup, setErrorMsg, setLoggedInUser} from "./state/actions";
+import {getErrorMsg, getGroups, getGroupsWithGroupChildren, getLoggedInUser,
+    getUsers, getSelectedGroupDetails, getNewUser, getGroupOptionalChildren} from "./selectors/selectors";
+import {RefObject} from "react";
 
-export const socket =io('http://localhost:4000',{
+export const socket = io('http://localhost:4000',{
     transports: ['websocket']
 });
 
-export enum ERROR_MSG{
-    none,
-    allGood,
-    credentials,
-    locked,
-    fail
+interface IAppProps {
+    users: IClientUser[],
+    groups: IClientGroup[],
+    loggedInUser:IClientUser | null,
+    errorMsg: string | null,
+    groupsWithGroupsChildren:IClientGroup[],
+    selectedGroupData:{}|null,
+    newUser:IClientUser|null,
+    groupOptionalUsers:IClientUser[]|null,
+    onSelectGroupToEdit(groupId:string):void,
+    onLogOut():void,
+    onEditUserDetails(user: IClientUser): void,
+    onEditGroupName(group:IClientGroup):void,
+    onAuthUser(user:{name:string,password:string}):IClientUser,
+    onGetGroupOptionalParents():void,
+    onCreateNewGroup(group:{name:string, parentId:string}):void,
+    onDeleteUser(user:IClientUser):void,
+    onDeleteGroup(group:IClientGroup):void,
+    onCreateNewUser(user:IClientUser, signUp?:boolean):void,
+    getGroupOptionalUsers(groupId:string):void,
+    onAddUsersToGroup(data:{usersIds:string[], groupId:string}):void
 }
 
-const changeOptions = {
-    'users' : stateStoreService.getUsers.bind(stateStoreService),
-    'groups' : stateStoreService.getGroups.bind(stateStoreService),
-    'tree' : stateStoreService.getTree.bind(stateStoreService)
-};
+type AppProps = RouteComponentProps<{}> & IAppProps;
 
-interface IAppState {
-    loggedInUser: {name:string, id:string} | null,
-    errorMsg: ERROR_MSG,
-    counter: number,
-    users:{name:string, age:string, id:string}[],
-    groups:{name:string, id:string}[],
-    tree:listItem[],
-    [key: string] : any
-}
-
-type AppProps = RouteComponentProps<{}> & {};
-
-class App extends React.Component<AppProps , IAppState> {
-    public chatMessagesChild:any;
-    public menu:any;
+class App extends React.PureComponent<AppProps , {}> {
+    public chat:RefObject<any>;
 
     constructor(props: AppProps) {
         super(props);
-
-        this.state = {
-            loggedInUser: null,
-            errorMsg: ERROR_MSG.none,
-            counter: 0,
-            users: [],
-            groups:[],
-            tree:[]
-        };
-
+        this.chat = React.createRef();
     }
 
-    componentWillMount(){
-        stateStoreService.subscribe(this.onSubscribe);
-    }
-
-    componentWillUnmount(){
-        stateStoreService.unsubscribe(this.onSubscribe);
+    public onEditUserDetails = (user:IClientUser) => {
+        this.props.onEditUserDetails(user);
     };
 
-    componentDidMount(){
-        this.setState({tree:stateStoreService.get('tree'), users: stateStoreService.get('users'), groups: stateStoreService.get('groups')})
-    }
-
-    private onSubscribe = async (event:{changed:string[]}) => {
-        if(event.changed){
-            event.changed.forEach((change)=>{
-                const result  = changeOptions[change]();
-                this.setState({[change]:result});
-            })
-        }
-    };
-
-    public onEditUserDetails = async (user:IClientUser) => {
-        return await stateStoreService.saveUserDetails(user);
-    };
-
-    public saveGroupNewName = async (group:IClientGroup) => {
-        return await stateStoreService.saveGroupDetails(group);
+    public onEditGroupName = async (group:IClientGroup) => {
+        this.props.onEditGroupName(group);
     };
 
     public onLoginSubmitHandler = async (user:{name:string, password:string})=> {
-        try {
-            const result = await stateStoreService.auth(user);
-            this.setState({
-                loggedInUser: {name: result.name, id: result.id},
-            }, () => {
-                socket.emit('login', result.name);
-                this.props.history.push('/chat');
-            })
-        }
-        catch (e) {
-            if (this.state.counter === 2) {
-                this.setState({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.locked
-                });
-            }
-            else {
-                this.setState((prevState) => ({
-                    loggedInUser: null,
-                    errorMsg: ERROR_MSG.credentials,
-                    counter: this.state.counter + 1
-                }));
-            }
-        }
+        this.props.onAuthUser(user);
     };
 
-    public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
-        try{
-            const result = await stateStoreService.createNewUser(user);
-            this.setState({loggedInUser:{name:result.user.name, id:result.user.id}}, ()=>{
-                socket.emit('login', result.user.name);
-                this.setState({errorMsg: ERROR_MSG.none})
-                this.props.history.push('/chat');
-            });
-        }
-        catch(e){
-            this.setState({errorMsg: ERROR_MSG.credentials})
-        }
+    public onSignUpSubmitHandler = (user:IClientUser) => {
+        this.props.onCreateNewUser(user, true);
     };
 
-    public loginRender = (props:any)=> (<Login {...props} data={this.state}
-                                               loginStatus={this.state.errorMsg} onSubmit={this.onLoginSubmitHandler}/>);
+    public loginRender = (props:any) => this.props.loggedInUser ? (<Redirect to={'/chat'}/>) :
+        (<Login {...props} onSubmit={this.onLoginSubmitHandler} errorMsg={this.props.errorMsg}/>);
 
-    public signUpRender = (props:any)=>(<SignUp {...props} signUpStatus={this.state.errorMsg}
-                                                onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=> this.props.loggedInUser ? (<Redirect to={'chat'}/>) :
+        (<SignUp errorMsg={this.props.errorMsg} {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
-    public chatRender = (props:any) => (<Chat tree={this.state.tree}
-                                              ref={instance => {this.chatMessagesChild = instance}} {...props} data={this.state}/>);
+    public chatRender = (props:any) => (<Chat ref={this.chat} {...props}/>);
 
     public logOut = () => {
-        this.setState({loggedInUser:null, errorMsg: ERROR_MSG.none});
-        this.chatMessagesChild.logOut();
+        this.props.onLogOut();
+        this.chat.current.getWrappedInstance().onUserLogOut();
     };
 
-    public usersRender = () => (<UserAdmin deleteUser={this.deleteUser} refMenu={this.menu} users={this.state.users}/>);
+    public usersRender = () => (<UserAdmin errorMsg={this.props.errorMsg} deleteUser={this.deleteUser} users={this.props.users}/>);
 
-    public groupsRender = () => (<GroupAdmin deleteGroup={this.deleteGroup} groups={this.state.groups}/>);
+    public groupsRender = () => (<GroupAdmin errorMsg={this.props.errorMsg} deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
 
-    public userEditRender = (props:any) => (<UserEdit onEditUserDetails={this.onEditUserDetails} {...props}/>);
+    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.errorMsg}
+                                                      onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
-    public  deleteUser = async(user:{name: string, age: number, id: string}):Promise<void> => {
-        return await stateStoreService.deleteUser(user);
+    public deleteUser = (user:IClientUser) => {
+        this.props.onDeleteUser(user);
     };
 
-    public deleteGroup = async(group:{id:string, name:string}) => {
-        return await stateStoreService.deleteGroup(group);
+    public deleteGroup = (group:IClientGroup) => {
+         this.props.onDeleteGroup(group);
     };
 
-    public newUserRender = (props:any) => (<NewUser {...props} onCreateNewUser={this.onCreateNewUser}/>);
+    public newUserRender = (props:any) => (<NewUser {...props} errorMsg={this.props.errorMsg} newUser={this.props.newUser}
+                                                    onCreateNewUser={this.onCreateNewUser}/>);
 
-    public newGroupRender = (props:any) => (<NewGroup {...props} onCreateNewGroup={this.onCreateNewGroup}/>);
+    public newGroupRender = (props:any) => (<NewGroup errorMsg={this.props.errorMsg} groupsWithGroupsChildren={this.props.groupsWithGroupsChildren}
+                                                      {...props} onGetGroupOptionalParents={this.onGetGroupOptionalParents}
+                                                      onCreateNewGroup={this.onCreateNewGroup}/>);
 
-    public groupEditRender = (props:any) => (<GroupEdit deleteGroup={this.deleteGroup}
-                                                        saveGroupNewName={this.saveGroupNewName} {...props}/>);
-
-    public selectUsersRender = (props:any) => (<SelectUsers {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
-
-    public onCreateNewUser = async (user:{name:string, age:number, password:string}) => {
-        return await stateStoreService.createNewUser(user);
+    public onGetGroupOptionalParents = () => {
+        this.props.onGetGroupOptionalParents();
     };
 
-    public onCreateNewGroup = async (group:{name:string, parent:string}) => {
-        return await stateStoreService.createNewGroup(group);
+    public groupEditRender = (props:any) => (<GroupEdit groups={this.props.groups} errorMsg={this.props.errorMsg}
+                                                        selectedGroupData={this.props.selectedGroupData}
+                                                        onSelectGroupToEdit={this.props.onSelectGroupToEdit}
+                                                        deleteGroup={this.deleteGroup}
+                                                        saveGroupNewName={this.onEditGroupName} {...props}/>);
+
+    public selectUsersRender = (props:any) => (<SelectUsers errorMsg={this.props.errorMsg}
+                                                            getGroupOptionalUsers={this.props.getGroupOptionalUsers}
+                                                            groupOptionalUsers={this.props.groupOptionalUsers} {...props}
+                                                            handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
+
+    public onCreateNewUser = (user:IClientUser) => {
+        this.props.onCreateNewUser(user);
     };
 
-    public handelAddUsersToGroup = async(data:{usersIds:string[], groupId:string}) => {
-        return await stateStoreService.addUsersToGroup(data);
+    public onCreateNewGroup = (group:{name:string, parentId:string}) => {
+        return this.props.onCreateNewGroup(group);
+    };
+
+    public handelAddUsersToGroup = (data:{usersIds:string[], groupId:string}) => {
+        this.props.onAddUsersToGroup(data);
     };
 
     public render() {
@@ -195,15 +148,15 @@ class App extends React.Component<AppProps , IAppState> {
                         <Link to="/"><button className="btn-home">Home</button></Link>
                         <Link to="/login"><button className="btn-login">login</button></Link>
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
-                        <Menu ref={instance => {this.menu = instance}}/>
+                        <Menu/>
                     </div>
                     <div className="nav-right">
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
                     </div>
-                    <div hidden={!this.state.loggedInUser} className='nav-right'>
+                    <div hidden={!this.props.loggedInUser} className='nav-right'>
                         <div className="app-logged-in">You are logged in as:
                             <span className='logged-in-name'>
-                                {this.state.loggedInUser ? this.state.loggedInUser.name : ""}
+                                {this.props.loggedInUser ? this.props.loggedInUser.name : ""}
                             </span>
                         </div>
                     </div>
@@ -228,4 +181,62 @@ class App extends React.Component<AppProps , IAppState> {
     }
 }
 
-export default withRouter(App);
+const mapStateToProps = (state:any, ownProps:any) => {
+    return {
+        users:getUsers(state),
+        groups:getGroups(state),
+        loggedInUser:getLoggedInUser(state),
+        errorMsg: getErrorMsg(state),
+        groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
+        selectedGroupData:getSelectedGroupDetails(state),
+        newUser:getNewUser(state),
+        groupOptionalUsers:getGroupOptionalChildren(state)
+    }
+};
+
+const mapDispatchToProps = (dispatch:any, ownProps:any) => {
+    return {
+        onEditUserDetails: (user:IClientUser) => {
+            dispatch(saveUserNewDetails(user))
+        },
+        onEditGroupName: (group:IClientGroup) => {
+            dispatch(saveGroupNewName(group))
+        },
+        onAuthUser: (user:{name:string, password:string}) => {
+            dispatch(authUser(user))
+        },
+        onLogOut: () => {
+            dispatch(setLoggedInUser(null));
+            dispatch(setErrorMsg(null));
+        },
+        onGetGroupOptionalParents: () => {
+            dispatch(getGroupOptionalParents())
+        },
+        onCreateNewGroup: (group:IClientGroup) => {
+            dispatch(onCreateNewGroup(group))
+        },
+        onDeleteUser: (user:IClientUser) => {
+            dispatch(onDeleteUser(user));
+        },
+        onDeleteGroup:(group:IClientGroup) => {
+            dispatch(onDeleteGroup(group));
+        },
+        onSelectGroupToEdit:(groupId:string) => {
+            dispatch(getSelectedGroupData(groupId))
+        },
+        onCreateNewUser:(user:IClientUser, signUp?:boolean) => {
+            dispatch(onCreateNewUser(user, signUp))
+        },
+        getGroupOptionalUsers: (groupId:string) => {
+            dispatch(onGetGroupOptionalUsers(groupId))
+        },
+        onAddUsersToGroup:(data:{usersIds:string[], groupId:string}) => {
+            dispatch(onAddUsersToGroup(data))
+        }
+    }
+};
+
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App));

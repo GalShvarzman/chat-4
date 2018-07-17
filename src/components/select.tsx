@@ -1,12 +1,14 @@
 import * as React from 'react';
 import './select.css';
+import {IClientGroup} from "../interfaces";
+
 interface ISelectProps {
-    groups:{name:string, id:string}[],
+    groups:IClientGroup[],
     handleSelect(select:any):void,
     parent:string;
 }
 
-class Select extends React.Component<ISelectProps, {}> {
+class Select extends React.PureComponent<ISelectProps, {}> {
     constructor(props:ISelectProps){
         super(props);
     }
@@ -17,7 +19,7 @@ class Select extends React.Component<ISelectProps, {}> {
 
     render(){
         const optionsList = this.props.groups.map((group, index)=>{
-            return <option value={group.id} key={index}>{group.name} {group.id}</option>
+            return <option value={group["_id"]} key={index}>{group.name} {group["_id"]}</option>
         });
         return (
             <select className="select" onChange={this.handleChange} value={this.props.parent}>
