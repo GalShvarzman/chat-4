@@ -7,7 +7,7 @@ import {IClientUser} from "../interfaces";
 interface IUserEditProps {
     location:any,
     onEditUserDetails(user:IClientUser):void,
-    updateErrorMsg:string|null
+    errorMsg:string|null
 }
 
 interface IUserEditState {
@@ -56,7 +56,7 @@ class UserEdit extends React.PureComponent<IUserEditProps, IUserEditState>{
                            onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
                     <button className="edit-user-save-btn" type="button" onClick={this.saveUserNewDetails}>Save</button>
-                    <p hidden={!this.props.updateErrorMsg}>{this.props.updateErrorMsg}</p>
+                    <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                 </div>
             </div>
         )

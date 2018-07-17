@@ -1,12 +1,5 @@
 import {IState} from "./store";
-import {IClientGroup} from "../interfaces";
-
-export function setTree(state:IState, action:any){
-    return{
-        ...state,
-        tree:action.tree
-    }
-}
+import {IClientGroup, IClientUser} from "../interfaces";
 
 export function setGroups(state:IState, action:any){
     return{
@@ -42,7 +35,7 @@ export function updateUsersAfterEditUserDetails(state:IState, action:any){
     }
 }
 
-export function updateGroupsAfterEditGroupName(state:IState, action:any){
+export function updateGroupsAfterEditGroup(state:IState, action:any){
     const groupsClone = [...state.groups];
     const groupIndex = groupsClone.findIndex((group) => {
         return group._id === action.group._id;
@@ -106,7 +99,8 @@ export function setGroupsAfterCreateNewGroup(state:IState, action:any){
 
     return{
         ...state,
-        groups:groupsClone.concat([newGroup])
+        groups:groupsClone.concat([newGroup]),
+        groupsWithGroupsChildren:state.groupsWithGroupsChildren.concat([newGroup])
     }
 }
 
@@ -131,6 +125,57 @@ export function setSelectedGroupData(state:IState, action:any){
     return {
         ...state,
         selectedGroupData:action.groupData
+    }
+}
+
+export function setUsersAfterCreateNewUser(state:IState, action:any){
+    return{
+        ...state,
+        users: state.users.concat([action.newUser]),
+        newUser:action.newUser
+    }
+}
+
+export function setNewUserErrorMsg(state:IState, action:any){
+    return{
+        ...state,
+        newUserErrorMsg:action.newUserErrorMsg
+    }
+}
+
+export function setGroupOptionalUsers(state:IState, action:any){
+    return{
+        ...state,
+        groupOptionalUsers:action.groupOptionalUsers
+    }
+}
+
+export function setAddUsersToGroupErrorMsg(state:IState, action:any){
+    return{
+        ...state,
+        addUsersToGroupErrorMsg:action.addUsersToGroupErrorMsg
+    }
+}
+
+export function setGroupsAfterDeleteUserFromGroup(state:IState, action:any){
+    const deletedUserId = action.userId;
+    const groupId = action.groupId;
+
+    const groupsClone = [...state.groups];
+    const group = groupsClone.find((group)=>{
+        return group._id === groupId;
+    });
+
+    const deletedUserIndex = group.children.findIndex((child:IClientUser)=>{
+        return child._id === deletedUserId;
+    });
+    if(deletedUserIndex !== -1){
+        group.children.splice(deletedUserIndex, 1)
+    }
+
+    return{
+        ...state,
+        groups:groupsClone
     }
 }
 

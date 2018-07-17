@@ -4,22 +4,25 @@ import {Link} from "react-router-dom";
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './group-edit.css';
-import {stateStoreService} from "../state/store";
+import {store} from "../state/store";
 import {IClientGroup} from "../interfaces";
+import {onDeleteUserFromGroup} from "../state/actions";
+import {setErrorMsg} from "../state/actions";
 
 interface IGroupEditProps {
+    groups:IClientGroup[],
     location: any,
     saveGroupNewName(group: { name: string, id: string }): void,
     deleteGroup(group:IClientGroup):void,
-    updateErrorMsg:string,
     onSelectGroupToEdit(groupId:string):void,
-    selectedGroupData:{}|null
+    selectedGroupData:{}|null,
+    errorMsg:string|null,
 }
 
 interface IGroupEditState {
     group: {
         name:string,
-        id:string,
+        _id:string,
         children?:any[],
         parentId?:any
     },
@@ -34,7 +37,7 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
         this.state = {
             group:{
                 name:props.location.state.group.name,
-                id:props.location.state.group._id || props.location.state.group.id
+                _id:props.location.state.group._id || props.location.state.group.id
             },
             columns : [
                 {
@@ -56,7 +59,7 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
     }
 
     public saveGroupNewName = () => {
-        this.props.saveGroupNewName({id: this.state.group.id, name: this.state.group.name});
+        this.props.saveGroupNewName({id: this.state.group._id, name: this.state.group.name});
     };
 
     public updateField = (fieldName: string, value: string) => {
@@ -71,7 +74,7 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
     };
 
     async componentDidMount(){
-       this.props.onSelectGroupToEdit(this.state.group.id);
+       this.props.onSelectGroupToEdit(this.state.group._id);
     }
 
     static getDerivedStateFromProps(nextProps:IGroupEditProps, prevState:IGroupEditState) {
@@ -88,7 +91,10 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
         return null;
     }
 
-    componentDidUpdate(){
+    componentDidUpdate(prevProps:IGroupEditProps, prevState:IGroupEditState){
+        if(this.props.groups !== prevProps.groups){
+            this.props.onSelectGroupToEdit(this.state.group._id);
+        }
         this.groupChildrenCheck();
     }
 
@@ -103,7 +109,7 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
             onClick: (e:any, handleOriginal:any) => {
                 if(e.target.className === "fa fa-trash"){
                     if(rowInfo.original.kind === 'User'){
-                         stateStoreService.deleteUserFromGroup(rowInfo.original.childId._id, this.state.group.id);
+                         store.dispatch(onDeleteUserFromGroup(rowInfo.original.childId._id, this.state.group._id));
                     }
                     else{
                         this.props.deleteGroup(rowInfo.original);
@@ -116,6 +122,10 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
         };
     };
 
+    componentWillUnmount(){
+        store.dispatch(setErrorMsg(null));
+    }
+
     render(){
         return(
             <div>
@@ -124,7 +134,7 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
                     <h2 className="edit-group-header">Edit group details</h2>
                     <p className="parent-wrapper">
                         <span className="group-id">Id:</span>
-                        <span className="id">{this.state.group.id}</span>
+                        <span className="id">{this.state.group._id}</span>
                     </p>
                     <Field name={'name'} type={'text'} group={this.state.group.name} onChange={this.updateField}/>
                     <button onClick={this.saveGroupNewName} className="edit-group-save-btn" type="button">Save</button>
@@ -135,13 +145,13 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
                             </span>
                         </p>
                         <div className="children-wrapper">
-                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group.id}/add-users`, state:{group:this.state.group}}}><button className="add-children-btn">Add users to group</button></Link>}
+                            {!this.state.addNewUserBtnIsHidden && <Link to={{pathname:`/groups/${this.state.group._id}/add-users`, state:{group:this.state.group}}}><button className="add-children-btn">Add users to group</button></Link>}
                             <h2 className="children-header">Children</h2>
                             <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true} defaultPageSize={4}
                                         minRows={4} className="children-table" data={this.state.group.children}
                                         columns={this.state.columns}/>
                         </div>
-                        <p hidden={!this.props.updateErrorMsg}>{this.props.updateErrorMsg}</p>
+                        <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
                     </div>
                 </div>
             </div>

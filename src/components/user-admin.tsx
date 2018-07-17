@@ -62,7 +62,7 @@ class UserAdmin extends React.PureComponent<IUserAdminProps, IUserAdminState>{
                 <Link to='/users/new'><button className='admin-create-new-user-btn'>Create new user</button></Link>
                 <h1 className="users-header">Users</h1>
                 <ReactTable getTdProps={this.onClickEvent} filterable={true} defaultSortDesc={true}
-                            defaultPageSize={10} minRows={10} className="users-table" data={this.props.users}
+                            defaultPageSize={9} minRows={9} className="users-table" data={this.props.users}
                             columns={this.state.columns}/>
                 <p hidden={!this.props.errorMsg}>{this.props.errorMsg}</p>
             </>

@@ -20,7 +20,7 @@ class GroupsService{
         const users = data.usersIds.map((id)=>{
             return {kind:'User', childId:id}
         });
-        return await Group.findByIdAndUpdate(data.groupId, {$addToSet:{children:users}},{new:true});
+        return await Group.findOneAndUpdate({_id:data.groupId}, {$addToSet:{children:users}},{new:true, select:{parentId:0, __v:0}});
     }
 
     async createNewGroup(newGroupDetails){
@@ -55,9 +55,8 @@ class GroupsService{
     }
 
     async deleteUserFromGroup(groupId, userId){
-        //fixme not working;
         const selectedUser = await User.findOne({_id:userId});
-        await Group.findByIdAndUpdate(groupId, {$pull: {children: {childId: selectedUser._id}}});
+        return await Group.findByIdAndUpdate(groupId, {$pull: {children: {childId: selectedUser._id}}});
     }
 
     async getGroupOptionalChildren(groupId){

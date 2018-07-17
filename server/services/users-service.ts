@@ -89,7 +89,7 @@ class UsersService{
         user.kind = "User";
         const newUser = await new User(user);
         await newUser.save();
-        return ({id: newUser._id, name: newUser["name"], age: newUser["age"]});
+        return ({_id: newUser._id, name: newUser["name"], age: newUser["age"]});
 
         // const usersData = await users.getUsersFullData();
         // if(await users.isUserExists(usersData, user.name)){

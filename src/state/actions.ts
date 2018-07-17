@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import {addMessage, getSelectedMessages, getTree, auth, deleteUserFromGroup,
+import {addMessage, getSelectedMessages, auth, deleteUserFromGroup,
     getGroupOptionalUsers, saveGroupDetails, addUsersToGroup, getUsers, saveUserDetails,
     deleteUser, createNewUser,createNewGroup, getGroups, getGroupData, deleteGroup,
     getGroupsWithGroupsChildren} from '../server-api';
@@ -9,24 +9,34 @@ import {socket} from "../App";
 
 export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, _id: string } | null) {
     return async (dispatch:Dispatch)=>{
-        if (loggedInUser && selectedId) {
-            let conversationId;
-            if (selectedType === 'Group') {
-                conversationId = selectedId;
+        try {
+            if (loggedInUser && selectedId) {
+                let conversationId;
+                if (selectedType === 'Group') {
+                    conversationId = selectedId;
+                }
+                else {
+                    conversationId = [selectedId, loggedInUser._id].sort().join("_");
+                }
+                await addMessage(message, conversationId);
+                dispatch({type: ""});
             }
-            else {
-                conversationId = [selectedId,loggedInUser._id].sort().join("_");
-            }
-            await addMessage(message, conversationId);
-            dispatch({type:""});
+        }
+        catch (e) {
+            //fixme
         }
     }
 }
 
 export function getSelectedMessagesHistory(selectedId: string) {
     return async (dispatch:Dispatch)=>{
-        const result = await getSelectedMessages(selectedId);
-        dispatch(setSelectedMessages(result.messages));
+        try {
+            const result = await getSelectedMessages(selectedId);
+            dispatch(setSelectedMessages(result.messages));
+        }
+        catch(e){
+            //fixme
+        }
     }
 }
 
@@ -35,26 +45,23 @@ export function onCreateNewGroup(group: { name: string, parentId: string }) {
         try {
             const newGroup = await createNewGroup(group);
             dispatch(setGroupsAfterCreateNewGroup(newGroup, group.parentId));
-            dispatch(setNewErrorMsg("Group created successfully"));
+            dispatch(setCreateNewErrorMsg("Group created successfully"));
         }
         catch (e) {
-            dispatch(setNewErrorMsg("Create new group failed"));
+            dispatch(setCreateNewErrorMsg("Create new group failed"));
         }
     };
 }
 
-
-export function loadTree():any{
-    return async (dispatch:Dispatch) => {
-        const tree = await getTree();
-        dispatch(setTree(tree));
-    }
-}
-
 export function loadUsers():any{
     return async (dispatch:Dispatch) => {
-        const users = await getUsers();
-        dispatch(setUsers(users));
+        try {
+            const users = await getUsers();
+            dispatch(setUsers(users));
+        }
+        catch (e) {
+            //fixme
+        }
     }
 }
 
@@ -121,12 +128,25 @@ export function getSelectedGroupData(groupId: string) {
     }
 }
 
+export function onCreateNewUser(user: IClientUser){
+    return async (dispatch:Dispatch) => {
+        try {
+            const newUser = await createNewUser(user);
+            dispatch(setUsersAfterCreateNewUser(newUser));
+            dispatch(setNewUserErrorMsg("User created successfully"));
+        }
+        catch (e) {
+            dispatch(setNewUserErrorMsg("Username already exist, choose a different name"));
+        }
+    };
+}
+
 
 export function saveGroupNewName(group: { name: string, _id: string }){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
-            dispatch(updateGroupsAfterEditGroupName(updatedGroup, null));
+            dispatch(updateGroupsAfterEditGroup(updatedGroup, null));
         }
         catch (e) {
             dispatch(setErrorMsg("Update group name failed"))
@@ -159,18 +179,48 @@ export function getGroupOptionalParents(){
     }
 }
 
+export function onAddUsersToGroup(data: { usersIds: string[], groupId: string }) {
+    return async(dispatch:Dispatch) => {
+        try {
+            const updatedGroup = await addUsersToGroup(data);
+            dispatch(updateGroupsAfterEditGroup(updatedGroup, "Users added successfully to group"));
+        }
+        catch (e) {
+            dispatch(setErrorMsg("Add users to group failed"));
+        }
+    }
+}
+
+export function onGetGroupOptionalUsers(groupId: string) {
+    return async (dispatch:Dispatch) => {
+        try {
+            const groupOptionalUsers = await getGroupOptionalUsers(groupId);
+            dispatch(setGroupOptionalUsers(groupOptionalUsers));
+        }
+        catch (e) {
+            dispatch(setAddUsersToGroupErrorMsg("Fetch optional users failed"));
+        }
+    };
+}
+
+export function onDeleteUserFromGroup(userId: string, groupId: string):any {
+    return async (dispatch:Dispatch) => {
+        try {
+            await deleteUserFromGroup(userId, groupId);
+            dispatch(setGroupsAfterDeleteUserFromGroup(userId, groupId));
+            dispatch(setErrorMsg("User deleted successfully from group"));
+        }
+        catch (e) {
+            dispatch(setErrorMsg("Delete user from group failed"));
+        }
+    }
+}
+
 export function logOut(loggedInUser:null, loginErrorMsg:null){
     return {
         type:'USER_LOGGED_OUT',
         loggedInUser,
         loginErrorMsg
-    }
-}
-
-function setTree(tree:any[]){
-    return{
-        type: 'SET_TREE',
-        tree
     }
 }
 
@@ -181,11 +231,18 @@ function updateUsersAfterEditUserDetails(user:any){
     }
 }
 
-function updateGroupsAfterEditGroupName(group:IClientGroup, errorMsg:null){
+function updateGroupsAfterEditGroup(group:IClientGroup, errorMsg:null|string){
     return {
-        type: 'UPDATE_GROUPS_AFTER_EDIT_GROUP_NAME',
+        type: 'UPDATE_GROUPS_AFTER_EDIT_GROUP',
         group,
         errorMsg
+    }
+}
+
+function setUsersAfterCreateNewUser(newUser:any){
+    return {
+        type:'SET_USERS_AFTER_CREATE_NEW_USER',
+        newUser
     }
 }
 
@@ -211,10 +268,39 @@ function setGroupOptionalParents(groupOptionalParents:IClientGroup[]){
     }
 }
 
-function setErrorMsg(errorMsg:string){
+function setGroupOptionalUsers(groupOptionalUsers:any[]){
+    return{
+        type:'SET_GROUP_OPTIONAL_USERS',
+        groupOptionalUsers
+    }
+}
+
+export function setAddUsersToGroupErrorMsg(addUsersToGroupErrorMsg:string|null){
+    return{
+     type:'SET_ADD_USERS_TO_GROUP_ERROR_MSG',
+     addUsersToGroupErrorMsg
+    }
+}
+
+export function setErrorMsg(errorMsg:string){
     return{
         type:'SET_ERROR_MSG',
         errorMsg
+    }
+}
+
+function setGroupsAfterDeleteUserFromGroup(userId:string, groupId:string){
+    return{
+        type:'SET_GROUPS_AFTER_DELETE_USER_FROM_GROUP',
+        userId,
+        groupId
+    }
+}
+
+export function setNewUserErrorMsg(newUserErrorMsg:string|null){
+    return{
+        type:'SET_NEW_USER_ERROR_MSG',
+        newUserErrorMsg
     }
 }
 
@@ -254,7 +340,7 @@ function setGroupsAfterCreateNewGroup(newGroup:IClientGroup, parent:any){
     }
 }
 
-function setNewErrorMsg(createNewErrorMsg:string){
+export function setCreateNewErrorMsg(createNewErrorMsg:string){
     return {
         type:'SET_NEW_ERROR_MSG',
         createNewErrorMsg

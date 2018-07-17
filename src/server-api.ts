@@ -51,7 +51,6 @@ export async function getGroupsWithGroupsChildren():Promise<IClientGroup[]>{
 }
 
 export async function addUsersToGroup(data:{usersIds:string[], groupId:string}){
-    debugger;
     return await post(`/groups/${data.groupId}/users`, data)
 }
 

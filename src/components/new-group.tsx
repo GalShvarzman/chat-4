@@ -4,8 +4,9 @@ import {Link} from "react-router-dom";
 import './new-user.css';
 import './new-group.css';
 import Select from "./select";
-import {stateStoreService} from "../state/store";
 import {IClientGroup} from "../interfaces";
+import {store} from "../state/store";
+import {setCreateNewErrorMsg} from "../state/actions";
 
 interface INewGroupProps {
     history:any;
@@ -27,14 +28,9 @@ class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{
         };
     }
 
-    // static getDerivedStateFromProps(nextProps:INewGroupProps, prevState:INewGroupState){
-    //     if (prevState.groupsWithGroupsChildren !== nextProps.groupsWithGroupsChildren) {
-    //         return {
-    //             groupsWithGroupsChildren: nextProps.groupsWithGroupsChildren,
-    //         };
-    //     }
-    //     return null;
-    // }
+    componentWillUnmount(){
+        store.dispatch(setCreateNewErrorMsg(null));
+    }
 
     public handleSelect = (parentId:any) => {
         this.setState((prevState)=>{

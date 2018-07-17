@@ -6,7 +6,7 @@ import './group-admin.css';
 import {IClientGroup} from "../interfaces";
 
 interface IGroupAdminProps {
-    groups:{name:string, _id:string}[],
+    groups:IClientGroup[],
     deleteGroup(group:IClientGroup):void,
     errorMsg:string|null
 }

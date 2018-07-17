@@ -3,18 +3,22 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css'
 import CheckBox from './checkbox';
 import {Link} from "react-router-dom";
-import {stateStoreService} from "../state/store";
 import './select-users.css';
+import {IClientUser} from "../interfaces";
+import {store} from "../state/store";
+import {setAddUsersToGroupErrorMsg, setErrorMsg} from "../state/actions";
 
 interface ISelectUsersProps {
     handelAddUsersToGroup(data:{usersIds:string[], groupId:string}):Promise<{name:string, age:string, _id:string}[]>,
-    location:any
+    location:any,
+    groupOptionalUsers:IClientUser[]|null,
+    getGroupOptionalUsers(groupId:string):void,
+    addUsersToGroupErrorMsg:string|null,
+    errorMsg:string|null
 }
 
 interface ISelectUsersState {
     columns:any[],
-    message?:string,
-    users:{name:string, age:string, _id:string}[],
 }
 
 class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
@@ -24,7 +28,6 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         super(props);
 
         this.state = {
-            users:[],
             columns : [
                     {
                         Header: 'ID',
@@ -56,43 +59,42 @@ class SelectUsers extends React.Component<ISelectUsersProps, ISelectUsersState>{
         }
     };
 
-    async componentDidMount(){
-        try {
-            const optionalUsers = await stateStoreService.getOptionalUsers(this.props.location.state.group.id);
-            this.setState({users: optionalUsers});
-        }
-        catch (e) {
-            this.setState({message:"Failed to fetch users"});
+    componentDidMount(){
+        this.props.getGroupOptionalUsers(this.props.location.state.group._id);
+    }
+
+    componentWillUnmount(){
+        store.dispatch(setAddUsersToGroupErrorMsg(null));
+        store.dispatch(setErrorMsg(null));
+    }
+
+    componentDidUpdate(prevProps:ISelectUsersProps, prevState:ISelectUsersState){
+        if(this.props.groupOptionalUsers !== prevProps.groupOptionalUsers){
+            this.props.getGroupOptionalUsers(this.props.location.state.group._id);
         }
     }
 
     private handleFormSubmit = async (e:React.MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
-        //try {
-            const selectedUsersIterator = this.selectedUsers.values();
-            await this.props.handelAddUsersToGroup({
-                usersIds: Array.from(selectedUsersIterator),
-                groupId: this.props.location.state.group.id
-            });
-         //   this.setState({message: 'Users added successfully'})
-        // }
-        // catch (e) {
-        //     this.setState({message: 'Adding users to the group failed'});
-        // }
+        const selectedUsersIterator = this.selectedUsers.values();
+        await this.props.handelAddUsersToGroup({
+            usersIds: Array.from(selectedUsersIterator),
+            groupId: this.props.location.state.group._id
+        });
     };
 
     render(){
         return(
             <>
-                <Link to={{pathname:`/groups/${this.props.location.state.group.id}/edit`, state:{group:this.props.location.state.group}}}><button className="select-users-back-btn">Back</button></Link>
+                <Link to={{pathname:`/groups/${this.props.location.state.group._id}/edit`, state:{group:this.props.location.state.group}}}><button className="select-users-back-btn">Back</button></Link>
                 <h1 className="select-users-group-name-header">{this.props.location.state.group.name}</h1>
                 <h2 className="select-users-header">Select users</h2>
                 <form onSubmit={this.handleFormSubmit}>
-                    <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={8}
-                                minRows={8} className="users-select-table" data={this.state.users}
+                    <ReactTable filterable={true} defaultSortDesc={true} defaultPageSize={7}
+                                minRows={7} className="users-select-table" data={this.props.groupOptionalUsers}
                                 columns={this.state.columns}/>
                     <button className="select-users-save-btn" type='submit'>Save</button>
-                    <p className="select-users-message" hidden={!this.state.message}>{this.state.message}</p>
+                    <p className="select-users-message" hidden={!this.props.addUsersToGroupErrorMsg && !this.props.errorMsg}>{this.props.addUsersToGroupErrorMsg || this.props.errorMsg}</p>
                 </form>
             </>
         )

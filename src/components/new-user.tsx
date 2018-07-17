@@ -2,15 +2,19 @@ import * as React from 'react';
 import Field from "./field";
 import './new-user.css';
 import {Link} from "react-router-dom";
+import {IClientUser} from "../interfaces";
+import {store} from "../state/store";
+import {setNewUserErrorMsg} from "../state/actions";
 
 interface INewUserProps {
-    onCreateNewUser(user:{name:string, age?:number, password:string}):Promise<{user:{name:string, age:string, id:string}}>
+    onCreateNewUser(user:IClientUser):void
     history:any;
+    newUserErrorMsg:string|null,
+    newUser:IClientUser
 }
 
 interface INewUserState {
     user: {name: string, age?:number, password: string},
-    message?:string
 }
 
 class NewUser extends React.Component<INewUserProps,INewUserState>{
@@ -25,29 +29,26 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
         this.setState(prevState => {
             return {
                 user: {
-                    ...this.state.user,
+                    ...prevState.user,
                     [fieldName]: value
                 }
             }
         })
     };
 
-    private onCreateNewUser = async () => {
-        try{
-            const newUser = await this.props.onCreateNewUser(this.state.user);
-            if(newUser){
-                const id = newUser["_id"];
-                this.props.history.push(id);
-                this.setState({message:"User created successfully"});
-            }
-            else{
-                this.setState({message:"Username already exist, choose a different name"});
-            }
-        }
-        catch(e){
-            this.setState({message:"Username already exist, choose a different name"});
-        }
+    private onCreateNewUser = () => {
+        this.props.onCreateNewUser(this.state.user);
     };
+
+    componentDidUpdate(prevProps:INewUserProps, prevState:INewUserState){
+        if(this.props.newUser !== prevProps.newUser){
+            this.props.history.push(this.props.newUser._id);
+        }
+    }
+
+    componentWillUnmount(){
+        store.dispatch(setNewUserErrorMsg(null));
+    }
 
     render(){
         return(
@@ -58,7 +59,7 @@ class NewUser extends React.Component<INewUserProps,INewUserState>{
                     <Field name={'name'} type={'text'} onChange={this.updateField}/>
                     <Field name={'age'} type={'number'} onChange={this.updateField}/>
                     <Field name={'password'} type={'password'} onChange={this.updateField}/>
-                    <p hidden={!this.state.message}>{this.state.message}</p>
+                    <p hidden={!this.props.newUserErrorMsg}>{this.props.newUserErrorMsg}</p>
                     <button onClick={this.onCreateNewUser} className="create-new-user-btn"
                             disabled={!this.state.user.name || !this.state.user.password} type="button">Create</button>
                 </div>
