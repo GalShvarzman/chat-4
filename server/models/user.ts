@@ -2,18 +2,13 @@ import * as mongoose from 'mongoose';
 import { Document, Model } from 'mongoose';
 
 export default interface IUserDocument extends Document {
-    id:string,
     name:string,
     age?:number,
     password:string
 }
 
-export interface IUser extends IUserDocument {
-    // methods;
-}
-
-export interface IUserModel extends Model<IUser> {
-    getAllUsers():IUser[]
+export interface IUserModel extends Model<IUserDocument> {
+    getAllUsers():IUserDocument[]
 }
 
 const userSchema = new mongoose.Schema({
@@ -33,4 +28,4 @@ userSchema.statics = {
     }
 };
 
-export const User:IUserModel = mongoose.model<IUser, IUserModel>('User', userSchema);
+export const User:IUserModel = mongoose.model<IUserDocument, IUserModel>('User', userSchema);

@@ -3,7 +3,6 @@ import {IMessageDocument, messageSchema} from './message';
 import {Document} from "mongoose";
 
 export default interface IConversationDocument extends Document {
-    id:string,
     conversationId:string,
     messages:IMessageDocument[]
 }

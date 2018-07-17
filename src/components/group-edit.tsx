@@ -79,7 +79,6 @@ class GroupEdit extends React.PureComponent<IGroupEditProps, IGroupEditState>{
 
     static getDerivedStateFromProps(nextProps:IGroupEditProps, prevState:IGroupEditState) {
         if (nextProps.selectedGroupData !== null && nextProps.selectedGroupData !== prevState.group) {
-            debugger;
             return {
                 group:{
                     ...prevState.group,

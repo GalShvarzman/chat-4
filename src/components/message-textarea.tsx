@@ -3,6 +3,7 @@ import {IMessage} from "../models/message";
 import './message-textarea.css';
 import send from '../images/send.png';
 import {IClientUser} from "../interfaces";
+
 interface IMassageTextAreaProps {
     loggedInUser: IClientUser| null,
     selectedName:string|undefined,
@@ -12,15 +13,12 @@ interface IMassageTextAreaProps {
     onClickSend(event:React.MouseEvent<HTMLButtonElement>):void,
     isAllowedToJoinTheGroup:boolean
 }
-interface IMassageTextAreaState {
 
-}
+class MessageTextarea extends React.Component<IMassageTextAreaProps, {}> {
 
-class MessageTextarea extends React.Component<IMassageTextAreaProps, IMassageTextAreaState> {
     constructor(props:IMassageTextAreaProps){
         super(props);
     }
-
 
     public render() {
         return (

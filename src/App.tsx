@@ -16,30 +16,11 @@ import SelectUsers from "./components/select-users";
 import * as io from 'socket.io-client';
 import {IClientGroup, IClientUser} from "./interfaces";
 import {connect} from 'react-redux';
-import {
-    authUser,
-    onCreateNewGroup,
-    getGroupOptionalParents,
-    saveGroupNewName,
-    saveUserNewDetails,
-    onDeleteUser,
-    onDeleteGroup,
-    getSelectedGroupData,
-    onCreateNewUser,
-    onGetGroupOptionalUsers,
-    onAddUsersToGroup,
-    setErrorMsg,
-    setLoggedInUser
-} from "./state/actions";
-import {
-    getErrorMsg,
-    getGroups,
-    getGroupsWithGroupChildren,
-    getLoggedInUser,
-    getUsers,
-    getSelectedGroupDetails,
-    getNewUser, getGroupOptionalChildren
-} from "./selectors/selectors";
+import {authUser, onCreateNewGroup, getGroupOptionalParents, saveGroupNewName,
+    saveUserNewDetails, onDeleteUser, onDeleteGroup, getSelectedGroupData, onCreateNewUser,
+    onGetGroupOptionalUsers, onAddUsersToGroup, setErrorMsg, setLoggedInUser} from "./state/actions";
+import {getErrorMsg, getGroups, getGroupsWithGroupChildren, getLoggedInUser,
+    getUsers, getSelectedGroupDetails, getNewUser, getGroupOptionalChildren} from "./selectors/selectors";
 import {RefObject} from "react";
 
 export const socket = io('http://localhost:4000',{
@@ -49,7 +30,7 @@ export const socket = io('http://localhost:4000',{
 interface IAppProps {
     users: IClientUser[],
     groups: IClientGroup[],
-    loggedInUser:IClientUser,
+    loggedInUser:IClientUser | null,
     errorMsg: string | null,
     groupsWithGroupsChildren:IClientGroup[],
     selectedGroupData:{}|null,
@@ -64,7 +45,7 @@ interface IAppProps {
     onCreateNewGroup(group:{name:string, parentId:string}):void,
     onDeleteUser(user:IClientUser):void,
     onDeleteGroup(group:IClientGroup):void,
-    onCreateNewUser(user:IClientUser):void,
+    onCreateNewUser(user:IClientUser, signUp?:boolean):void,
     getGroupOptionalUsers(groupId:string):void,
     onAddUsersToGroup(data:{usersIds:string[], groupId:string}):void
 }
@@ -73,7 +54,6 @@ type AppProps = RouteComponentProps<{}> & IAppProps;
 
 class App extends React.PureComponent<AppProps , {}> {
     public chat:RefObject<any>;
-    public menu:any;
 
     constructor(props: AppProps) {
         super(props);
@@ -92,24 +72,15 @@ class App extends React.PureComponent<AppProps , {}> {
         this.props.onAuthUser(user);
     };
 
-    public onSignUpSubmitHandler = async (user:IClientUser):Promise<void> => {
-        // try{
-        //     const result = await stateStoreService.createNewUser(user);
-        //     this.setState({loggedInUser:{name:result.user.name, id:result.user._id}}, ()=>{
-        //         socket.emit('login', result.user.name);
-        //         this.setState({errorMsg: ERROR_MSG.none});
-        //         this.props.history.push('/chat');
-        //     });
-        // }
-        // catch(e){
-        //     this.setState({errorMsg: ERROR_MSG.credentials})
-        // }
+    public onSignUpSubmitHandler = (user:IClientUser) => {
+        this.props.onCreateNewUser(user, true);
     };
 
     public loginRender = (props:any) => this.props.loggedInUser ? (<Redirect to={'/chat'}/>) :
         (<Login {...props} onSubmit={this.onLoginSubmitHandler} errorMsg={this.props.errorMsg}/>);
 
-    public signUpRender = (props:any)=>(<SignUp {...props} onSubmit={this.onSignUpSubmitHandler}/>);
+    public signUpRender = (props:any)=> this.props.loggedInUser ? (<Redirect to={'chat'}/>) :
+        (<SignUp errorMsg={this.props.errorMsg} {...props} onSubmit={this.onSignUpSubmitHandler}/>);
 
     public chatRender = (props:any) => (<Chat ref={this.chat} {...props}/>);
 
@@ -118,11 +89,12 @@ class App extends React.PureComponent<AppProps , {}> {
         this.chat.current.getWrappedInstance().onUserLogOut();
     };
 
-    public usersRender = () => (<UserAdmin errorMsg={this.props.errorMsg} deleteUser={this.deleteUser} refMenu={this.menu} users={this.props.users}/>);
+    public usersRender = () => (<UserAdmin errorMsg={this.props.errorMsg} deleteUser={this.deleteUser} users={this.props.users}/>);
 
     public groupsRender = () => (<GroupAdmin errorMsg={this.props.errorMsg} deleteGroup={this.deleteGroup} groups={this.props.groups}/>);
 
-    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.errorMsg} onEditUserDetails={this.onEditUserDetails} {...props}/>);
+    public userEditRender = (props:any) => (<UserEdit updateErrorMsg={this.props.errorMsg}
+                                                      onEditUserDetails={this.onEditUserDetails} {...props}/>);
 
     public deleteUser = (user:IClientUser) => {
         this.props.onDeleteUser(user);
@@ -132,7 +104,8 @@ class App extends React.PureComponent<AppProps , {}> {
          this.props.onDeleteGroup(group);
     };
 
-    public newUserRender = (props:any) => (<NewUser {...props} errorMsg={this.props.errorMsg} newUser={this.props.newUser} onCreateNewUser={this.onCreateNewUser}/>);
+    public newUserRender = (props:any) => (<NewUser {...props} errorMsg={this.props.errorMsg} newUser={this.props.newUser}
+                                                    onCreateNewUser={this.onCreateNewUser}/>);
 
     public newGroupRender = (props:any) => (<NewGroup errorMsg={this.props.errorMsg} groupsWithGroupsChildren={this.props.groupsWithGroupsChildren}
                                                       {...props} onGetGroupOptionalParents={this.onGetGroupOptionalParents}
@@ -148,7 +121,10 @@ class App extends React.PureComponent<AppProps , {}> {
                                                         deleteGroup={this.deleteGroup}
                                                         saveGroupNewName={this.onEditGroupName} {...props}/>);
 
-    public selectUsersRender = (props:any) => (<SelectUsers errorMsg={this.props.errorMsg} getGroupOptionalUsers={this.props.getGroupOptionalUsers} groupOptionalUsers={this.props.groupOptionalUsers} {...props} handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
+    public selectUsersRender = (props:any) => (<SelectUsers errorMsg={this.props.errorMsg}
+                                                            getGroupOptionalUsers={this.props.getGroupOptionalUsers}
+                                                            groupOptionalUsers={this.props.groupOptionalUsers} {...props}
+                                                            handelAddUsersToGroup={this.handelAddUsersToGroup}/>);
 
     public onCreateNewUser = (user:IClientUser) => {
         this.props.onCreateNewUser(user);
@@ -172,7 +148,7 @@ class App extends React.PureComponent<AppProps , {}> {
                         <Link to="/"><button className="btn-home">Home</button></Link>
                         <Link to="/login"><button className="btn-login">login</button></Link>
                         <Link to="/sign-up"><button className="btn-sign-up">sign up</button></Link>
-                        <Menu ref={instance => {this.menu = instance}}/>
+                        <Menu/>
                     </div>
                     <div className="nav-right">
                         <Link to="/chat"><button className="btn-log-out" onClick={this.logOut}>Log out</button></Link>
@@ -236,10 +212,10 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         onGetGroupOptionalParents: () => {
             dispatch(getGroupOptionalParents())
         },
-        onCreateNewGroup: (group:{name:string, parentId:string}) => {
+        onCreateNewGroup: (group:IClientGroup) => {
             dispatch(onCreateNewGroup(group))
         },
-        onDeleteUser: (user:{name: string, age: number, _id: string}) => {
+        onDeleteUser: (user:IClientUser) => {
             dispatch(onDeleteUser(user));
         },
         onDeleteGroup:(group:IClientGroup) => {
@@ -248,8 +224,8 @@ const mapDispatchToProps = (dispatch:any, ownProps:any) => {
         onSelectGroupToEdit:(groupId:string) => {
             dispatch(getSelectedGroupData(groupId))
         },
-        onCreateNewUser:(user:IClientUser) => {
-            dispatch(onCreateNewUser(user))
+        onCreateNewUser:(user:IClientUser, signUp?:boolean) => {
+            dispatch(onCreateNewUser(user, signUp))
         },
         getGroupOptionalUsers: (groupId:string) => {
             dispatch(onGetGroupOptionalUsers(groupId))

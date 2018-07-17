@@ -6,7 +6,7 @@ export interface IClientUser {
 }
 
 export interface IClientGroup {
-    _id:string,
+    _id?:string,
     name:string,
     children?:any
     kind?:string,

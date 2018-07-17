@@ -39,7 +39,7 @@ export function getSelectedMessagesHistory(selectedId: string) {
     }
 }
 
-export function onCreateNewGroup(group: { name: string, parentId: string }) {
+export function onCreateNewGroup(group: IClientGroup) {
     return async (dispatch:Dispatch) => {
         try {
             const newGroup = await createNewGroup(group);
@@ -127,12 +127,16 @@ export function getSelectedGroupData(groupId: string) {
     }
 }
 
-export function onCreateNewUser(user: IClientUser){
+export function onCreateNewUser(user: IClientUser, signUp?:boolean){
     return async (dispatch:Dispatch) => {
         try {
             const newUser = await createNewUser(user);
             dispatch(setUsersAfterCreateNewUser(newUser));
             dispatch(setErrorMsg("User created successfully"));
+            if(signUp){
+                socket.emit('login', newUser["name"]);
+                dispatch(setLoggedInUser(newUser));
+            }
         }
         catch (e) {
             dispatch(setErrorMsg("Username already exist, choose a different name"));
@@ -141,7 +145,7 @@ export function onCreateNewUser(user: IClientUser){
 }
 
 
-export function saveGroupNewName(group: { name: string, _id: string }){
+export function saveGroupNewName(group: IClientGroup){
     return async (dispatch:Dispatch)=>{
         try{
             const updatedGroup = await saveGroupDetails(group);
@@ -238,7 +242,7 @@ function setUsersAfterCreateNewUser(newUser:any){
     }
 }
 
-export function setLoggedInUser(loggedInUser:IClientUser){
+export function setLoggedInUser(loggedInUser:any){
     return {
         type: 'SET_LOGGED_IN_USER',
         loggedInUser

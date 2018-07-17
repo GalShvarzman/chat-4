@@ -22,7 +22,7 @@ export async function deleteUserFromGroup(userId:string, groupId:string){
    await remove(`/groups/${groupId}/users/${userId}`)
 }
 
-export async function deleteGroup(group:{_id:string, name:string}):Promise<void>{
+export async function deleteGroup(group:IClientGroup):Promise<void>{
     await remove(`/groups/${group._id}`);
 }
 
@@ -30,7 +30,7 @@ export async function createNewUser(user:IClientUser):Promise<{user:IClientUser}
     return await post('/users', user);
 }
 
-export async function createNewGroup(group:{name:string, parentId:string}) {
+export async function createNewGroup(group:IClientGroup) {
     return await post('/groups', group);
 }
 

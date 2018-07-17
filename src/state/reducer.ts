@@ -1,20 +1,9 @@
 import {IState} from "./store";
-import {
-    setGroupOptionalParents,
-    setGroups,
-    setGroupsAfterCreateNewGroup,
-    setSelectedMessages,
-    setUsers,
-    setUpdateErrorMsg,
-    updateGroupsAfterEditGroup,
-    setLoggedInUser,
-    updateUsersAfterEditUserDetails,
-    setUsersAndGroupsAfterDeleteUser,
-    setGroupsAfterDeleteGroup,
-    setSelectedGroupData,
-    setUsersAfterCreateNewUser,
-    setGroupOptionalUsers, setGroupsAfterDeleteUserFromGroup
-} from "./functions";
+import {setGroupOptionalParents, setGroups, setGroupsAfterCreateNewGroup,
+    setSelectedMessages, setUsers, setUpdateErrorMsg, updateGroupsAfterEditGroup,
+    setLoggedInUser, updateUsersAfterEditUserDetails, setUsersAndGroupsAfterDeleteUser,
+    setGroupsAfterDeleteGroup, setSelectedGroupData, setUsersAfterCreateNewUser,
+    setGroupOptionalUsers, setGroupsAfterDeleteUserFromGroup} from "./functions";
 
 const options = {
     "SET_GROUPS" : setGroups,

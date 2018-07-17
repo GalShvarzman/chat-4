@@ -176,7 +176,7 @@ export function setUsersAndGroupsAfterDeleteUser(state:IState, action:any){
         groupsClone.forEach((group)=>{
             if(group.children.length && group.children[0].kind === 'User'){
                 const deletedUserIndex = group.children.findIndex((child:any)=>{
-                    return child.id !== deletedUser._id;
+                    return child._id === deletedUser._id;
                 });
                 if(deletedUserIndex !== -1){
                    group.children.splice(deletedUserIndex, 1);

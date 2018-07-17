@@ -10,14 +10,14 @@ import {setErrorMsg} from "../state/actions";
 
 interface INewGroupProps {
     history:any;
-    onCreateNewGroup(group:{name:string, parentId:string}):{name:string, _id:string},
+    onCreateNewGroup(group:IClientGroup):IClientGroup,
     onGetGroupOptionalParents():void,
     groupsWithGroupsChildren:IClientGroup[],
     errorMsg:string|null
 }
 
 interface INewGroupState {
-    group: {name: string, parentId:string}
+    group: IClientGroup
 }
 
 class NewGroup extends React.PureComponent<INewGroupProps,INewGroupState>{

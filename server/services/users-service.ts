@@ -1,15 +1,14 @@
 import {createHash, compareHash} from "../utils/hash";
 import {ClientError} from "../utils/client-error";
-import {IUser, User} from "../models/user";
+import {User} from "../models/user";
 import IUserDocument from "../models/user";
 import {Group} from "../models/group";
 
 
 class UsersService{
 
-    async getAllUsers():Promise<IUser[]>{
+    async getAllUsers():Promise<IUserDocument[]>{
         return await User.getAllUsers();
-            //.find({}, {password:0, __v:0});
     }
 
     async saveUserDetails(userDetails:IUserDocument):Promise<{name:string, age:number, _id:string, kind:string}> {
@@ -29,7 +28,6 @@ class UsersService{
 
 
     async deleteUser(id):Promise<void>{
-        // fixme delete also user message history;
         await User.findByIdAndRemove(id);
         const allGroups = await Group.find({}, {__v:0, parentId:0});
         const promises = allGroups.map(async (group) => {

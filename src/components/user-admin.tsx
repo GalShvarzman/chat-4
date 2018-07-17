@@ -5,11 +5,11 @@ import {Link} from "react-router-dom";
 import './user-admin.css';
 import {setErrorMsg} from "../state/actions";
 import {store} from "../state/store";
+import {IClientUser} from "../interfaces";
 
 interface IUserAdminProps {
     users:any,
-    refMenu:any,
-    deleteUser(user:{name: string, age: number, _id: string}):void,
+    deleteUser(user:IClientUser):void,
     errorMsg:string|null
 }
 

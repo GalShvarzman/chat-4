@@ -1,8 +1,9 @@
 import * as React from 'react';
 import './select.css';
+import {IClientGroup} from "../interfaces";
 
 interface ISelectProps {
-    groups:{name:string, _id:string}[],
+    groups:IClientGroup[],
     handleSelect(select:any):void,
     parent:string;
 }

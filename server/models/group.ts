@@ -3,7 +3,6 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 import { Document, Model } from 'mongoose';
 
 export default interface IGroupDocument extends Document {
-    id:string,
     name:string,
     parentId:string,
     children:any[]

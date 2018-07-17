@@ -25,14 +25,14 @@ interface IChatProps {
 }
 
 interface IChatState {
-    selectedName? : string,
+    selectedName?:string,
     selectedId?:string,
     selectedType?:string,
     message:IMessage,
     selectedMessages:IMessage[],
     previousSelectedId?:string,
     previousSelectedType?:string,
-    isAllowedToJoinTheGroup : boolean
+    isAllowedToJoinTheGroup:boolean
 }
 
 class Chat extends React.PureComponent<IChatProps, IChatState> {
