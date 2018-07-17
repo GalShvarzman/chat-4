@@ -8,12 +8,8 @@ import {Group} from "../models/group";
 class UsersService{
 
     async getAllUsers():Promise<IUser[]>{
-        return await User.find({}, {password:0, __v:0});
-        // const usersList =  await users.getUsersFullData();
-        // const result = usersList.data.map((user)=>{
-        //     return {"name":user.name, "age":user.age, "id":user.id}
-        // });
-        // return {result};
+        return await User.getAllUsers();
+            //.find({}, {password:0, __v:0});
     }
 
     async saveUserDetails(userDetails:IUserDocument):Promise<{name:string, age:number, _id:string, kind:string}> {
@@ -29,18 +25,6 @@ class UsersService{
         const updateUser = await user.save();
 
         return ({_id:updateUser._id, name:updateUser["name"], age:updateUser["age"], kind:updateUser["kind"]});
-
-
-        // const usersData = await users.getUsersFullData();
-        // const userIndex = users.getUserIndexById(usersData, userDetails.id);
-        // if (userDetails.age) {
-        //     usersData.data[userIndex].age = userDetails.age;
-        // }
-        // if (userDetails.password) {
-        //     usersData.data[userIndex].password =
-        // }
-        // await users.updateUsersFile(usersData);
-        // return ({user:{name:usersData.data[userIndex].name, age:usersData.data[userIndex].age, id:usersData.data[userIndex].id}});
     }
 
 
@@ -48,9 +32,9 @@ class UsersService{
         // fixme delete also user message history;
         await User.findByIdAndRemove(id);
         const allGroups = await Group.find({}, {__v:0, parentId:0});
-        const promises = allGroups.map(async(group)=>{
+        const promises = allGroups.map(async (group) => {
             if(group["children"].length > 0 && group["children"][0].kind === "User"){
-                const child = group["children"].find((child)=>{
+                const child = group["children"].find((child) => {
                     return child.childId.toString() === id;
                 });
                 if(child !== undefined){
@@ -60,28 +44,6 @@ class UsersService{
             return group;
         });
         await Promise.all(promises);
-
-        // await users.onDeleteUser(id);
-        // const connectorsList = await nTree.getConnectorsList();
-        // connectorsList.data = connectorsList.data.filter((connector)=>{
-        //     return connector.id !== id;
-        // });
-        // nTree.updateFile(connectorsList, 'connectors.json');
-        // const allMessages = await messagesDb.getAllMessages();
-        // const allMessagesKeysArr = Object.keys(allMessages.data);
-        // const matchConversationKeys = [];
-        //
-        // allMessagesKeysArr.forEach((key)=>{
-        //     if (key.includes(id)){
-        //         matchConversationKeys.push(key);
-        //     }
-        // });
-        // if(matchConversationKeys.length){
-        //     matchConversationKeys.forEach((key)=>{
-        //         delete allMessages.data[key];
-        //     });
-        //     await messagesDb.updateMessagesFile(allMessages);
-        // }
     }
 
     async createNewUser(user){
@@ -90,15 +52,6 @@ class UsersService{
         const newUser = await new User(user);
         await newUser.save();
         return ({_id: newUser._id, name: newUser["name"], age: newUser["age"]});
-
-        // const usersData = await users.getUsersFullData();
-        // if(await users.isUserExists(usersData, user.name)){
-        //     throw new ClientError(422, "usernameAlreadyExist");
-        // }
-        // else{
-        //     const newUser = new User(user.name, user.age, password);
-        //     return await users.createNewUser(newUser);
-        // }
     }
 
     async authUser(userToAuth) {

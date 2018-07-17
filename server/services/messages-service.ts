@@ -8,7 +8,6 @@ class MessagesService{
             return messages;
         }
         return {messages:[]};
-        //return await messagesDb.getConversationMessages(conversationId);
     }
     async saveMessage(message, conversationId){
         const newMessage = await new Message({message:message.message, date:message.date, sender:message.sender._id});
@@ -21,8 +20,6 @@ class MessagesService{
         conversation.messages.push(newMessage);
         await conversation.save();
         return newMessage;
-
-        //return await messagesDb.addMessageToConversation(message, conversationId);
     }
 }
 

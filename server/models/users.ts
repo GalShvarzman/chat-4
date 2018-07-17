@@ -1,44 +1,44 @@
-import {db} from '../lib/DB';
-import IUserDocument from "./user";
-const usersFile = 'users.json';
-
-export interface IUsers {
-    isUserExists(data:any,username:string):boolean,
-    deleteUser(username:string):Promise<boolean>,
-    updateUsersFile(newData):Promise<boolean>,
-    createNewUser(user):Promise<{user:IUserDocument}>,
-    getUserIndexById(data, id):number,
-    getUsersFullData():Promise<{data:IUserDocument[]}>
-}
-
-class Users implements IUsers{
-
-    public isUserExists(data, username):boolean{
-        return db.isObjExistsByName(data, username);
-    }
-
-    public async deleteUser(id:string):Promise<boolean>{
-        return await db.deleteObj(id, usersFile);
-    }
-
-    public async updateUsersFile(newData):Promise<boolean>{
-        return await db.updateFile(newData, usersFile);
-    }
-
-    public getUserIndexById(data, id):number{
-        return db.getObjIndexById(data, id);
-    }
-
-    public async createNewUser(user):Promise<{user:IUserDocument}>{
-        return await db.createNew(user, usersFile);
-    }
-
-    public async getUsersFullData():Promise<{data:IUserDocument[]}>{
-        return await db.getFullData(usersFile);
-    }
-
-}
-
-const users: IUsers = new Users();
-
-export default users;
+// import {db} from '../lib/DB';
+// import IUserDocument from "./user";
+// const usersFile = 'users.json';
+//
+// export interface IUsers {
+//     isUserExists(data:any,username:string):boolean,
+//     deleteUser(username:string):Promise<boolean>,
+//     updateUsersFile(newData):Promise<boolean>,
+//     createNewUser(user):Promise<{user:IUserDocument}>,
+//     getUserIndexById(data, id):number,
+//     getUsersFullData():Promise<{data:IUserDocument[]}>
+// }
+//
+// class Users implements IUsers{
+//
+//     public isUserExists(data, username):boolean{
+//         return db.isObjExistsByName(data, username);
+//     }
+//
+//     public async deleteUser(id:string):Promise<boolean>{
+//         return await db.deleteObj(id, usersFile);
+//     }
+//
+//     public async updateUsersFile(newData):Promise<boolean>{
+//         return await db.updateFile(newData, usersFile);
+//     }
+//
+//     public getUserIndexById(data, id):number{
+//         return db.getObjIndexById(data, id);
+//     }
+//
+//     public async createNewUser(user):Promise<{user:IUserDocument}>{
+//         return await db.createNew(user, usersFile);
+//     }
+//
+//     public async getUsersFullData():Promise<{data:IUserDocument[]}>{
+//         return await db.getFullData(usersFile);
+//     }
+//
+// }
+//
+// const users: IUsers = new Users();
+//
+// export default users;

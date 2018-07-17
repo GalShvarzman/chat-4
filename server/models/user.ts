@@ -13,7 +13,7 @@ export interface IUser extends IUserDocument {
 }
 
 export interface IUserModel extends Model<IUser> {
-    // statics;
+    getAllUsers():IUser[]
 }
 
 const userSchema = new mongoose.Schema({
@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema({
     password:String,
     kind:String
 });
-//
-// userSchema.statics = {
-//     async getAllUsers(){
-//         return await User.find({}, {password:0, __v:0});
-//     }
-// };
+
+userSchema.statics = {
+    async getAllUsers(){
+        return await User.find({}, {password:0, __v:0});
+    }
+};
 
 export const User:IUserModel = mongoose.model<IUser, IUserModel>('User', userSchema);
