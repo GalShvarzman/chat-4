@@ -4,11 +4,12 @@ import './chat-messages.css';
 import {IMessage} from "../models/message";
 import {setErrorMsg} from "../state/actions";
 import {store} from "../state/store";
+import {IClientUser} from "../interfaces";
 
 interface IChatMessagesProps {
     messages:IMessage[]|undefined,
     selectedName:string|undefined,
-    loggedInUser: {name:string, _id:string}|null,
+    loggedInUser: IClientUser|null,
     errorMsg:string|null
 }
 

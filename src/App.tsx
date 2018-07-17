@@ -31,7 +31,15 @@ import {
     setErrorMsg,
     setLoggedInUser
 } from "./state/actions";
-import {getGroups, getGroupsWithGroupChildren, getUsers} from "./selectors/selectors";
+import {
+    getErrorMsg,
+    getGroups,
+    getGroupsWithGroupChildren,
+    getLoggedInUser,
+    getUsers,
+    getSelectedGroupDetails,
+    getNewUser, getGroupOptionalChildren
+} from "./selectors/selectors";
 import {RefObject} from "react";
 
 export const socket = io('http://localhost:4000',{
@@ -201,12 +209,12 @@ const mapStateToProps = (state:any, ownProps:any) => {
     return {
         users:getUsers(state),
         groups:getGroups(state),
-        loggedInUser:state.loggedInUser,
-        errorMsg: state.errorMsg,
+        loggedInUser:getLoggedInUser(state),
+        errorMsg: getErrorMsg(state),
         groupsWithGroupsChildren:getGroupsWithGroupChildren(state),
-        selectedGroupData:state.selectedGroupData,
-        newUser:state.newUser,
-        groupOptionalUsers:state.groupOptionalUsers
+        selectedGroupData:getSelectedGroupDetails(state),
+        newUser:getNewUser(state),
+        groupOptionalUsers:getGroupOptionalChildren(state)
     }
 };
 

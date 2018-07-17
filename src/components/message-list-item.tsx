@@ -1,11 +1,12 @@
 import * as React from 'react';
 import './message-list-item.css';
 import {IMessage} from "../models/message";
+import {IClientUser} from "../interfaces";
 
 interface IMessageListItemProps {
     className?:string,
     message:IMessage,
-    loggedInUser: {name:string, _id:string}|null
+    loggedInUser: IClientUser|null
 }
 
 class MessageListItem extends React.Component<IMessageListItemProps, {}> {

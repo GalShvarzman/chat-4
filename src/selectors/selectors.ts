@@ -1,8 +1,16 @@
 import {createSelector} from "reselect";
+import {IState} from "../state/store";
 
-export const getUsers = (state:any) => state.users;
-export const getGroups = (state:any) => state.groups;
-export const getGroupsWithGroupChildren = (state:any) => state.groupsWithGroupsChildren;
+export const getUsers = (state:IState) => state.users;
+export const getGroups = (state:IState) => state.groups;
+export const getLoggedInUser = (state:IState) => state.loggedInUser;
+export const getErrorMsg = (state:IState) => state.errorMsg;
+export const getGroupsWithGroupChildren = (state:IState) => state.groupsWithGroupsChildren;
+export const getSelectedGroupDetails = (state:IState) => state.selectedGroupData;
+export const getNewUser = (state:IState) => state.newUser;
+export const getGroupOptionalChildren = (state:IState) => state.groupOptionalUsers;
+export const getConversationMessages = (state:IState) => state.selectedMessages;
+
 const getUser = (usersObj:any, userId:any) => usersObj[userId];
 const getGroup = (groupsObj:any, groupId:any) => groupsObj[groupId];
 

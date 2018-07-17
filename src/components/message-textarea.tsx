@@ -2,8 +2,9 @@ import * as React from 'react';
 import {IMessage} from "../models/message";
 import './message-textarea.css';
 import send from '../images/send.png';
+import {IClientUser} from "../interfaces";
 interface IMassageTextAreaProps {
-    loggedInUser: {name:string, _id:string} | null,
+    loggedInUser: IClientUser| null,
     selectedName:string|undefined,
     message:IMessage,
     handleChange(event: any):void,

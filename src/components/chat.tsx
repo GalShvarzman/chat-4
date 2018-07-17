@@ -9,17 +9,17 @@ import {listItem} from './left-tree';
 import {socket} from '../App';
 import {addMessageToConversation, getSelectedMessagesHistory} from "../state/actions";
 import {connect} from "react-redux";
-import {getGroups, treeSelectors} from "../selectors/selectors";
-import {IClientGroup} from "../interfaces";
+import {getConversationMessages, getErrorMsg, getGroups, getLoggedInUser, treeSelectors} from "../selectors/selectors";
+import {IClientGroup, IClientUser} from "../interfaces";
 import {setSelectedMessages} from "../state/actions";
 
 interface IChatProps {
     tree:listItem[],
     groups:IClientGroup[],
-    onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:{name:string, _id:string}):void,
+    onAddMessage(selectedType:string,selectedId:string, message:IMessage, loggedInUser:IClientUser):void,
     onSelectConversation(selectedId:string):void,
     selectedMessages:IMessage[],
-    loggedInUser:{name:string, _id:string},
+    loggedInUser:IClientUser,
     onSelectGroupThatTheUserDoesNotBelongTo():void,
     errorMsg:string|null
 }
@@ -133,7 +133,6 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
         }
     }
 
-
     private getSelectedMessages = (selectedId:string)=>{
         this.props.onSelectConversation(selectedId);
         this.setState({message:{message:""}, isAllowedToJoinTheGroup:true});
@@ -184,7 +183,7 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
                 conversationId = this.state.selectedId;
             }
             socket.emit('msg', conversationId, this.state.message);
-            await this.props.onAddMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.loggedInUser);
+            this.props.onAddMessage(this.state.selectedType, this.state.selectedId, this.state.message, this.props.loggedInUser);
             this.setState((prevState)=>{
                 return{
                     selectedMessages:[
@@ -219,20 +218,19 @@ class Chat extends React.PureComponent<IChatProps, IChatState> {
     }
 }
 
-
 const mapStateToProps = (state:any, ownProps:any) => {
     return {
         tree: treeSelectors(state),
-        selectedMessages : state.selectedMessages,
-        loggedInUser : state.loggedInUser,
+        selectedMessages : getConversationMessages(state),
+        loggedInUser : getLoggedInUser(state),
         groups: getGroups(state),
-        errorMsg:state.errorMsg
+        errorMsg:getErrorMsg(state)
     }
 };
 
 const mapDispatchToProps = (dispatch:any, ownProps:any) => {
     return {
-        onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:{name:string, _id:string}) => {
+        onAddMessage: (selectedType:string, selectedId:string, msg:IMessage, loggedInUser:IClientUser) => {
             dispatch(addMessageToConversation(selectedType, selectedId, msg, loggedInUser))
         },
         onSelectConversation: (selectedId:string) => {

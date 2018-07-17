@@ -7,7 +7,7 @@ import {IClientGroup, IClientUser} from "../interfaces";
 import {IMessage} from "../models/message";
 import {socket} from "../App";
 
-export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: { name: string, _id: string } | null) {
+export function addMessageToConversation(selectedType: string | undefined, selectedId: string | undefined, message: IMessage, loggedInUser: IClientUser | null) {
     return async (dispatch:Dispatch)=>{
         try {
             if (loggedInUser && selectedId) {
