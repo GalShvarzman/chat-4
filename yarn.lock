@@ -1813,7 +1813,7 @@ cssesc@^0.1.0:
     postcss-minify-font-values "^1.0.2"
     postcss-minify-gradients "^1.0.1"
     postcss-minify-params "^1.0.4"
-    postcss-minify-selectors "^2.0.4"
+    postcss-minify-treeSelectors "^2.0.4"
     postcss-normalize-charset "^1.1.0"
     postcss-normalize-url "^3.0.7"
     postcss-ordered-values "^2.1.0"
@@ -1821,7 +1821,7 @@ cssesc@^0.1.0:
     postcss-reduce-initial "^1.0.0"
     postcss-reduce-transforms "^1.0.3"
     postcss-svgo "^2.1.1"
-    postcss-unique-selectors "^2.0.2"
+    postcss-unique-treeSelectors "^2.0.2"
     postcss-value-parser "^3.2.3"
     postcss-zindex "^2.0.1"
 
@@ -5237,7 +5237,7 @@ postcss-minify-params@^1.0.4:
 
 postcss-minify-selectors@^2.0.4:
   version "2.1.1"
-  resolved "https://registry.yarnpkg.com/postcss-minify-selectors/-/postcss-minify-selectors-2.1.1.tgz#b2c6a98c0072cf91b932d1a496508114311735bf"
+  resolved "https://registry.yarnpkg.com/postcss-minify-treeSelectors/-/postcss-minify-treeSelectors-2.1.1.tgz#b2c6a98c0072cf91b932d1a496508114311735bf"
   dependencies:
     alphanum-sort "^1.0.2"
     has "^1.0.1"
@@ -5333,7 +5333,7 @@ postcss-svgo@^2.1.1:
 
 postcss-unique-selectors@^2.0.2:
   version "2.0.2"
-  resolved "https://registry.yarnpkg.com/postcss-unique-selectors/-/postcss-unique-selectors-2.0.2.tgz#981d57d29ddcb33e7b1dfe1fd43b8649f933ca1d"
+  resolved "https://registry.yarnpkg.com/postcss-unique-treeSelectors/-/postcss-unique-treeSelectors-2.0.2.tgz#981d57d29ddcb33e7b1dfe1fd43b8649f933ca1d"
   dependencies:
     alphanum-sort "^1.0.1"
     postcss "^5.0.4"
